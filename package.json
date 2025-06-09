@@ -2,9 +2,12 @@
   "name": "me-plus",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently -n client,server -c magenta,cyan \"pnpm --filter client dev\" \"pnpm --filter server dev\""
+    "dev": "concurrently -n client,server -c magenta,cyan \"pnpm --filter client dev\" \"pnpm --filter server dev\"",
+    "lint": "pnpm --filter client lint && pnpm --filter server lint",
+    "build": "pnpm --filter client build"
   },
   "keywords": [],
   "author": "",
