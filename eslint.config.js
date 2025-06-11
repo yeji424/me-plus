@@ -1,6 +1,6 @@
 // eslint.config.js (루트에)
-import eslintPluginPrettier from 'eslint-plugin-prettier';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import eslintPluginPrettier from 'eslint-plugin-prettier';
 
 export default [
   {
@@ -15,7 +15,7 @@ export default [
     },
     rules: {
       ...eslintConfigPrettier.rules,
-      'prettier/prettier': 'error',
+      'prettier/prettier': ['error', { endOfLine: 'auto' }],
     },
   },
 ];
