@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon index.js",
+    "dev": "nodemon server.js",
     "lint": "eslint . --ext .js"
   },
   "keywords": [],
@@ -13,7 +14,13 @@
   "license": "ISC",
   "packageManager": "pnpm@10.12.1",
   "dependencies": {
-    "express": "^5.1.0"
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.15.1",
+    "openai": "^5.2.0",
+    "socket.io": "^4.8.1",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
