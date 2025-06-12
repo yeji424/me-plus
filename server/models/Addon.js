@@ -13,16 +13,13 @@ const model = mongoose.model;
 
 export const addonSchema = new Schema(
   {
-    _id: mongoose.ObjectId,
-    category: String,
-    name: String,
+    category: { type: String, required: true },
+    name: { type: String, required: true },
     description: String,
-    monthlyFee: Number,
+    monthlyFee: { type: Number, default: 0 },
     detailUrl: String,
-    createdAt: Date,
-    updatedAt: Date,
   },
-  { collection: 'addons' },
+  { collection: 'addons', timestamps: true },
 );
 
 export const Addon = model('Addon', addonSchema);

@@ -13,25 +13,22 @@ const model = mongoose.model;
 
 export const planSchema = new Schema(
   {
-    _id: mongoose.ObjectId,
-    category: String,
-    name: String,
+    category: { type: String, required: true },
+    name: { type: String, required: true },
     description: String,
-    monthlyFee: Number,
+    monthlyFee: { type: Number, default: 0 },
     detailUrl: String,
-    isPopular: Number,
-    dataGb: Number,
-    sharedDataGb: Number,
-    voiceMinutes: Number,
-    smsCount: Number,
-    bundleBenefitId: Number,
-    optionalDiscountAmount: Number,
-    premiumDiscountAmount: Number,
-    ageGroup: String,
-    createdAt: Date,
-    updatedAt: Date,
+    isPopular: { type: Boolean, default: false },
+    dataGb: { type: Number, default: 0 },
+    sharedDataGb: { type: Number, default: 0 },
+    voiceMinutes: { type: Number, default: 0 },
+    smsCount: { type: Number, default: 0 },
+    bundleBenefit: { type: mongoose.ObjectId },
+    optionalDiscountAmount: { type: Number, default: 0 },
+    premiumDiscountAmount: { type: Number, default: 0 },
+    ageGroup: { type: String, required: true },
   },
-  { collection: 'plans' },
+  { collection: 'plans', timestamps: true },
 );
 
 export const Plan = model('Plan', planSchema);

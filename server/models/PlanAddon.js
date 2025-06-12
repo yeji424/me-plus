@@ -13,13 +13,10 @@ const model = mongoose.model;
 
 export const planAddonSchema = new Schema(
   {
-    _id: mongoose.ObjectId,
-    createdAt: Date,
-    updatedAt: Date,
-    addon: Object,
-    plan: Object,
+    addon: { type: mongoose.ObjectId, require: true },
+    plan: { type: mongoose.ObjectId, require: true },
   },
-  { collection: 'plansAddons' },
+  { collection: 'plansAddons', timestamps: true },
 );
 
 export const PlanAddon = model('PlanAddon', planAddonSchema);

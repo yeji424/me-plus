@@ -13,14 +13,11 @@ const model = mongoose.model;
 
 export const bundleBenefitSchema = new Schema(
   {
-    _id: mongoose.ObjectId,
-    name: String,
+    name: { type: String, required: true },
     description: String,
     detailUrl: String,
-    createdAt: Date,
-    updatedAt: Date,
   },
-  { collection: 'bundleBenefits' },
+  { collection: 'bundleBenefits', timestamps: true },
 );
 
 export const BundleBenefit = model('BundleBenefit', bundleBenefitSchema);

@@ -13,15 +13,12 @@ const model = mongoose.model;
 
 export const bundleConditionSchema = new Schema(
   {
-    _id: mongoose.ObjectId,
-    count: Number,
-    discountAmount: Number,
-    type: String,
-    createdAt: Date,
-    updatedAt: Date,
-    bundleBenefit: Object,
+    count: { type: Number, default: 0 },
+    discountAmount: { type: Number, default: 0 },
+    type: { type: String, required: true },
+    bundleBenefit: { type: mongoose.ObjectId, require: true },
   },
-  { collection: 'bundleCondition' },
+  { collection: 'bundleCondition', timestamps: true },
 );
 
 export const BundleCondition = model('BundleCondition', bundleConditionSchema);
