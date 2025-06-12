@@ -13,8 +13,15 @@ const model = mongoose.model;
 
 export const planAddonSchema = new Schema(
   {
-    addon: { type: mongoose.ObjectId, require: true },
-    plan: { type: mongoose.ObjectId, require: true },
+    addon: {
+      type: {
+        _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+        name: { type: String, required: true },
+        description: String,
+      },
+      required: true,
+    },
+    plan: { type: mongoose.ObjectId, required: true },
     benefitType: { type: String, required: true },
     addonType: String,
   },
