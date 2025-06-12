@@ -7,25 +7,27 @@ dotenv.config();
 
 const client = new MongoClient(process.env.MONGO_URI);
 
-export const updateData = async () => {
+export const changeSchema = async () => {
   const database = client.db('meplus');
-  const collection = database.collection('plansAddons');
-  const addonsCollection = database.collection('addons');
+  const collection = database.collection('plans');
+  const refCollection = database.collection('bundleBenefits');
 
   const result = await collection.find({}).toArray();
 
-  for (const addon of result) {
-    const addonDetails = await addonsCollection.findOne({ _id: addon.addon });
+  for (const item of result) {
+    const target = await refCollection.findOne({ _id: item.bundleBenefit });
 
-    const updatedAddon = {
-      _id: addon.addon,
-      name: addonDetails.name,
-      description: addonDetails.description,
-    };
+    const updated = target
+      ? {
+          _id: item.bundleBenefit,
+          name: target.name,
+          description: target.description,
+        }
+      : null;
 
     await collection.updateOne(
-      { _id: addon._id },
-      { $set: { addon: updatedAddon } },
+      { _id: item._id },
+      { $set: { bundleBenefit: updated } },
     );
   }
 };

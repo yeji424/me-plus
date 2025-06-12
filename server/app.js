@@ -21,6 +21,8 @@ mongoose
   .then(() => console.log('✅ MongoDB connected'))
   .catch(console.error);
 
+// changeSchema();
+
 // Routers
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
