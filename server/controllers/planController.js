@@ -35,10 +35,6 @@ export const getPlanDetail = async (req, res) => {
       premiumServices: transform(premiumAddons),
       mediaServices: transform(mediaAddons),
     },
-    bundleBenefit: {
-      _id: 'bundle-01',
-      name: 'U+ 투게더 결합',
-    },
   };
 
   return res.status(200).json(data);
