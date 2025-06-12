@@ -13,7 +13,7 @@ export const getPlanDetail = async (req, res) => {
 
   const planId = req.params.planId;
   const plan = await Plan.findById(planId).select('-updatedAt -createdAt');
-  const planAddonList = await PlanAddon.find({ plan: plan._id }); // todo: addon Object로 넣기
+  const planAddonList = await PlanAddon.find({ plan: plan._id });
   const mediaAddons = planAddonList.filter(
     (item) =>
       item.benefitType === BenefitType.SPECIAL &&
