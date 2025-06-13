@@ -13,14 +13,14 @@ export const handlePlanRecommend = async (socket, { sessionId, message }) => {
 
   const newUserMsg = { role: 'user', content: message };
   const fullMessages = [...session.messages, newUserMsg];
-
+  console.log(plans);
   const messages = buildPromptMessages(plans, fullMessages);
   let assistantReply = '';
 
   await streamChat(messages, socket, (chunk) => {
     assistantReply += chunk;
   });
-
+  console.log('text');
   session.messages.push(newUserMsg);
   session.messages.push({ role: 'assistant', content: assistantReply });
   session.markModified('messages');

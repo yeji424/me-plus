@@ -3,7 +3,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export const streamChat = async (messages, socket, onDelta) => {
   const streamRes = await openai.chat.completions.create({
-    model: 'gpt-4-0613',
+    model: 'gpt-4.1-nano',
     messages,
     stream: true,
     function_call: 'auto',
