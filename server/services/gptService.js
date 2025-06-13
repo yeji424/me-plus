@@ -25,11 +25,11 @@ export const streamChat = async (messages, socket, onDelta) => {
       },
     ],
   });
-
+  console.log('tet');
   let isFunctionCalled = false;
   let functionName = '';
   let functionArgsRaw = '';
-
+  console.log('text');
   for await (const chunk of streamRes) {
     const delta = chunk.choices[0].delta;
 
