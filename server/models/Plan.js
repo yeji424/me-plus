@@ -23,7 +23,13 @@ export const planSchema = new Schema(
     sharedDataGb: { type: Number, default: 0 },
     voiceMinutes: { type: Number, default: 0 },
     smsCount: { type: Number, default: 0 },
-    bundleBenefit: { type: mongoose.ObjectId },
+    bundleBenefit: {
+      type: {
+        _id: { type: mongoose.Schema.Types.ObjectId, required: true },
+        name: { type: String, required: true },
+        description: String,
+      },
+    },
     optionalDiscountAmount: { type: Number, default: 0 },
     premiumDiscountAmount: { type: Number, default: 0 },
     ageGroup: { type: String, required: true },
