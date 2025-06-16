@@ -1,6 +1,8 @@
 import { Plan } from '../models/Plan.js';
 
-/** 무제한 요금제 목록 JSON 반환 */
+/** GPT에게 넘길 데이터를 JSON으로 반환합니다. */
+
+/** 무제한 요금제 목록 */
 export const getUnlimitedDataPlans = async () => {
   try {
     const unlimitedDataPlans = await Plan.find({
