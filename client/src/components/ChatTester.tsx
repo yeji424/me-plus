@@ -34,7 +34,74 @@ const PlanChatTester = () => {
       socket.off('session-history');
     };
   }, []);
+  useEffect(() => {
+    // 기존 stream, done, price-options 외 추가 이벤트 처리
 
+    socket.on('ott-service-list', ({ question, options }) => {
+      setChatLog((prev) => [...prev, { role: 'assistant', content: question }]);
+      setOptionButtons(options);
+    });
+
+    socket.on('carousel-buttons', (items) => {
+      setChatLog((prev) => [
+        ...prev,
+        {
+          role: 'assistant',
+          content: '다음 항목 중 하나를 선택해주세요:',
+        },
+      ]);
+      setOptionButtons(items.map((item) => item.label));
+    });
+
+    socket.on('plan-details', (plan) => {
+      const {
+        name,
+        monthlyFee,
+        description,
+        dataGb,
+        sharedDataGb,
+        voiceMinutes,
+        bundleBenefit,
+        baseBenefit,
+        specialBenefit,
+        detailUrl,
+      } = plan;
+
+      const formatted = `
+      📦 ${name}
+      💰 월정액 ${monthlyFee.toLocaleString()}원
+      
+      📝 ${description}
+      
+      ━━━━━━━━━━━━━━━━━━
+      
+      📶 데이터: ${dataGb === -1 ? '무제한' : `${dataGb}GB`}
+      🔄 공유데이터: ${sharedDataGb}
+      📞 음성통화: ${voiceMinutes}
+      🤝 결합 할인: ${bundleBenefit}
+      🎁 기본 혜택: ${baseBenefit}
+      💎 특별 혜택: ${specialBenefit}
+      
+      🔗 [요금제 자세히 보기](${detailUrl})
+      `;
+      setChatLog((prev) => [
+        ...prev,
+        { role: 'assistant', content: formatted },
+      ]);
+    });
+
+    socket.on('text-buttons', ({ question, options }) => {
+      setChatLog((prev) => [...prev, { role: 'assistant', content: question }]);
+      setOptionButtons(options);
+    });
+
+    return () => {
+      socket.off('ott-service-list');
+      socket.off('carousel-buttons');
+      socket.off('plan-details');
+      socket.off('text-buttons');
+    };
+  }, []);
   useEffect(() => {
     socket.on('stream', (chunk: string) => {
       responseRef.current += chunk;
