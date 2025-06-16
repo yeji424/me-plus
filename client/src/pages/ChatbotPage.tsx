@@ -1,9 +1,24 @@
 // import React from 'react';
+import Header from '@/components/common/Header';
+import NewChatIcon from '@/assets/icon/new_chat_icon.svg?react';
 import CallIcon from '@/assets/icon/call_icon.svg?react';
 
 const ChatbotPage = () => {
   return (
     <main>
+      <Header
+        title="요금제 추천 AI 챗봇 Me+"
+        iconButtons={[
+          {
+            icon: <NewChatIcon />,
+            onClick: () => {},
+          },
+          {
+            icon: <CallIcon />,
+            onClick: () => {},
+          },
+        ]}
+      />
       <h2>ChatbotPage</h2>
       <CallIcon className="border border-gray-300 hover:text-blue-500 transition-colors" />
 
