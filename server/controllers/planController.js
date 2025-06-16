@@ -4,6 +4,7 @@ import {
   getAffordablePlans,
   getFamilyBundlePlans,
   getOTTBundlePlans,
+  getPlans,
   getUnlimitedDataPlans,
 } from '../services/gptFuncDefinitions.js';
 import { AddonType, BenefitType } from '../utils/constants.js';
@@ -85,6 +86,16 @@ export const getBundlePlanList = async (req, res) => {
   try {
     const data = await getFamilyBundlePlans();
     return res.status(200).json(data);
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};
+
+/** 요금제 목록 조회 (테스트용: GPT랑 상관 없음)  */
+export const getPlanList = async (req, res) => {
+  try {
+    const data = await getPlans();
+    return res.status(200).json({ plans: data });
   } catch (error) {
     return res.sendStatus(500);
   }
