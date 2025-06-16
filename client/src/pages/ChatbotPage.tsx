@@ -1,7 +1,12 @@
+// import React from 'react';
+import CallIcon from '@/assets/icon/call_icon.svg?react';
+
 const ChatbotPage = () => {
-  return(
-        <main>
+  return (
+    <main>
       <h2>ChatbotPage</h2>
+      <CallIcon className="border border-gray-300 hover:text-blue-500 transition-colors" />
+
       <div className="bg-blue-100">
         <h1 className="text-center text-gray-700 mb-8">
           Tailwind CSS 테스트 중입니다
