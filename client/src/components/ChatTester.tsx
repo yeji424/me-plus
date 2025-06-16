@@ -5,7 +5,10 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
 }
-
+interface CarouselItem {
+  id: string;
+  label: string;
+}
 const socket: Socket = io('http://localhost:3001');
 
 const PlanChatTester = () => {
@@ -50,7 +53,7 @@ const PlanChatTester = () => {
           content: '다음 항목 중 하나를 선택해주세요:',
         },
       ]);
-      setOptionButtons(items.map((item) => item.label));
+      setOptionButtons(items.map((item: CarouselItem) => item.label));
     });
 
     socket.on('plan-details', (plan) => {
