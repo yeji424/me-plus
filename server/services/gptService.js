@@ -3,7 +3,7 @@ import {
   getAffordablePlans,
   getOTTBundlePlans,
   getUnlimitedDataPlans,
-} from './gptFuncDefinitions';
+} from './gptFuncDefinitions.js';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export const streamChat = async (messages, socket, onDelta) => {
