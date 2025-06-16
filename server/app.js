@@ -7,6 +7,7 @@ import {
   getBundlePlanList,
   getOTTPlanList,
   getPlanDetail,
+  getPlanList,
   getUnlimitedDataPlanList,
 } from './controllers/planController.js';
 
@@ -28,6 +29,9 @@ mongoose
   .catch(console.error);
 
 // changeSchema();
+// getChatResponse().then((res) => {
+//   console.log(res);
+// });
 
 // Routers
 const apiRouter = express.Router();
@@ -38,5 +42,6 @@ apiRouter.get('/unlimited-plans', getUnlimitedDataPlanList);
 apiRouter.get('/ott-plans', getOTTPlanList);
 apiRouter.get('/affordable-plans', getAffordablePlanList);
 apiRouter.get('/bundle-plans', getBundlePlanList);
+apiRouter.get('/plans', getPlanList);
 
 export default app;

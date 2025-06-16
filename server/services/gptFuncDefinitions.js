@@ -27,6 +27,44 @@ const refineData = (plans) => {
   );
 };
 
+const refineDataWithBundleBenefit = (plans) => {
+  return plans.map(
+    ({
+      _id,
+      name,
+      description,
+      dataGb,
+      sharedDataGb,
+      monthlyFee,
+      detailUrl,
+      bundleBenefit,
+    }) => ({
+      _id,
+      name,
+      description,
+      dataGb,
+      sharedDataGb,
+      monthlyFee,
+      detailUrl,
+      bundleBenefit,
+    }),
+  );
+};
+
+/** 전체 요금제 목록 */
+export const getPlans = async () => {
+  try {
+    const plans = await Plan.find({}).select(EXCLUDED_FIELDS).limit(10);
+
+    const data = refineDataWithBundleBenefit(plans);
+
+    return data;
+  } catch (error) {
+    console.error('getPlans >>', error);
+    throw error;
+  }
+};
+
 /** 무제한 요금제 목록 */
 export const getUnlimitedDataPlans = async () => {
   try {
@@ -94,31 +132,11 @@ export const getFamilyBundlePlans = async () => {
       .select(EXCLUDED_FIELDS)
       .limit(5);
 
-    const data = bundlePlans.map(
-      ({
-        _id,
-        name,
-        description,
-        dataGb,
-        sharedDataGb,
-        monthlyFee,
-        detailUrl,
-        bundleBenefit,
-      }) => ({
-        _id,
-        name,
-        description,
-        dataGb,
-        sharedDataGb,
-        monthlyFee,
-        detailUrl,
-        bundleBenefit,
-      }),
-    );
+    const data = refineDataWithBundleBenefit(bundlePlans);
 
     return data;
   } catch (error) {
-    console.error('getAffordablePlans >>', error);
+    console.error('getFamilyBundlePlans >>', error);
     throw error;
   }
 };
