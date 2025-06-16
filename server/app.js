@@ -2,7 +2,13 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
-import { getPlanDetail } from './controllers/planController.js';
+import {
+  getAffordablePlanList,
+  getBundlePlanList,
+  getOTTPlanList,
+  getPlanDetail,
+  getUnlimitedDataPlanList,
+} from './controllers/planController.js';
 
 dotenv.config();
 
@@ -28,5 +34,9 @@ const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
 apiRouter.get('/plans/:planId', getPlanDetail);
+apiRouter.get('/unlimited-plans', getUnlimitedDataPlanList);
+apiRouter.get('/ott-plans', getOTTPlanList);
+apiRouter.get('/affordable-plans', getAffordablePlanList);
+apiRouter.get('/bundle-plans', getBundlePlanList);
 
 export default app;
