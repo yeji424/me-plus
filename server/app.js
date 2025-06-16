@@ -2,7 +2,10 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
-import { getPlanDetail } from './controllers/planController.js';
+import {
+  getPlanDetail,
+  getUnlimitedDataPlanList,
+} from './controllers/planController.js';
 
 dotenv.config();
 
@@ -28,5 +31,6 @@ const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
 apiRouter.get('/plans/:planId', getPlanDetail);
+apiRouter.get('/unlimited-plans', getUnlimitedDataPlanList);
 
 export default app;

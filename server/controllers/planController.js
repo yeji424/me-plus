@@ -1,7 +1,9 @@
 import { Plan } from '../models/Plan.js';
 import { PlanAddon } from '../models/PlanAddon.js';
+import { getUnlimitedDataPlans } from '../services/gptFuncDefinitions.js';
 import { AddonType, BenefitType } from '../utils/constants.js';
 
+/** 요금제 상세 정보 조회 */
 export const getPlanDetail = async (req, res) => {
   const transform = (planAddonList) => {
     return planAddonList.map(({ addon: { _id, name, description } }) => ({
@@ -10,32 +12,45 @@ export const getPlanDetail = async (req, res) => {
       description,
     }));
   };
+  try {
+    const planId = req.params.planId;
+    const plan = await Plan.findById(planId).select('-updatedAt -createdAt');
+    const planAddonList = await PlanAddon.find({ plan: plan._id });
+    const mediaAddons = planAddonList.filter(
+      (item) =>
+        item.benefitType === BenefitType.SPECIAL &&
+        item.addonType === AddonType.MEDIA,
+    );
+    const premiumAddons = planAddonList.filter(
+      (item) =>
+        item.benefitType === BenefitType.SPECIAL &&
+        item.addonType === AddonType.PREMIUM,
+    );
+    const basicAddons = planAddonList.filter(
+      (item) => item.benefitType === BenefitType.BASIC,
+    );
 
-  const planId = req.params.planId;
-  const plan = await Plan.findById(planId).select('-updatedAt -createdAt');
-  const planAddonList = await PlanAddon.find({ plan: plan._id });
-  const mediaAddons = planAddonList.filter(
-    (item) =>
-      item.benefitType === BenefitType.SPECIAL &&
-      item.addonType === AddonType.MEDIA,
-  );
-  const premiumAddons = planAddonList.filter(
-    (item) =>
-      item.benefitType === BenefitType.SPECIAL &&
-      item.addonType === AddonType.PREMIUM,
-  );
-  const basicAddons = planAddonList.filter(
-    (item) => item.benefitType === BenefitType.BASIC,
-  );
+    const data = {
+      ...plan._doc,
+      basicBenefits: transform(basicAddons),
+      specialBenefits: {
+        premiumServices: transform(premiumAddons),
+        mediaServices: transform(mediaAddons),
+      },
+    };
 
-  const data = {
-    ...plan._doc,
-    basicBenefits: transform(basicAddons),
-    specialBenefits: {
-      premiumServices: transform(premiumAddons),
-      mediaServices: transform(mediaAddons),
-    },
-  };
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};
 
-  return res.status(200).json(data);
+/** 무제한 요금제 목록 조회 (테스트용: GPT랑 상관 없음)  */
+export const getUnlimitedDataPlanList = async (req, res) => {
+  try {
+    const data = await getUnlimitedDataPlans();
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.sendStatus(500);
+  }
 };
