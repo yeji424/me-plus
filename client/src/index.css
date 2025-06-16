@@ -50,3 +50,9 @@ body {
 main {
   @apply flex-1;
 }
+/* 유틸리티 클래스(재사용 가능한 class) 여기 넣으면 됩니다! */
+@layer utilities {
+  .icon-button {
+    @apply cursor-pointer stroke-gray-500 hover:text-secondary-purple-60 transition-colors;
+  }
+}

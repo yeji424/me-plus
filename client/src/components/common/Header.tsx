@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BackIcon from '@/assets/icon/back_icon.svg?react';
-// import NewChatIcon from '@/assets/icon/new_chat_icon.svg?react';
-// import CallIcon from '@/assets/icon/call_icon.svg?react';
 
 interface HeaderProps {
   title: string;
@@ -19,10 +17,7 @@ const Header = ({ title, iconButtons }: HeaderProps) => {
   };
   return (
     <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] px-5 pt-5 pb-3 bg-transparent flex items-center justify-between z-50">
-      <BackIcon
-        onClick={backPage}
-        className="cursor-pointer stroke-gray-500 hover:text-secondary-purple-60 transition-colors"
-      />
+      <BackIcon onClick={backPage} className="icon-button" />
       {title && (
         <p className=" absolute left-1/2 -translate-x-1/2 text-base text-secondary-purple-80">
           {title}
@@ -31,11 +26,7 @@ const Header = ({ title, iconButtons }: HeaderProps) => {
       {iconButtons && (
         <div className="flex items-center gap-4">
           {iconButtons.map((btn, index) => (
-            <button
-              key={index}
-              onClick={btn.onClick}
-              className="cursor-pointer hover:text-secondary-purple-60 transition-colors"
-            >
+            <button key={index} onClick={btn.onClick} className="icon-button">
               {btn.icon}
             </button>
           ))}
