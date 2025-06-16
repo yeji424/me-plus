@@ -5,7 +5,7 @@ import CallIcon from '@/assets/icon/call_icon.svg?react';
 
 const ChatbotPage = () => {
   return (
-    <main>
+    <div>
       <Header
         title="요금제 추천 AI 챗봇 Me+"
         iconButtons={[
@@ -19,9 +19,6 @@ const ChatbotPage = () => {
           },
         ]}
       />
-      <h2>ChatbotPage</h2>
-      <CallIcon className="border border-gray-300 hover:text-blue-500 transition-colors" />
-
       <div className="bg-blue-100">
         <h1 className="text-center text-gray-700 mb-8">
           Tailwind CSS 테스트 중입니다
@@ -33,7 +30,7 @@ const ChatbotPage = () => {
           눌러보세요
         </button>
       </div>
-    </main>
+    </div>
   );
 };
 

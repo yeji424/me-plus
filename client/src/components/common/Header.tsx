@@ -16,7 +16,7 @@ const Header = ({ title, iconButtons }: HeaderProps) => {
     navigate(-1);
   };
   return (
-    <div className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] px-5 pt-5 pb-3 bg-transparent flex items-center justify-between z-50">
+    <header className="fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] px-5 pt-5 pb-3 bg-transparent flex items-center justify-between z-50">
       <BackIcon onClick={backPage} className="icon-button" />
       {title && (
         <p className=" absolute left-1/2 -translate-x-1/2 text-base text-secondary-purple-80">
@@ -32,7 +32,7 @@ const Header = ({ title, iconButtons }: HeaderProps) => {
           ))}
         </div>
       )}
-    </div>
+    </header>
   );
 };
 

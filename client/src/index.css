@@ -43,7 +43,7 @@ body {
 }
 #root {
   @apply overflow-x-hidden overflow-y-auto relative max-w-[600px] w-full min-h-screen;
-  @apply pt-[55px] pr-[20px] pb-[29px] pl-[20px];
+  @apply pr-[20px] pb-[0px] pl-[20px];
   box-shadow: var(--shadow-basic);
   background-color: var(--color-background);
 }
