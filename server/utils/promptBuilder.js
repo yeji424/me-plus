@@ -13,12 +13,7 @@ export const buildPromptMessages = (plans, fullMessages) => {
 - 예상 사용자의 특징: xxx
 - 링크: xxx
 
-요금제 목록:
-${plans
-  .map((plan, idx) => {
-    return `📦 ${idx + 1}. ${plan.name} - ${plan.price}원 / ${plan.data} / ${plan.call} / ${plan.tags.join(', ')}\n링크: ${plan.url}`;
-  })
-  .join('\n\n')}`,
+`,
   };
 
   return [systemMessage, ...fullMessages];
