@@ -4,6 +4,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import {
   getAffordablePlanList,
+  getBundlePlanList,
   getOTTPlanList,
   getPlanDetail,
   getUnlimitedDataPlanList,
@@ -36,5 +37,6 @@ apiRouter.get('/plans/:planId', getPlanDetail);
 apiRouter.get('/unlimited-plans', getUnlimitedDataPlanList);
 apiRouter.get('/ott-plans', getOTTPlanList);
 apiRouter.get('/affordable-plans', getAffordablePlanList);
+apiRouter.get('/bundle-plans', getBundlePlanList);
 
 export default app;
