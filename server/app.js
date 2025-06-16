@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
 import {
+  getOTTPlanList,
   getPlanDetail,
   getUnlimitedDataPlanList,
 } from './controllers/planController.js';
@@ -32,5 +33,6 @@ app.use('/api', apiRouter);
 
 apiRouter.get('/plans/:planId', getPlanDetail);
 apiRouter.get('/unlimited-plans', getUnlimitedDataPlanList);
+apiRouter.get('/ott-plans', getOTTPlanList);
 
 export default app;
