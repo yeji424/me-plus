@@ -95,7 +95,7 @@ export const getBundlePlanList = async (req, res) => {
 export const getPlanList = async (req, res) => {
   try {
     const data = await getPlans();
-    return res.status(200).json({ plans: data });
+    return res.status(200).json(data);
   } catch (error) {
     return res.sendStatus(500);
   }
