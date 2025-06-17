@@ -13,8 +13,11 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [boxSize, setBoxSize] = useState({ width: 0, height: 0 });
   const ghostRef = useRef<HTMLDivElement>(null);
-
-  const chars = parseMarkedTextToChars(displayText);
+  const springStyles = useSpring({
+    width: boxSize.width,
+    height: boxSize.height,
+    config: { tension: 180, friction: 22 },
+  });
 
   useLayoutEffect(() => {
     if (ghostRef.current) {
@@ -22,12 +25,6 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
       setBoxSize({ width: offsetWidth, height: offsetHeight });
     }
   }, [displayText]);
-
-  const springStyles = useSpring({
-    width: boxSize.width,
-    height: boxSize.height,
-    config: { tension: 180, friction: 22 },
-  });
 
   useEffect(() => {
     if (currentIndex >= messageChunks.length) return;
@@ -54,6 +51,8 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
 
     return () => clearTimeout(timer);
   }, [currentIndex, buffer]);
+
+  const chars = parseMarkedTextToChars(displayText);
 
   return (
     <>
