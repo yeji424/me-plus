@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Header from '@/components/common/Header';
 import NewChatIcon from '@/assets/icon/new_chat_icon.svg?react';
 import CallIcon from '@/assets/icon/call_icon.svg?react';

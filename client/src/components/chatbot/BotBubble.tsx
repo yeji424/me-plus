@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
+import { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { useSpring, animated } from '@react-spring/web';
 
 const parseMarkedTextToChars = (text: string) => {
