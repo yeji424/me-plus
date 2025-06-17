@@ -1,10 +1,14 @@
+import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import {
   getAffordablePlans,
   getOTTBundlePlans,
   getUnlimitedDataPlans,
 } from './gptFuncDefinitions.js';
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+dotenv.config();
+
+export const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export const streamChat = async (messages, socket, onDelta) => {
   const streamRes = await openai.chat.completions.create({

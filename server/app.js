@@ -2,6 +2,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
+import { getInputExamples } from './controllers/chatController.js';
 import {
   getAffordablePlanList,
   getBundlePlanList,
@@ -37,6 +38,7 @@ mongoose
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
+apiRouter.get('/chat/inputs', getInputExamples);
 apiRouter.get('/plans/:planId', getPlanDetail);
 apiRouter.get('/unlimited-plans', getUnlimitedDataPlanList);
 apiRouter.get('/ott-plans', getOTTPlanList);
