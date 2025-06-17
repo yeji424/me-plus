@@ -68,7 +68,7 @@ const BotBubble = () => {
       }
 
       setCurrentIndex((i) => i + 1);
-    }, 500);
+    }, 100);
 
     return () => clearTimeout(timer);
   }, [currentIndex, buffer]);
@@ -83,7 +83,15 @@ const BotBubble = () => {
           return <br key={idx} />;
         }
 
-        return <span>{item.char}</span>;
+        return (
+          <span
+            key={idx}
+            className={item.isBold ? 'text-primary-pink fade-in' : 'fade-in'}
+            style={{ animationDelay: `${idx * 30}ms` }}
+          >
+            {item.char}
+          </span>
+        );
       })}
     </div>
   );
