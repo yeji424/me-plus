@@ -5,6 +5,7 @@ import CallIcon from '@/assets/icon/call_icon.svg?react';
 import BotBubble from '@/components/chatbot/BotBubble';
 import InputBox from '@/components/chatbot/InputBox';
 import UserBubble from '@/components/chatbot/UserBubble';
+import ToggleCard from '@/components/chatbot/ToggleCard';
 
 type Message =
   | { type: 'user'; text: string }
@@ -55,7 +56,7 @@ const ChatbotPage = () => {
         ]}
       />
 
-      <div className="border-3 space-y-2 max-w-[560px] mx-auto mt-4 px-4">
+      <div className="border-3 space-y-2 max-w-[560px] mx-auto">
         {messages.map((msg, index) =>
           msg.type === 'user' ? (
             <UserBubble key={index} message={msg.text} />
@@ -64,7 +65,7 @@ const ChatbotPage = () => {
           ),
         )}
       </div>
-
+      <ToggleCard />
       <div className="border-3 fixed bottom-5 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] py-3 bg-transparent flex items-center justify-center z-50">
         <InputBox onSend={handleSendMessage} />
       </div>
