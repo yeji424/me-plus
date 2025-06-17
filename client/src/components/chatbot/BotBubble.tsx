@@ -11,8 +11,8 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
   const [buffer, setBuffer] = useState('');
   const [displayText, setDisplayText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
-  const ghostRef = useRef<HTMLDivElement>(null);
   const [boxSize, setBoxSize] = useState({ width: 0, height: 0 });
+  const ghostRef = useRef<HTMLDivElement>(null);
 
   const chars = parseMarkedTextToChars(displayText);
 
