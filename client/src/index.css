@@ -29,6 +29,24 @@
     #ce018b 75%,
     #eb008b 100%
   );
+  --color-gradation-20: linear-gradient(
+    90deg,
+    rgba(87, 50, 161, 0.1) 0%,
+    rgba(91, 3, 140, 0.1) 25%,
+    rgba(160, 1, 139, 0.1) 50%,
+    rgba(206, 1, 139, 0.1) 75%,
+    rgba(235, 0, 139, 0.1) 100%
+  );
+
+  --color-gradation-70: linear-gradient(
+    90deg,
+    rgba(87, 50, 161, 0.7) 0%,
+    rgba(91, 3, 140, 0.7) 25%,
+    rgba(160, 1, 139, 0.7) 50%,
+    rgba(206, 1, 139, 0.7) 75%,
+    rgba(235, 0, 139, 0.7) 100%
+  );
+
   --shadow-basic: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 @layer base {
