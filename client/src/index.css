@@ -20,6 +20,14 @@
   --color-gray200: #d5d7df;
   --color-gray100: #fcfcfc;
   --color-danger: #e94e4e;
+  --color-gradation: linear-gradient(
+    90deg,
+    var(--color-secondary-purple-80) 0%,
+    #5b038c 25%,
+    #a0018b 50%,
+    #ce018b 75%,
+    #eb008b 100%
+  );
   --shadow-basic: 0 0 20px rgba(0, 0, 0, 0.1);
 }
 @layer base {
@@ -34,6 +42,7 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    word-break: keep-all;
   }
 }
 html,
@@ -49,4 +58,12 @@ body {
 }
 main {
   @apply flex-1;
+}
+.text-gradation {
+  background: var(--color-gradation);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.bg-gradation {
+  background-image: var(--color-gradation);
 }
