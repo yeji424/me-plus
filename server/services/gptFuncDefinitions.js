@@ -15,28 +15,6 @@ const refineData = (plans) => {
       sharedDataGb,
       monthlyFee,
       detailUrl,
-    }) => ({
-      _id,
-      name,
-      description,
-      dataGb,
-      sharedDataGb,
-      monthlyFee,
-      detailUrl,
-    }),
-  );
-};
-
-const refineDataWithBundleBenefit = (plans) => {
-  return plans.map(
-    ({
-      _id,
-      name,
-      description,
-      dataGb,
-      sharedDataGb,
-      monthlyFee,
-      detailUrl,
       bundleBenefit,
     }) => ({
       _id,
@@ -55,10 +33,9 @@ const refineDataWithBundleBenefit = (plans) => {
 export const getPlans = async () => {
   try {
     const plans = await Plan.find({}).select(EXCLUDED_FIELDS).limit(10);
+    const data = refineData(plans);
 
-    const data = refineDataWithBundleBenefit(plans);
-
-    return data;
+    return { plans: data };
   } catch (error) {
     console.error('getPlans >>', error);
     throw error;
@@ -72,10 +49,9 @@ export const getUnlimitedDataPlans = async () => {
       dataGb: -1,
       isPopular: true, // 인기 요금제만
     }).select(EXCLUDED_FIELDS);
-
     const data = refineData(unlimitedDataPlans);
 
-    return data;
+    return { plans: data };
   } catch (error) {
     console.error('getUnlimitedDataPlans >>', error);
     throw error;
@@ -101,7 +77,7 @@ export const getOTTBundlePlans = async () => {
     }).select(EXCLUDED_FIELDS);
     const data = refineData(plans);
 
-    return data;
+    return { plans: data };
   } catch (error) {
     console.error('getOTTBundlePlans >>', error);
     throw error;
@@ -116,7 +92,7 @@ export const getAffordablePlans = async () => {
     }).select(EXCLUDED_FIELDS);
     const data = refineData(affordablePlans);
 
-    return data;
+    return { plans: data };
   } catch (error) {
     console.error('getAffordablePlans >>', error);
     throw error;
@@ -131,10 +107,9 @@ export const getFamilyBundlePlans = async () => {
     })
       .select(EXCLUDED_FIELDS)
       .limit(5);
+    const data = refineData(bundlePlans);
 
-    const data = refineDataWithBundleBenefit(bundlePlans);
-
-    return data;
+    return { plans: data };
   } catch (error) {
     console.error('getFamilyBundlePlans >>', error);
     throw error;

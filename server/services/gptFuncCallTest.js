@@ -9,8 +9,23 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const tools = [
   {
     ...BASE_PLAN_TOOL_DEF,
-    name: 'get_plans',
-    description: '요금제 전체 목록 조회',
+    name: 'getPlans',
+    description: '요금제 전체 목록을 반환합니다.',
+  },
+  {
+    ...BASE_PLAN_TOOL_DEF,
+    name: 'getAffordablePlans',
+    description: '월정액이 5만원 이하인 저렴한 요금제 목록을 반환합니다.',
+  },
+  {
+    ...BASE_PLAN_TOOL_DEF,
+    name: 'getUnlimitedDataPlans',
+    description: '데이터가 무제한인 요금제 목록을 반환합니다.',
+  },
+  {
+    ...BASE_PLAN_TOOL_DEF,
+    name: 'getOTTBundlePlans',
+    description: 'OTT 서비스가 결합된 요금제 목록을 반환합니다.',
   },
 ];
 
