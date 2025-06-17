@@ -1,16 +1,6 @@
 import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { useSpring, animated } from '@react-spring/web';
 
-const sampleChunks = [
-  '혹시 가족 구성원 중 ',
-  '**만 18세 이하의',
-  ' 청소년 자녀**가 ',
-  '있으신가요? ',
-  '\n있으시다면 ',
-  '**추가 결합 혜택**도 ',
-  '안내해드릴게요!',
-];
-
 const parseMarkedTextToChars = (text: string) => {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
   const chars: { char: string; isBold: boolean }[] = [];
@@ -31,7 +21,11 @@ const parseMarkedTextToChars = (text: string) => {
   return chars;
 };
 
-const BotBubble = () => {
+interface BotBubbleProps {
+  messageChunks: string[];
+}
+
+const BotBubble = ({ messageChunks }: BotBubbleProps) => {
   const [buffer, setBuffer] = useState('');
   const [displayText, setDisplayText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -63,7 +57,6 @@ const BotBubble = () => {
     );
   };
 
-  // measure text size
   useLayoutEffect(() => {
     if (ghostRef.current) {
       const { offsetWidth, offsetHeight } = ghostRef.current;
@@ -78,10 +71,10 @@ const BotBubble = () => {
   });
 
   useEffect(() => {
-    if (currentIndex >= sampleChunks.length) return;
+    if (currentIndex >= messageChunks.length) return;
 
     const timer = setTimeout(() => {
-      const chunk = sampleChunks[currentIndex];
+      const chunk = messageChunks[currentIndex];
 
       if (buffer || chunk.includes('**')) {
         const combined = buffer + chunk;
@@ -105,7 +98,7 @@ const BotBubble = () => {
 
   return (
     <>
-      {/* 숨겨진 텍스트로 크기 측정 (애니메이션용)*/}
+      {/* 숨겨진 텍스트로 크기 측정용 박스*/}
       <div
         ref={ghostRef}
         className="absolute invisible max-w-[309px] p-2 text-xs leading-5 whitespace-pre-wrap break-words"
