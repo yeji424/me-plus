@@ -1,25 +1,7 @@
 import { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { useSpring, animated } from '@react-spring/web';
-
-const parseMarkedTextToChars = (text: string) => {
-  const parts = text.split(/(\*\*[^*]+\*\*)/g);
-  const chars: { char: string; isBold: boolean }[] = [];
-
-  parts.forEach((part) => {
-    const isBold = part.startsWith('**') && part.endsWith('**');
-    const content = isBold ? part.slice(2, -2) : part;
-
-    for (const ch of content) {
-      if (ch === '\n') {
-        chars.push({ char: '\n', isBold });
-      } else {
-        chars.push({ char: ch, isBold });
-      }
-    }
-  });
-
-  return chars;
-};
+import { parseMarkedTextToChars } from '@/utils/parseMarkedTextToChars';
+import MarkedText from './MarkedText';
 
 interface BotBubbleProps {
   messageChunks: string[];
@@ -30,32 +12,9 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
   const [displayText, setDisplayText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const ghostRef = useRef<HTMLDivElement>(null);
-
   const [boxSize, setBoxSize] = useState({ width: 0, height: 0 });
 
   const chars = parseMarkedTextToChars(displayText);
-
-  // 텍스트 렌더 함수
-  const renderText = (
-    charList: { char: string; isBold: boolean }[],
-    withAnimation = false,
-  ) => {
-    return charList.map((item, idx) =>
-      item.char === '\n' ? (
-        <br key={idx} />
-      ) : (
-        <span
-          key={idx}
-          className={`${item.isBold ? 'text-primary-pink' : ''} ${withAnimation ? 'fade-in' : ''}`}
-          style={
-            withAnimation ? { animationDelay: `${idx * 30}ms` } : undefined
-          }
-        >
-          {item.char}
-        </span>
-      ),
-    );
-  };
 
   useLayoutEffect(() => {
     if (ghostRef.current) {
@@ -103,7 +62,7 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
         ref={ghostRef}
         className="absolute invisible max-w-[309px] p-2 text-xs leading-5 whitespace-pre-wrap break-words"
       >
-        {renderText(chars)}
+        <MarkedText chars={chars} />
       </div>
 
       {/* 애니메이션 되는 박스 */}
@@ -121,7 +80,7 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
       overflow-hidden
     "
       >
-        {renderText(chars, true)}
+        <MarkedText chars={chars} withAnimation />
       </animated.div>
     </>
   );
