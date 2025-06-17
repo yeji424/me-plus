@@ -55,9 +55,9 @@ export const setupSocket = (server) => {
       const systemInput = {
         role: InputRoleEnum.SYSTEM,
         content:
-          '너는 사용자의 조건에 맞는 휴대폰 요금제를 추천하는 전문가 챗봇이야. 주어진 조건과 추천 이유, 요금제 데이터를 보고 추천하는 요금제의 ID 목록을 최대 3가지 출력해줘. 반드시 아래 형식 그대로 출력해야 하고 다른 문장은 출력하면 안돼\n형식: [id1, id2, id3]',
+          '너는 사용자의 조건에 맞는 휴대폰 요금제를 추천하는 전문가 챗봇이야. 주어진 조건과 추천 이유, 요금제 데이터를 보고 추천하는 요금제의 ID 목록을 최대 3가지 출력해줘. ID는 실제 데이터에 있는 _id를 사용해야 해. 응답은 반드시 배열로 출력해야 하고 다른 문장은 출력하면 안돼.',
       };
-
+      console.log([systemInput, ...planInput.slice(1)]);
       const ids = await getPlanIds([systemInput, ...planInput.slice(1)]);
       socket.emit('recommend-plan-by-guide', { plans: ids });
     });
