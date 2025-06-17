@@ -96,10 +96,6 @@ export const emitRecommendReasonByGuide = async (input, socket) => {
             role: InputRoleEnum.ASSISTANT,
             content: event.text,
           });
-          input.push({
-            role: InputRoleEnum.USER,
-            content: '추천요금제',
-          });
         }
       }
     }
