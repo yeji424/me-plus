@@ -1,119 +1,24 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import Header from '@/components/common/Header';
 import NewChatIcon from '@/assets/icon/new_chat_icon.svg?react';
 import CallIcon from '@/assets/icon/call_icon.svg?react';
 import UserBubble from '@/components/chatbot/UserBubble';
 import InputBox from '@/components/chatbot/InputBox';
-import { socket } from '@/utils/socket';
-import BotBubbleFrame, {
-  type CarouselItem,
-  type FunctionCall,
-} from '@/components/chatbot/BotBubbleFrame';
-
-type Message =
-  | { type: 'user'; text: string }
-  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall };
+import BotBubbleFrame from '@/components/chatbot/BotBubbleFrame';
+import { useChatSocket } from '@/hooks/useChatSocket';
 
 const ChatbotPage = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const responseRef = useRef('');
-
-  useEffect(() => {
-    const existing = localStorage.getItem('sessionId');
-    socket.emit('init-session', existing || null);
-
-    socket.on('session-id', (id: string) => {
-      setSessionId(id);
-      localStorage.setItem('sessionId', id);
-    });
-
-    socket.on(
-      'session-history',
-      (logs: { role: string; content: string }[]) => {
-        const converted: Message[] = logs.map((msg) =>
-          msg.role === 'user'
-            ? { type: 'user', text: msg.content }
-            : { type: 'bot', messageChunks: [msg.content] },
-        );
-        setMessages(converted);
-      },
-    );
-    socket.on('carousel-buttons', (items: CarouselItem[]) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          type: 'bot',
-          messageChunks: ['다음 항목 중 하나를 선택해주세요:'],
-          functionCall: {
-            name: 'requestCarouselButtons',
-            args: { items },
-          },
-        },
-      ]);
-    });
-
-    return () => {
-      socket.off('session-id');
-      socket.off('session-history');
-    };
-  }, []);
-
-  // ✅ 소켓 응답 처리
-  useEffect(() => {
-    socket.on('stream', (chunk: string) => {
-      responseRef.current += chunk;
-      setMessages((prev) => {
-        const last = prev[prev.length - 1];
-        if (last?.type === 'bot') {
-          return [
-            ...prev.slice(0, -1),
-            { type: 'bot', messageChunks: [responseRef.current] },
-          ];
-        } else {
-          return [
-            ...prev,
-            { type: 'bot', messageChunks: [responseRef.current] },
-          ];
-        }
-      });
-    });
-
-    socket.on('done', () => {
-      setIsStreaming(false);
-    });
-
-    return () => {
-      socket.off('stream');
-      socket.off('done');
-      socket.off('carousel-buttons');
-    };
-  }, []);
+  const { messages, isStreaming, sendMessage, startNewChat } = useChatSocket();
 
   const handleSendMessage = (text: string) => {
-    if (!text.trim() || !sessionId) return;
-
-    const payload = {
-      sessionId,
-      message: text.trim(),
-    };
-
-    setMessages((prev) => [...prev, { type: 'user', text }]);
-    setIsStreaming(true);
+    sendMessage(text);
     setInput('');
-    responseRef.current = '';
-
-    socket.emit('recommend-plan', payload);
   };
 
   const handleNewChat = () => {
-    if (!sessionId) return;
-    socket.emit('reset-session', { sessionId });
-    setMessages([]);
+    startNewChat();
     setInput('');
-    responseRef.current = '';
   };
 
   return (
