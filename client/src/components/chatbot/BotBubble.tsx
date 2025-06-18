@@ -8,9 +8,7 @@ interface BotBubbleProps {
 }
 
 const BotBubble = ({ messageChunks }: BotBubbleProps) => {
-  const [buffer, setBuffer] = useState('');
   const [displayText, setDisplayText] = useState('');
-  const [currentIndex, setCurrentIndex] = useState(0);
   const [boxSize, setBoxSize] = useState({ width: 0, height: 0 });
   const ghostRef = useRef<HTMLDivElement>(null);
   const springStyles = useSpring({
@@ -26,31 +24,12 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
     }
   }, [displayText]);
 
+  // 스트리밍 응답에 맞게 단순화
   useEffect(() => {
-    if (currentIndex >= messageChunks.length) return;
-
-    const timer = setTimeout(() => {
-      const chunk = messageChunks[currentIndex];
-
-      if (buffer || chunk.includes('**')) {
-        const combined = buffer + chunk;
-        const match = combined.match(/\*\*[^*]+\*\*/);
-
-        if (match) {
-          setDisplayText((prev) => prev + combined);
-          setBuffer('');
-        } else {
-          setBuffer(combined);
-        }
-      } else {
-        setDisplayText((prev) => prev + chunk);
-      }
-
-      setCurrentIndex((i) => i + 1);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [currentIndex, buffer]);
+    if (messageChunks.length > 0) {
+      setDisplayText(messageChunks[0]);
+    }
+  }, [messageChunks]);
 
   const chars = parseMarkedTextToChars(displayText);
 

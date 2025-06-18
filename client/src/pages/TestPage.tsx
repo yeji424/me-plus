@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import SelectButton from '@/components/common/SelectButton';
 import Header from '@/components/common/Header';
 import ProgressBar from '../components/common/ProgressBar';
