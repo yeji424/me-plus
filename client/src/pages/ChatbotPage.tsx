@@ -21,6 +21,10 @@ const ChatbotPage = () => {
     setInput('');
   };
 
+  const handleButtonClick = (message: string) => {
+    sendMessage(message);
+  };
+
   return (
     <div>
       <Header
@@ -40,6 +44,7 @@ const ChatbotPage = () => {
               key={idx}
               messageChunks={msg.messageChunks}
               functionCall={msg.functionCall}
+              onButtonClick={handleButtonClick}
             />
           ),
         )}

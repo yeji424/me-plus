@@ -23,11 +23,13 @@ export interface FunctionCall {
 export interface BotBubbleFrameProps {
   messageChunks: string[];
   functionCall?: FunctionCall;
+  onButtonClick?: (message: string) => void;
 }
 
 const BotBubbleFrame = ({
   messageChunks,
   functionCall,
+  onButtonClick,
 }: BotBubbleFrameProps) => {
   return (
     <div className="space-y-2">
@@ -38,14 +40,20 @@ const BotBubbleFrame = ({
           switch (name) {
             case 'requestCarouselButtons':
               return args?.items ? (
-                <CarouselButtonGroup options={args.items} />
+                <CarouselButtonGroup
+                  options={args.items}
+                  onButtonClick={onButtonClick}
+                />
               ) : null;
             case 'requestOXButtons':
               return args?.options ? (
-                <OXButtonGroup options={args.options} />
+                <OXButtonGroup
+                  options={args.options}
+                  onButtonClick={onButtonClick}
+                />
               ) : null;
             case 'requestOttButtons':
-              return <OttButtonGroup />;
+              return <OttButtonGroup onButtonClick={onButtonClick} />;
             default:
               return null;
           }

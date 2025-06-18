@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import ChatButton from '../ChatButton';
 import NetflixIcon from '@/assets/icon/netflix.png';
 import TvingIcon from '@/assets/icon/tving.png';
@@ -18,7 +19,20 @@ const OTT_SERVICES: OttService[] = [
   { id: 'disney', label: '디즈니 +', icon: DisneyIcon },
 ];
 
-const OttButtonGroup = () => {
+interface OttButtonGroupProps {
+  onButtonClick?: (message: string) => void;
+}
+
+const OttButtonGroup = ({ onButtonClick }: OttButtonGroupProps) => {
+  const [clickedButton, setClickedButton] = useState<string | null>(null);
+
+  const handleButtonClick = (label: string) => {
+    if (clickedButton) return;
+
+    setClickedButton(label);
+    onButtonClick?.(label);
+  };
+
   return (
     <DraggableScroll className="flex flex-nowrap gap-1 hide-scrollbar overflow-visible">
       {OTT_SERVICES.map((service) => (
@@ -26,6 +40,8 @@ const OttButtonGroup = () => {
           key={service.id}
           label={service.label}
           icon={<img src={service.icon} alt={service.label} />}
+          disabled={clickedButton !== null && clickedButton !== service.label}
+          onClick={() => handleButtonClick(service.label)}
         />
       ))}
     </DraggableScroll>

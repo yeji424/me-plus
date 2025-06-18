@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import ChatButton from '../ChatButton';
 import OIcon from '@/assets/icon/o_icon.svg';
 import XIcon from '@/assets/icon/x_icon.svg';
@@ -6,6 +7,7 @@ import type { OXOption } from '../BotBubbleFrame';
 
 interface OXButtonGroupProps {
   options: OXOption[];
+  onButtonClick?: (message: string) => void;
 }
 
 const iconMap = {
@@ -13,7 +15,16 @@ const iconMap = {
   x: <XIcon />,
 };
 
-const OXButtonGroup = ({ options }: OXButtonGroupProps) => {
+const OXButtonGroup = ({ options, onButtonClick }: OXButtonGroupProps) => {
+  const [clickedButton, setClickedButton] = useState<string | null>(null);
+
+  const handleButtonClick = (label: string) => {
+    if (clickedButton) return;
+
+    setClickedButton(label);
+    onButtonClick?.(label);
+  };
+
   return (
     <DraggableScroll className="flex flex-nowrap gap-1 hide-scrollbar overflow-visible">
       {options.map((option) => (
@@ -21,6 +32,8 @@ const OXButtonGroup = ({ options }: OXButtonGroupProps) => {
           key={option.id}
           label={option.label}
           icon={iconMap[option.id]}
+          disabled={clickedButton !== null && clickedButton !== option.label}
+          onClick={() => handleButtonClick(option.label)}
         />
       ))}
     </DraggableScroll>
