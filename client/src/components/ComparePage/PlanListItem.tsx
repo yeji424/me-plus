@@ -1,27 +1,7 @@
 import Button from '@/components/common/Button';
 import PlanDetailInfo from './PlanDetailInfo';
 import dropdownIcon from '@/assets/icon/dropdown_icon.svg';
-
-interface Plan {
-  id: string;
-  category: string;
-  name: string;
-  monthlyFee: number;
-  bundleBenefit?: {
-    _id: string;
-    name: string;
-  };
-  basicBenefits?: Array<{
-    _id: string;
-    name: string;
-    description: string;
-  }>;
-  specialBenefits?: {
-    premiumServices: Array<{ _id: string; name: string }>;
-    mediaServices: Array<{ _id: string; name: string }>;
-  };
-  benefits?: string;
-}
+import type { Plan } from '@/components/types/Plan';
 
 interface PlanListItemProps {
   plan: Plan;

@@ -1,25 +1,5 @@
 import { useMemo } from 'react';
-
-interface Plan {
-  id: string;
-  category: string;
-  name: string;
-  monthlyFee: number;
-  bundleBenefit?: {
-    _id: string;
-    name: string;
-  };
-  basicBenefits?: Array<{
-    _id: string;
-    name: string;
-    description: string;
-  }>;
-  specialBenefits?: {
-    premiumServices: Array<{ _id: string; name: string }>;
-    mediaServices: Array<{ _id: string; name: string }>;
-  };
-  benefits?: string;
-}
+import type { Plan } from '@/components/types/Plan';
 
 export const usePlanFilter = (
   plans: Plan[],
