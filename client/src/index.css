@@ -46,7 +46,7 @@
     rgba(206, 1, 139, 0.7) 75%,
     rgba(235, 0, 139, 0.7) 100%
   );
-  --color-gradation: linear-gradient(#dfe4fd 0%, #ffffff 100%);
+  --color-gradation-background: linear-gradient(#dfe4fd 0%, #ffffff 100%);
   
   --shadow-basic: 0 0 20px rgba(0, 0, 0, 0.1);
   --shadow-small: 0 0 15px rgba(0, 0, 0, 0.07);
@@ -112,4 +112,12 @@
       opacity: 1;
     }
   }
+}
+
+[data-rsbs-scroll] {
+  scrollbar-width: none;
+}
+[data-rsbs-header]:before {
+  background-color: var(--color-secondary-purple-80) !important;
+  width: 44px !important;
 }

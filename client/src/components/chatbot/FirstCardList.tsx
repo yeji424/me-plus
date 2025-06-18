@@ -42,7 +42,7 @@ const cardData = [
 // 코드가 길지않아 그냥 한 파일에 넣었습니다
 const CardItem = ({ item }: { item: (typeof cardData)[0] }) => {
   return (
-    <div className="w-[152px] shrink-0 flex flex-col items-center gap-[18px] p-[10px] rounded-[12px] bg-gradation shadow-small">
+    <div className="w-[152px] shrink-0 flex flex-col items-center gap-[18px] p-[10px] rounded-[12px] bg-gradation-background shadow-small">
       <img
         src={item.image}
         alt={item.title}
