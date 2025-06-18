@@ -1,10 +1,5 @@
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
-import {
-  getAffordablePlans,
-  getOTTBundlePlans,
-  getUnlimitedDataPlans,
-} from './gptFuncDefinitions.js';
 
 dotenv.config();
 
@@ -12,26 +7,11 @@ export const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export const streamChat = async (messages, socket, onDelta) => {
   const streamRes = await openai.chat.completions.create({
-    model: 'gpt-4.1-nano',
+    model: 'gpt-4.1-mini-2025-04-14',
     messages,
     stream: true,
     function_call: 'auto',
     functions: [
-      {
-        name: 'getAffordablePlans',
-        description: 'DB에 저장된 저렴한 요금제 목록을 반환합니다.',
-        parameters: { type: 'object', properties: {} },
-      },
-      {
-        name: 'getUnlimitedDataPlans',
-        description: 'DB에 저장된 무제한 요금제 목록을 반환합니다.',
-        parameters: { type: 'object', properties: {} },
-      },
-      {
-        name: 'getOTTBundlePlans',
-        description: 'DB에 저장된 OTT 서비스 결합 요금제를 반환합니다.',
-        parameters: { type: 'object', properties: {} },
-      },
       {
         name: 'requestOTTServiceList',
         description:
@@ -169,24 +149,6 @@ export const streamChat = async (messages, socket, onDelta) => {
       const args = functionArgsRaw ? JSON.parse(functionArgsRaw) : {};
 
       switch (functionName) {
-        case 'getAffordablePlans': {
-          const result = await getAffordablePlans();
-          socket.emit('stream', JSON.stringify(result));
-          break;
-        }
-
-        case 'getUnlimitedDataPlans': {
-          const result = await getUnlimitedDataPlans();
-          socket.emit('stream', JSON.stringify(result));
-          break;
-        }
-
-        case 'getOTTBundlePlans': {
-          const result = await getOTTBundlePlans();
-          socket.emit('stream', JSON.stringify(result));
-          break;
-        }
-
         case 'requestOTTServiceList': {
           // 유저 응답용 프론트 출력
           socket.emit('ott-service-list', {

@@ -10,8 +10,8 @@ export const handlePlanRecommend = async (socket, { sessionId, message }) => {
     session = await ChatSession.create({ sessionId, messages: [] });
   }
 
-  const plans = await getPlansWithCache();
-
+  // const plans = await getPlansWithCache();
+  const plans = '';
   const newUserMsg = { role: 'user', content: message };
   const fullMessages = [...session.messages, newUserMsg];
 
