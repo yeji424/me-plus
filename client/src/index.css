@@ -46,8 +46,10 @@
     rgba(206, 1, 139, 0.7) 75%,
     rgba(235, 0, 139, 0.7) 100%
   );
-
+  --color-gradation: linear-gradient(#dfe4fd 0%, #ffffff 100%);
+  
   --shadow-basic: 0 0 20px rgba(0, 0, 0, 0.1);
+  --shadow-small: 0 0 15px rgba(0, 0, 0, 0.07);
 }
 @layer base {
   :root {

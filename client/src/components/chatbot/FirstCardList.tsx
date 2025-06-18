@@ -42,24 +42,26 @@ const cardData = [
 // 코드가 길지않아 그냥 한 파일에 넣었습니다
 const CardItem = ({ item }: { item: (typeof cardData)[0] }) => {
   return (
-    <div className="w-[152px] h-[221px] shrink-0 flex flex-col items-center gap-[18px] p-[10px] rounded-[12px] bg-white shadow">
+    <div className="w-[152px] shrink-0 flex flex-col items-center gap-[18px] p-[10px] rounded-[12px] bg-gradation shadow-small">
       <img
         src={item.image}
         alt={item.title}
         draggable={false}
         className="w-full h-auto object-contain"
       />
-      <div className="w-full flex flex-col items-center">
-        <div className="text-[14px] font-semibold">{item.title}</div>
-        <div>
-          <div className="text-[10px]">{item.content}</div>
-          <div className="text-[10px] font-semibold tracking-[-0.06em] text-secondary-purple-80">
+      <div className="w-full flex flex-col items-center gap-2">
+        <div className="text-[14px] font-semibold leading-[14px]">
+          {item.title}
+        </div>
+        <div className="flex flex-col items-center text-[10px]">
+          <div className="text-gray700">{item.content}</div>
+          <div className=" font-semibold tracking-[-0.06em] text-secondary-purple-80">
             {item.subcontent}
           </div>
         </div>
       </div>
       <button
-        className="cursor-pointer w-full px-[15px] py-[6px] rounded-[5.5px] bg-primary-pink text-white font-semibold text-[10px] text-center"
+        className="cursor-pointer w-full px-[15px] py-[6px] rounded-[5.5px] bg-primary-pink text-white font-semibold text-[9px] text-center"
         onClick={() => {}}
       >
         {item.buttonText}
@@ -70,7 +72,7 @@ const CardItem = ({ item }: { item: (typeof cardData)[0] }) => {
 
 const FirstCardList = () => {
   return (
-    <DraggableScroll className="flex flex-nowrap gap-4 overflow-x-auto hide-scrollbar">
+    <DraggableScroll className="flex flex-nowrap gap-[6px] hide-scrollbar overflow-visible">
       {cardData.map((item) => (
         <CardItem key={item.id} item={item} />
       ))}

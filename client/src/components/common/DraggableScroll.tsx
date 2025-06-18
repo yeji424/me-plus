@@ -1,67 +1,53 @@
-import { useRef, useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
+import { useRef, useEffect, useState, type ReactNode } from 'react';
+import { motion } from 'framer-motion';
 
-interface DraggableScrollProps {
+type Props = {
   children: ReactNode;
   className?: string;
-}
+};
 
-const DraggableScroll = ({
-  children,
-  className = '',
-}: DraggableScrollProps) => {
-  const scrollRef = useRef<HTMLDivElement | null>(null);
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollLeft = useRef(0);
-  const [isGrabbing, setIsGrabbing] = useState(false);
+const DraggableScroll = ({ children, className = '' }: Props) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const [constraints, setConstraints] = useState({ left: 0, right: 0 });
+
+  const updateConstraints = () => {
+    const container = containerRef.current;
+    const inner = innerRef.current;
+    if (container && inner) {
+      const containerWidth = container.offsetWidth;
+      const innerWidth = inner.scrollWidth;
+      const scrollDistance = innerWidth - containerWidth;
+      setConstraints({
+        left: -Math.max(scrollDistance, 0),
+        right: 0,
+      });
+    }
+  };
 
   useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    const handleMouseDown = (e: MouseEvent) => {
-      isDragging.current = true;
-      startX.current = e.pageX - el.offsetLeft;
-      scrollLeft.current = el.scrollLeft;
-      setIsGrabbing(true);
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging.current) return;
-      e.preventDefault();
-      const x = e.pageX - el.offsetLeft;
-      const walk = x - startX.current;
-      el.scrollLeft = scrollLeft.current - walk;
-    };
-
-    const handleMouseUp = () => {
-      isDragging.current = false;
-      setIsGrabbing(false);
-    };
-
-    el.addEventListener('mousedown', handleMouseDown);
-    el.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      el.removeEventListener('mousedown', handleMouseDown);
-      el.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
+    updateConstraints();
+    window.addEventListener('resize', updateConstraints); // 리사이즈 대응
+    return () => window.removeEventListener('resize', updateConstraints);
   }, []);
 
+  useEffect(() => {
+    updateConstraints();
+  }, [children]);
+
   return (
-    <div
-      ref={scrollRef}
-      className={className}
-      style={{
-        overflowX: 'auto',
-        cursor: isGrabbing ? 'grabbing' : 'grab',
-        userSelect: 'none',
-      }}
-    >
-      {children}
+    <div ref={containerRef} className={`overflow-hidden ${className}`}>
+      <motion.div
+        ref={innerRef}
+        className={`flex ${className}`}
+        drag="x"
+        dragConstraints={constraints}
+        dragElastic={0.1}
+        whileTap={{ cursor: 'grabbing' }}
+        style={{ cursor: 'grab' }}
+      >
+        {children}
+      </motion.div>
     </div>
   );
 };
