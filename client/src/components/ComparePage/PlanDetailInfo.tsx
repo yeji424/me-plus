@@ -1,42 +1,27 @@
-interface Plan {
-  id: string;
-  category: string;
-  name: string;
-  monthlyFee: number;
-  bundleBenefit?: {
-    _id: string;
-    name: string;
-  };
-  basicBenefits?: Array<{
-    _id: string;
-    name: string;
-    description: string;
-  }>;
-  specialBenefits?: {
-    premiumServices: Array<{ _id: string; name: string }>;
-    mediaServices: Array<{ _id: string; name: string }>;
-  };
-  benefits?: string;
-}
+import type { Plan } from '@/components/types/Plan';
 
 interface PlanDetailInfoProps {
   plan: Plan;
 }
 
 const PlanDetailInfo: React.FC<PlanDetailInfoProps> = ({ plan }) => {
-  const formatBenefits = (plan: Plan): string => {
-    if (plan.benefits) return plan.benefits;
-
-    // specialBenefits가 있는 경우 처리
-    if (plan.specialBenefits) {
+  const formatBenefits = (plan: Plan): string[] => {
+    if (plan.mediaAddons && plan.premiumAddons) {
       const services = [
-        ...(plan.specialBenefits.premiumServices || []),
-        ...(plan.specialBenefits.mediaServices || []),
+        ...(plan.mediaAddons || []),
+        ...', ',
+        ...(plan.premiumAddons || []),
       ];
-      return services.map((service) => service.name).join(', ');
+      return services;
+    } else if (plan.mediaAddons) {
+      const services = [...(plan.mediaAddons || [])];
+      return services;
+    } else if (plan.premiumAddons) {
+      const services = [...(plan.premiumAddons || [])];
+      return services;
     }
 
-    return '기본 제공';
+    return ['-'];
   };
 
   return (
