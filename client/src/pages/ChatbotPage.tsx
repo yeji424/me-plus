@@ -6,6 +6,7 @@ import BotBubble from '@/components/chatbot/BotBubble';
 import InputBox from '@/components/chatbot/InputBox';
 import UserBubble from '@/components/chatbot/UserBubble';
 import ToggleCard from '@/components/chatbot/ToggleCard';
+import FirstCardList from '@/components/chatbot/FirstCardList';
 
 type Message =
   | { type: 'user'; text: string }
@@ -66,6 +67,7 @@ const ChatbotPage = () => {
         )}
       </div>
       <ToggleCard />
+      <FirstCardList />
       <div className="border-3 fixed bottom-5 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] py-3 bg-transparent flex items-center justify-center z-50">
         <InputBox onSend={handleSendMessage} />
       </div>

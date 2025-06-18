@@ -87,6 +87,14 @@
 .bg-gradation {
   background-image: var(--color-gradation);
 }
+/* 스크롤바 숨기기입니다. 갖다쓰세영~ */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
 
 /* 테일윈드 사용한 유틸리티 클래스(재사용 가능한 class) 여기 넣으면 됩니다! */
 @layer utilities {
