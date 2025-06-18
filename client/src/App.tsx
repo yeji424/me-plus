@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 import ChatTestPage from './pages/ChatTestPage';
 import ChatbotPage from './pages/ChatbotPage';
-import PlanTestPage from './pages/PlanTestPage';
+import TestFirstPage from './pages/TestFirstPage';
 import TestPage from './pages/TestPage';
 import ComparePage from './pages/ComparePage';
 import MainPage from './pages/MainPage';
@@ -33,7 +33,7 @@ function App() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<MainPage />} />
           <Route path="chatbot" element={<ChatbotPage />} />
-          <Route path="plan-test" element={<PlanTestPage />} />
+          <Route path="plan-test" element={<TestFirstPage />} />
           <Route path="test1" element={<TestPage />} />
           <Route path="compare" element={<ComparePage />} />
           <Route path="/chat-test" element={<ChatTestPage />} />

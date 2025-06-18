@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SelectButton from '@/components/common/SelectButton';
-import SelectButton3 from '@/components/common/SelectButton3';
+import SelectButton from '@/components/testPage/SelectButton';
+import SelectButton3 from '@/components/testPage/SelectButton3';
 import Header from '@/components/common/Header';
-import ProgressBar from '../components/common/ProgressBar';
+import ProgressBar from '../components/testPage/ProgressBar';
 import moonerImage from '../assets/image/mooner_hmm.png';
 import moonerAhaImage from '../assets/image/mooner_aha.png';
 import tips from '../assets/icon/tips.png';
