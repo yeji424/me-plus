@@ -29,32 +29,27 @@ const BotBubbleFrame = ({
   messageChunks,
   functionCall,
 }: BotBubbleFrameProps) => {
-  const renderButtonGroup = () => {
-    if (!functionCall) return null;
-
-    const { name, args } = functionCall;
-
-    switch (name) {
-      case 'requestCarouselButtons':
-        return args?.items ? (
-          <CarouselButtonGroup options={args.items} />
-        ) : null;
-
-      case 'requestOXButtons':
-        return args?.options ? <OXButtonGroup options={args.options} /> : null;
-
-      case 'requestOttButtons':
-        return <OttButtonGroup />;
-
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="space-y-2">
       <BotBubble messageChunks={messageChunks} />
-      {renderButtonGroup()}
+      {functionCall &&
+        (() => {
+          const { name, args } = functionCall;
+          switch (name) {
+            case 'requestCarouselButtons':
+              return args?.items ? (
+                <CarouselButtonGroup options={args.items} />
+              ) : null;
+            case 'requestOXButtons':
+              return args?.options ? (
+                <OXButtonGroup options={args.options} />
+              ) : null;
+            case 'requestOttButtons':
+              return <OttButtonGroup />;
+            default:
+              return null;
+          }
+        })()}
     </div>
   );
 };
