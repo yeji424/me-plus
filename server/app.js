@@ -2,7 +2,15 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
-import { getPlanDetail } from './controllers/planController.js';
+import { getInputExamples } from './controllers/chatController.js';
+import {
+  getAffordablePlanList,
+  getBundlePlanList,
+  getOTTPlanList,
+  getPlanDetail,
+  getPlanList,
+  getUnlimitedDataPlanList,
+} from './controllers/planController.js';
 
 dotenv.config();
 
@@ -22,11 +30,20 @@ mongoose
   .catch(console.error);
 
 // changeSchema();
+// getChatResponse().then((res) => {
+//   console.log(res);
+// });
 
 // Routers
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
+apiRouter.get('/chat/inputs', getInputExamples);
 apiRouter.get('/plans/:planId', getPlanDetail);
+apiRouter.get('/unlimited-plans', getUnlimitedDataPlanList);
+apiRouter.get('/ott-plans', getOTTPlanList);
+apiRouter.get('/affordable-plans', getAffordablePlanList);
+apiRouter.get('/bundle-plans', getBundlePlanList);
+apiRouter.get('/plans', getPlanList);
 
 export default app;
