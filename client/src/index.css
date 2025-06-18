@@ -73,3 +73,11 @@ main {
     @apply cursor-pointer stroke-gray-500 hover:text-secondary-purple-60 transition-colors;
   }
 }
+
+[data-rsbs-scroll] {
+  scrollbar-width: none;
+}
+[data-rsbs-header]:before {
+  background-color: var(--color-secondary-purple-80) !important;
+  width: 44px !important;
+}
