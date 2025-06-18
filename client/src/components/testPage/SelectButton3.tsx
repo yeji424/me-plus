@@ -12,7 +12,7 @@ const SelectButton3: React.FC<SelectButton3Props> = ({
   onClick,
 }) => {
   const baseClass =
-    'w-full py-4 px-3 text-center text-sm rounded-xl font-medium transition-all';
+    'w-full px-[27px] py-[25px] text-[16px] rounded-xl font-medium transition-all text-left flex justify-start';
 
   const selectedClass = selected
     ? 'text-[var(--color-gray700)]'
