@@ -3,13 +3,16 @@ import Header from '@/components/common/Header';
 import NewChatIcon from '@/assets/icon/new_chat_icon.svg?react';
 import CallIcon from '@/assets/icon/call_icon.svg?react';
 import UserBubble from '@/components/chatbot/UserBubble';
-import BotBubble from '@/components/chatbot/BotBubble';
 import InputBox from '@/components/chatbot/InputBox';
 import { socket } from '@/utils/socket';
+import BotBubbleFrame, {
+  type CarouselItem,
+  type FunctionCall,
+} from '@/components/chatbot/BotBubbleFrame';
 
 type Message =
   | { type: 'user'; text: string }
-  | { type: 'bot'; messageChunks: string[] };
+  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall };
 
 const ChatbotPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -38,6 +41,19 @@ const ChatbotPage = () => {
         setMessages(converted);
       },
     );
+    socket.on('carousel-buttons', (items: CarouselItem[]) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: 'bot',
+          messageChunks: ['다음 항목 중 하나를 선택해주세요:'],
+          functionCall: {
+            name: 'requestCarouselButtons',
+            args: { items },
+          },
+        },
+      ]);
+    });
 
     return () => {
       socket.off('session-id');
@@ -72,6 +88,7 @@ const ChatbotPage = () => {
     return () => {
       socket.off('stream');
       socket.off('done');
+      socket.off('carousel-buttons');
     };
   }, []);
 
@@ -109,18 +126,19 @@ const ChatbotPage = () => {
         ]}
       />
 
-
-
       <div className="space-y-2 max-w-[560px] mx-auto mt-4 px-4">
         {messages.map((msg, idx) =>
           msg.type === 'user' ? (
             <UserBubble key={idx} message={msg.text} />
           ) : (
-            <BotBubble key={idx} messageChunks={msg.messageChunks} />
+            <BotBubbleFrame
+              key={idx}
+              messageChunks={msg.messageChunks}
+              functionCall={msg.functionCall}
+            />
           ),
         )}
       </div>
-
       <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] py-3 bg-transparent flex items-center justify-center z-50">
         <InputBox
           onSend={handleSendMessage}
