@@ -18,7 +18,7 @@ const SelectButton: React.FC<SelectButtonProps> = ({
   const baseClass =
     'w-[153px] h-[153px] flex flex-col items-center justify-center text-lg transition-all rounded-[20px]';
 
-  const textColor = selected ? 'text-[var(--color-gray-700)]' : 'text-gray-400';
+  const textColor = selected ? 'text-[var(--color-gray700)]' : 'text-gray-400';
   const iconColor = selected
     ? 'text-[var(--color-primary-pink)]'
     : 'text-gray-300';
@@ -40,7 +40,7 @@ const SelectButton: React.FC<SelectButtonProps> = ({
     <button
       onClick={onClick}
       className={`${baseClass} ${textColor} ${
-        selected ? '' : 'border border-gray-300 bg-white'
+        selected ? '' : 'border border-gray300 bg-white'
       }`}
       style={selectedStyle}
     >
