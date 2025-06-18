@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Button from '@/components/common/Button';
 import SelectButton from '@/components/testPage/SelectButton';
 import SelectButton3 from '@/components/testPage/SelectButton3';
 import Header from '@/components/common/Header';
@@ -121,6 +122,10 @@ const TestPage = () => {
     }
   };
 
+  const allAnswered = questions.every(
+    (q) => selectedOptions[q.id] !== undefined,
+  );
+
   return (
     <div className="h-screen flex flex-col">
       <Header title="나에게 잘 어울리는 요금제는?" onBackClick={handleGoHome} />
@@ -193,7 +198,14 @@ const TestPage = () => {
                 “{currentQuestion.tip.highlight}”
               </span>
               {currentQuestion.tip.rest}
-            </p>
+            </p>{' '}
+            {allAnswered && (
+              <div className="w-full mt-10">
+                <Button onClick={() => navigate('/test-wait')}>
+                  Me플러스 맞춤 추천 받기
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
