@@ -27,14 +27,17 @@ const ChatbotPage = () => {
       localStorage.setItem('sessionId', id);
     });
 
-    socket.on('session-history', (logs) => {
-      const converted: Message[] = logs.map((msg: any) =>
-        msg.role === 'user'
-          ? { type: 'user', text: msg.content }
-          : { type: 'bot', messageChunks: [msg.content] },
-      );
-      setMessages(converted);
-    });
+    socket.on(
+      'session-history',
+      (logs: { role: string; content: string }[]) => {
+        const converted: Message[] = logs.map((msg) =>
+          msg.role === 'user'
+            ? { type: 'user', text: msg.content }
+            : { type: 'bot', messageChunks: [msg.content] },
+        );
+        setMessages(converted);
+      },
+    );
 
     return () => {
       socket.off('session-id');
@@ -54,7 +57,10 @@ const ChatbotPage = () => {
             { type: 'bot', messageChunks: [responseRef.current] },
           ];
         } else {
-          return [...prev, { type: 'bot', messageChunks: [chunk] }];
+          return [
+            ...prev,
+            { type: 'bot', messageChunks: [responseRef.current] },
+          ];
         }
       });
     });
