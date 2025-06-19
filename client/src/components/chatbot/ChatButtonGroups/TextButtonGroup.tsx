@@ -18,7 +18,7 @@ const TextButtonGroup = ({ options, onButtonClick }: TextButtonGroupProps) => {
   };
 
   return (
-    <div className="inline-flex flex-col gap-1 items-start">
+    <div className="overflow-visible inline-flex flex-col gap-1 items-start px-1 mx-1.5">
       {options.map((option, idx) => (
         <ChatButton
           key={idx}

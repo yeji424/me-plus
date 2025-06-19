@@ -26,7 +26,7 @@ const OXButtonGroup = ({ options, onButtonClick }: OXButtonGroupProps) => {
   };
 
   return (
-    <DraggableScroll className="flex flex-nowrap gap-1 hide-scrollbar overflow-visible">
+    <DraggableScroll className="overflow-visible gap-1 items-start px-1 mx-1.5">
       {options.map((option) => (
         <ChatButton
           key={option.id}

@@ -34,17 +34,19 @@ const OttButtonGroup = ({ onButtonClick }: OttButtonGroupProps) => {
   };
 
   return (
-    <DraggableScroll className="flex flex-nowrap gap-1 hide-scrollbar overflow-visible">
-      {OTT_SERVICES.map((service) => (
-        <ChatButton
-          key={service.id}
-          label={service.label}
-          icon={<img src={service.icon} alt={service.label} />}
-          disabled={clickedButton !== null && clickedButton !== service.label}
-          onClick={() => handleButtonClick(service.label)}
-        />
-      ))}
-    </DraggableScroll>
+    <div className="px-1 -mx-1">
+      <DraggableScroll className="flex overflow-visible flex-nowrap gap-1  mx-1.5">
+        {OTT_SERVICES.map((service) => (
+          <ChatButton
+            key={service.id}
+            label={service.label}
+            icon={<img src={service.icon} alt={service.label} />}
+            disabled={clickedButton !== null && clickedButton !== service.label}
+            onClick={() => handleButtonClick(service.label)}
+          />
+        ))}
+      </DraggableScroll>
+    </div>
   );
 };
 
