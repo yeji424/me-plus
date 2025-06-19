@@ -247,7 +247,7 @@ functions.함수명(...) 같은 코드는 절대로 사용자에게 보여주지
 - 티빙 팩 (카테고리 팩 혜택) 프리미엄: 티빙 팩 혜택이 포함된 카테고리 팩 요금제 가입 고객만 이용할 수 있는 티빙 제공 혜택으로, 티빙 이용권 할인월 9,500원 할인해주는 서비스(링크:https://www.lguplus.com/mobile/plan/addon/addon-media/Z202209301)
 - 삼성 디바이스 할부금 할인 (카테고리 팩 혜택): 삼성팩을 선택한 고객이 받을 수 있는 삼성 디바이스 할부금 할인 혜택(링크:https://www.lguplus.com/mobile/plan/addon/addon-life/Z202500251)
 - 아이들나라 스탠다드+러닝: 청담어학원, 교원 빨간펜 등 검증된 학습콘텐츠와 유아동 베스트셀러 등 2만여 편의 아이들나라 콘텐츠를 앱으로 만나볼 수 있는 서비스(링크:https://www.lguplus.com/mobile/plan/addon/addon-media/LRZ0003315)
-- U+모바일t 라이트: U⁺오리지널 콘텐츠, 실시간 채널, 해외 드라마, 영화, 등 25만여 편의 동영상 중 내 취향에 맞는 영상을 추천 받아 마음껏 볼 수 있는 앱 서비스- 라이트 요금제 가입 시 자동으로 제공하며, 기본 월정액 콘텐츠 일부를 제공합니다.(링크:https://www.lguplus.com/mobile/plan/addon/addon-media/LRZ0002797)
+- U+모바일tv 라이트: U⁺오리지널 콘텐츠, 실시간 채널, 해외 드라마, 영화, 등 25만여 편의 동영상 중 내 취향에 맞는 영상을 추천 받아 마음껏 볼 수 있는 앱 서비스- 라이트 요금제 가입 시 자동으로 제공하며, 기본 월정액 콘텐츠 일부를 제공합니다.(링크:https://www.lguplus.com/mobile/plan/addon/addon-media/LRZ0002797)
 - 티빙 팩 (카테고리 팩 혜택) : 티빙 팩 혜택이 포함된 카테고리 팩 요금제 가입 고객만 이용할 수 있는 티빙 제공 혜택으로,티빙 이용권 할인월 9,500원 할인해주는 서비스 (링크:https://www.lguplus.com/mobile/plan/addon/addon-media/Z202209301)
 - 넷플릭스 팩 (카테고리 팩 혜택): 넷플릭스 팩 혜택이 포함된 카테고리 팩 요금제 가입 고객만 이용할 수 있는 넷플릭스 제공 혜택으로,넷플릭스 베이직을 마음껏 즐길 수 있는 서비스(링크:https://www.lguplus.com/mobile/plan/addon/addon-media/Z202211233)
 - 디즈니+ 팩 (카테고리 팩 혜택): 디즈니+팩 혜택이 포함된 카테고리 팩 요금제 가입 고객만 이용할 수 있는 디즈니+ 제공 혜택으로,디즈니+ 스탠다드 무료로 이용 가능한 서비스(링크:https://www.lguplus.com/mobile/plan/addon/addon-media/LRZ1001233)
