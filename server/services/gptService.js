@@ -19,9 +19,15 @@ export const streamChat = async (messages, socket, onDelta) => {
         parameters: { type: 'object', properties: {} },
       },
       {
+        name: 'requestOXCarouselButtons',
+        description:
+          '유저에게 예/아니오로만 대답할 수 있는 선택지를 캐러셀 형태로 제공합니다.',
+        parameters: { type: 'object', properties: {} },
+      },
+      {
         name: 'requestCarouselButtons',
         description:
-          '유저의 화면에 캐러셀 버튼들을 보여주며, 버튼의 텍스트와 id를 포함한 항목들을 응답합니다.',
+          '유저에게 짧은 키워드나 명사형 선택지를 가로 스크롤 캐러셀 형태로 제공합니다. 통신사명, 요금대, 데이터량, 기술(5G/LTE) 등 단순한 카테고리 선택에 사용합니다.',
         parameters: {
           type: 'object',
           properties: {
@@ -99,7 +105,8 @@ export const streamChat = async (messages, socket, onDelta) => {
       },
       {
         name: 'requestTextButtons',
-        description: '유저에게 질문 텍스트와 버튼형 응답 선택지를 제공합니다.',
+        description:
+          '유저에게 복잡한 문장형 응답 선택지를 세로 배열 버튼으로 제공합니다. 3개 이상의 선택지가 있고, 각 선택지가 완전한 문장이거나 상세한 설명일 때 사용합니다.',
         parameters: {
           type: 'object',
           properties: {
@@ -154,6 +161,14 @@ export const streamChat = async (messages, socket, onDelta) => {
           socket.emit('ott-service-list', {
             question: '어떤 OTT 서비스를 함께 사용 중이신가요?',
             options: ['넷플릭스', '디즈니+', '티빙', '왓챠'],
+          });
+          break;
+        }
+
+        case 'requestOXCarouselButtons': {
+          // 예/아니오 선택지를 캐러셀 형태로 제공
+          socket.emit('ox-carousel-buttons', {
+            options: ['예', '아니오'],
           });
           break;
         }
