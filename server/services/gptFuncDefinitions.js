@@ -42,6 +42,21 @@ export const getPlans = async () => {
   }
 };
 
+/** 인기 요금제 목록 */
+export const getPopularPlans = async () => {
+  try {
+    const popularPlans = await Plan.find({ isPopular: true }).select(
+      EXCLUDED_FIELDS,
+    );
+    const data = refineData(popularPlans);
+
+    return { plans: data };
+  } catch (error) {
+    console.error('getPopularPlans >>', error);
+    throw error;
+  }
+};
+
 /** 무제한 요금제 목록 */
 export const getUnlimitedDataPlans = async () => {
   try {
