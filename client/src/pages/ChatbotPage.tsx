@@ -3,133 +3,99 @@ import Header from '@/components/common/Header';
 import NewChatIcon from '@/assets/icon/new_chat_icon.svg?react';
 import CallIcon from '@/assets/icon/call_icon.svg?react';
 import UserBubble from '@/components/chatbot/UserBubble';
-import BotBubble from '@/components/chatbot/BotBubble';
 import InputBox from '@/components/chatbot/InputBox';
-import { socket } from '@/utils/socket';
-
-type Message =
-  | { type: 'user'; text: string }
-  | { type: 'bot'; messageChunks: string[] };
+import BotBubbleFrame from '@/components/chatbot/BotBubbleFrame';
+import { useChatSocket } from '@/hooks/useChatSocket';
+// import GradientScroll from 'react-gradient-scroll-indicator';
 
 const ChatbotPage = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [isStreaming, setIsStreaming] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const responseRef = useRef('');
-
-  useEffect(() => {
-    const existing = localStorage.getItem('sessionId');
-    socket.emit('init-session', existing || null);
-
-    socket.on('session-id', (id: string) => {
-      setSessionId(id);
-      localStorage.setItem('sessionId', id);
-    });
-
-    socket.on(
-      'session-history',
-      (logs: { role: string; content: string }[]) => {
-        const converted: Message[] = logs.map((msg) =>
-          msg.role === 'user'
-            ? { type: 'user', text: msg.content }
-            : { type: 'bot', messageChunks: [msg.content] },
-        );
-        setMessages(converted);
-      },
-    );
-
-    return () => {
-      socket.off('session-id');
-      socket.off('session-history');
-    };
-  }, []);
-
-  // ✅ 소켓 응답 처리
-  useEffect(() => {
-    socket.on('stream', (chunk: string) => {
-      responseRef.current += chunk;
-      setMessages((prev) => {
-        const last = prev[prev.length - 1];
-        if (last?.type === 'bot') {
-          return [
-            ...prev.slice(0, -1),
-            { type: 'bot', messageChunks: [responseRef.current] },
-          ];
-        } else {
-          return [
-            ...prev,
-            { type: 'bot', messageChunks: [responseRef.current] },
-          ];
-        }
-      });
-    });
-
-    socket.on('done', () => {
-      setIsStreaming(false);
-    });
-
-    return () => {
-      socket.off('stream');
-      socket.off('done');
-    };
-  }, []);
+  const { messages, isStreaming, sendMessage, startNewChat } = useChatSocket();
 
   const handleSendMessage = (text: string) => {
-    if (!text.trim() || !sessionId) return;
-
-    const payload = {
-      sessionId,
-      message: text.trim(),
-    };
-
-    setMessages((prev) => [...prev, { type: 'user', text }]);
-    setIsStreaming(true);
+    sendMessage(text);
     setInput('');
-    responseRef.current = '';
-
-    socket.emit('recommend-plan', payload);
   };
 
   const handleNewChat = () => {
-    if (!sessionId) return;
-    socket.emit('reset-session', { sessionId });
-    setMessages([]);
+    startNewChat();
     setInput('');
-    responseRef.current = '';
   };
 
+  const handleButtonClick = (message: string) => {
+    sendMessage(message);
+  };
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const prevMessageLengthRef = useRef(0);
+  useEffect(() => {
+    if (!bottomRef.current) return;
+
+    const isNewMessageAdded = messages.length > prevMessageLengthRef.current;
+    prevMessageLengthRef.current = messages.length;
+
+    // 1) 메시지 추가되면 부드럽게 스크롤
+    bottomRef.current.scrollIntoView({
+      behavior: isNewMessageAdded ? 'smooth' : 'smooth',
+    });
+
+    // 2) 300ms 후에 무조건 딱 맨 아래로 스크롤(스크롤 위치 재조정)
+    const timeout = setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [messages]);
+
   return (
-    <div>
+    <>
+      {/* 1. Header - Fixed */}
       <Header
         title="요금제 추천 AI 챗봇 Me+"
         iconButtons={[
           { icon: <NewChatIcon />, onClick: handleNewChat },
           { icon: <CallIcon />, onClick: () => {} },
         ]}
+        isTransparent={true}
+        className="custom-header"
       />
-
-
-
-      <div className="space-y-2 max-w-[560px] mx-auto mt-4 px-4">
-        {messages.map((msg, idx) =>
-          msg.type === 'user' ? (
-            <UserBubble key={idx} message={msg.text} />
-          ) : (
-            <BotBubble key={idx} messageChunks={msg.messageChunks} />
-          ),
-        )}
+      {/* 원래 삭제해도 되는데 같이 넣으니까 더 자연스러워서 넣음 */}
+      <div className="pointer-events-none fixed top-13 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-[40px] z-30 bg-gradient-to-b from-[#ffffff] to-transparent" />
+      {/* 2. ChatArea - Flex */}
+      <div className="gradient-scroll-container flex flex-col h-[100vh]">
+        {/* 패딩으로 보이는 영역 조절 (= 스크롤 가능 영역) */}
+        {/* 마진으로 안하고 패딩으로 한 이유 : 마진으로 하면 그라데이션 넣은 이유 사라짐 */}
+        <div className="relative flex-1 overflow-y-auto pt-[94px] pb-[60px]">
+          {/* 메시지 리스트 */}
+          <div className="space-y-2 max-w-[560px]  min-h-full px-1 -mx-1">
+            <div className="h-1" />
+            {messages.map((msg, idx) =>
+              msg.type === 'user' ? (
+                <UserBubble key={idx} message={msg.text} />
+              ) : (
+                <BotBubbleFrame
+                  key={idx}
+                  messageChunks={msg.messageChunks}
+                  functionCall={msg.functionCall}
+                  onButtonClick={handleButtonClick}
+                />
+              ),
+            )}
+            <div ref={bottomRef} />
+          </div>
+        </div>
       </div>
-
-      <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] py-3 bg-transparent flex items-center justify-center z-50">
-        <InputBox
-          onSend={handleSendMessage}
-          value={input}
-          onChange={(v) => setInput(v)}
-          disabled={isStreaming}
-        />
+      {/* 3. InputBox - Fixed */}
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] z-50">
+        <div className="bg-background-80 h-[65px]  rounded-xl shadow-[0_-3px_15px_rgba(0,0,0,0.15)] border-t border-gray-100 py-3 px-5">
+          <InputBox
+            onSend={handleSendMessage}
+            value={input}
+            onChange={(v) => setInput(v)}
+            disabled={isStreaming}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

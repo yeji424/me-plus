@@ -69,6 +69,14 @@
     background-color: var(--color-gray300);
     @apply flex items-start justify-center relative w-full;
   }
+  body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+    overflow: hidden;
+  }
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+  }
   #root {
     @apply overflow-x-hidden overflow-y-auto relative max-w-[600px] w-full min-h-screen;
     @apply pr-[20px] pb-[0px] pl-[20px];
@@ -88,13 +96,24 @@
 .bg-gradation {
   background-image: var(--color-gradation);
 }
-/* 스크롤바 숨기기입니다. 갖다쓰세영~ */
 .hide-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+.user-bubble {
+  background: linear-gradient(
+      180deg,
+      #5732a1 0%,
+      #5b038c 25%,
+      #a0018b 50%,
+      #ce018b 75%,
+      #eb008b 100%
+    )
+    no-repeat center;
+  background-attachment: fixed;
 }
 
 /* 테일윈드 사용한 유틸리티 클래스(재사용 가능한 class) 여기 넣으면 됩니다! */
@@ -119,4 +138,46 @@
 [data-rsbs-header]:before {
   background-color: var(--color-secondary-purple-80) !important;
   width: 44px !important;
+}
+
+/* GradientScroll 스크롤바 숨기기 */
+.gradient-scroll-container ::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+}
+.gradient-scroll-container * {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+/* GradientScroll 상단 그라데이션 숨기기 - 여러 방법 시도 */
+.gradient-scroll-container > div::before,
+.gradient-scroll-container > div::after {
+  display: none !important;
+}
+
+.gradient-scroll-container > div {
+  background: none !important;
+  background-image: none !important;
+}
+.custom-header {
+  padding-bottom: 45px !important;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 1) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+/* 상단 그라데이션만 숨기기 */
+.gradient-scroll-container > div:first-child {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0px,
+    black 30px
+  ) !important;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0px,
+    black 30px
+  ) !important;
 }

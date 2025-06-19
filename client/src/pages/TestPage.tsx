@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import Modal from '@/components/common/Modal';
 import { useNavigate } from 'react-router-dom';
 import { TestResult } from '@/data/TestResult';
 import { questions } from '@/data/Questions';
+import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
 import SelectButton from '@/components/testPage/SelectButton';
 import SelectButton3 from '@/components/testPage/SelectButton3';
