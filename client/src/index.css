@@ -159,15 +159,6 @@
   background: none !important;
   background-image: none !important;
 }
-.custom-header {
-  padding-bottom: 45px !important;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 1) 60%,
-    rgba(255, 255, 255, 0) 100%
-  );
-}
 /* 상단 그라데이션만 숨기기 */
 .gradient-scroll-container > div:first-child {
   -webkit-mask-image: linear-gradient(
@@ -180,4 +171,50 @@
     transparent 0px,
     black 30px
   ) !important;
+}
+/* 채팅 페이지 헤더 */
+.custom-header {
+  padding-bottom: 45px !important;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 1) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+/* 로딩 스피너 관련 */
+.spinner-wrapper {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--color-gradation-20);
+  mask: radial-gradient(farthest-side, transparent 73%, black 74%);
+  -webkit-mask: radial-gradient(farthest-side, transparent 73%, black 74%);
+}
+.loading-spinner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #a98de6 0%,
+    #b067e4 5%,
+    #c146db 10%,
+    #d733c3 15%,
+    #eb008b 25%,
+    transparent 25%,
+    transparent 100%
+  );
+  mask: radial-gradient(farthest-side, transparent 73%, black 74%);
+  -webkit-mask: radial-gradient(farthest-side, transparent 73%, black 74%);
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
