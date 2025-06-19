@@ -109,6 +109,8 @@ const ChatbotPage = () => {
         ]}
       />
 
+
+
       <div className="space-y-2 max-w-[560px] mx-auto mt-4 px-4">
         {messages.map((msg, idx) =>
           msg.type === 'user' ? (

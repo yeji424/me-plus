@@ -46,15 +46,16 @@
     rgba(206, 1, 139, 0.7) 75%,
     rgba(235, 0, 139, 0.7) 100%
   );
+  --color-gradation-background: linear-gradient(#dfe4fd 0%, #ffffff 100%);
 
   --shadow-basic: 0 0 20px rgba(0, 0, 0, 0.1);
+  --shadow-small: 0 0 15px rgba(0, 0, 0, 0.07);
 }
 @layer base {
   :root {
     font-family: 'Poppins', sans-serif;
     @apply tracking-tighter;
     line-height: 1.5;
-    font-weight: 400;
     color-scheme: light dark;
     background-color: var(--color-background);
     color: var(--color-gray-700);
@@ -87,6 +88,14 @@
 .bg-gradation {
   background-image: var(--color-gradation);
 }
+/* 스크롤바 숨기기입니다. 갖다쓰세영~ */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
 
 /* 테일윈드 사용한 유틸리티 클래스(재사용 가능한 class) 여기 넣으면 됩니다! */
 @layer utilities {
@@ -102,4 +111,12 @@
       opacity: 1;
     }
   }
+}
+
+[data-rsbs-scroll] {
+  scrollbar-width: none;
+}
+[data-rsbs-header]:before {
+  background-color: var(--color-secondary-purple-80) !important;
+  width: 44px !important;
 }

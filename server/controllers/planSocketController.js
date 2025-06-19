@@ -1,7 +1,8 @@
 import { getPlansWithCache } from '../cache/planCache.js';
+import { ChatSession } from '../models/ChatSession.js';
 import { streamChat } from '../services/gptService.js';
 import { buildPromptMessages } from '../utils/promptBuilder.js';
-import { ChatSession } from '../models/ChatSession.js';
+
 export const handlePlanRecommend = async (socket, { sessionId, message }) => {
   let session = await ChatSession.findOne({ sessionId });
 

@@ -3,6 +3,7 @@ interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
+  isModal?: boolean;
 }
 
 const colorClasses: Record<string, string> = {
@@ -15,6 +16,7 @@ const Button: React.FC<ButtonProps> = ({
   children = '계속할래요',
   onClick,
   disabled = false,
+  isModal = false,
 }) => {
   return (
     <button
@@ -22,6 +24,7 @@ const Button: React.FC<ButtonProps> = ({
       disabled={disabled}
       className={`
         px-4 py-[9px] rounded-[10px] font-semibold w-full text-sm
+        ${isModal ? 'h-[42px]' : 'h-full'}
         ${colorClasses[color] || colorClasses.primary}
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:cursor-pointer'}
       `}
