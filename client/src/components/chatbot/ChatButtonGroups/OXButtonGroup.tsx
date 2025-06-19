@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import ChatButton from '../ChatButton';
-import OIcon from '@/assets/icon/o_icon.svg';
-import XIcon from '@/assets/icon/x_icon.svg';
+import OIcon from '@/assets/icon/o_icon.svg?react';
+import XIcon from '@/assets/icon/x_icon.svg?react';
 import DraggableScroll from '@/components/common/DraggableScroll';
 import type { OXOption } from '../BotBubbleFrame';
 
