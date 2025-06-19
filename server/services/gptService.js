@@ -10,119 +10,142 @@ export const streamChat = async (messages, socket, onDelta) => {
     model: 'gpt-4.1-mini-2025-04-14',
     messages,
     stream: true,
-    function_call: 'auto',
-    functions: [
+    tools: [
       {
-        name: 'requestOTTServiceList',
-        description:
-          '유저에게 통신사와 연결된 OTT 서비스 목록을 선택하도록 응답 받습니다.',
-        parameters: { type: 'object', properties: {} },
+        type: 'function',
+        function: {
+          name: 'requestOTTServiceList',
+          description:
+            '유저에게 통신사와 연결된 OTT 서비스 목록을 선택하도록 응답 받습니다.',
+          parameters: { type: 'object', properties: {} },
+        },
       },
       {
-        name: 'requestOXCarouselButtons',
-        description:
-          '유저에게 예/아니오로만 대답할 수 있는 선택지를 캐러셀 형태로 제공합니다.',
-        parameters: { type: 'object', properties: {} },
+        type: 'function',
+        function: {
+          name: 'requestOXCarouselButtons',
+          description:
+            '유저에게 예/아니오로만 대답할 수 있는 선택지를 캐러셀 형태로 제공합니다.',
+          parameters: { type: 'object', properties: {} },
+        },
       },
       {
-        name: 'requestCarouselButtons',
-        description:
-          '유저에게 짧은 키워드나 명사형 선택지를 가로 스크롤 캐러셀 형태로 제공합니다. 통신사명, 요금대, 데이터량, 기술(5G/LTE) 등 단순한 카테고리 선택에 사용합니다.',
-        parameters: {
-          type: 'object',
-          properties: {
-            items: {
-              type: 'array',
-              description: '캐러셀 버튼으로 보여줄 항목 리스트',
+        type: 'function',
+        function: {
+          name: 'requestCarouselButtons',
+          description:
+            '유저에게 짧은 키워드나 명사형 선택지를 가로 스크롤 캐러셀 형태로 제공합니다. 통신사명, 요금대, 데이터량, 기술(5G/LTE) 등 단순한 카테고리 선택에 사용합니다.',
+          parameters: {
+            type: 'object',
+            properties: {
               items: {
+                type: 'array',
+                description: '캐러셀 버튼으로 보여줄 항목 리스트',
+                items: {
+                  type: 'object',
+                  properties: {
+                    id: {
+                      type: 'string',
+                      description: '항목 고유 ID 또는 태그',
+                    },
+                    label: {
+                      type: 'string',
+                      description: '버튼에 보여질 텍스트',
+                    },
+                  },
+                  required: ['id', 'label'],
+                },
+              },
+            },
+            required: ['items'],
+          },
+        },
+      },
+      {
+        type: 'function',
+        function: {
+          name: 'showPlanLists',
+          description:
+            '유저에게 하나의 요금제 상세 정보를 카드 형식으로 제공합니다.',
+          parameters: {
+            type: 'object',
+            properties: {
+              plan: {
                 type: 'object',
                 properties: {
-                  id: { type: 'string', description: '항목 고유 ID 또는 태그' },
-                  label: {
+                  name: { type: 'string', description: '요금제 이름' },
+                  monthlyFee: { type: 'number', description: '월 요금' },
+                  description: {
                     type: 'string',
-                    description: '버튼에 보여질 텍스트',
+                    description: '요금제 요약 설명',
+                  },
+                  dataGb: { type: 'number', description: '기본 데이터 제공량' },
+                  sharedDataGb: {
+                    type: 'string',
+                    description: '공유/테더링 데이터',
+                  },
+                  voiceMinutes: {
+                    type: 'string',
+                    description: '음성통화 내용',
+                  },
+                  bundleBenefit: {
+                    type: 'string',
+                    description: '결합 할인 정보',
+                  },
+                  baseBenefit: {
+                    type: 'string',
+                    description: '기본 제공 혜택',
+                  },
+                  specialBenefit: {
+                    type: 'string',
+                    description: '특별 제공 혜택',
+                  },
+                  detailUrl: {
+                    type: 'string',
+                    description: '자세히 보기 링크 URL',
                   },
                 },
-                required: ['id', 'label'],
+                required: [
+                  'name',
+                  'monthlyFee',
+                  'description',
+                  'dataGb',
+                  'sharedDataGb',
+                  'voiceMinutes',
+                  'bundleBenefit',
+                  'baseBenefit',
+                  'specialBenefit',
+                  'detailUrl',
+                ],
               },
             },
+            required: ['plan'],
           },
-          required: ['items'],
         },
       },
       {
-        name: 'showPlanLists',
-        description:
-          '유저에게 하나의 요금제 상세 정보를 카드 형식으로 제공합니다.',
-        parameters: {
-          type: 'object',
-          properties: {
-            plan: {
-              type: 'object',
-              properties: {
-                name: { type: 'string', description: '요금제 이름' },
-                monthlyFee: { type: 'number', description: '월 요금' },
-                description: {
-                  type: 'string',
-                  description: '요금제 요약 설명',
-                },
-                dataGb: { type: 'number', description: '기본 데이터 제공량' },
-                sharedDataGb: {
-                  type: 'string',
-                  description: '공유/테더링 데이터',
-                },
-                voiceMinutes: { type: 'string', description: '음성통화 내용' },
-                bundleBenefit: {
-                  type: 'string',
-                  description: '결합 할인 정보',
-                },
-                baseBenefit: { type: 'string', description: '기본 제공 혜택' },
-                specialBenefit: {
-                  type: 'string',
-                  description: '특별 제공 혜택',
-                },
-                detailUrl: {
-                  type: 'string',
-                  description: '자세히 보기 링크 URL',
-                },
-              },
-              required: [
-                'name',
-                'monthlyFee',
-                'description',
-                'dataGb',
-                'sharedDataGb',
-                'voiceMinutes',
-                'bundleBenefit',
-                'baseBenefit',
-                'specialBenefit',
-                'detailUrl',
-              ],
-            },
-          },
-          required: ['plan'],
-        },
-      },
-      {
-        name: 'requestTextButtons',
-        description:
-          '유저에게 복잡한 문장형 응답 선택지를 세로 배열 버튼으로 제공합니다. 3개 이상의 선택지가 있고, 각 선택지가 완전한 문장이거나 상세한 설명일 때 사용합니다.',
-        parameters: {
-          type: 'object',
-          properties: {
-            question: {
-              type: 'string',
-              description: '화면에 보여줄 질문 또는 안내 텍스트',
-            },
-            options: {
-              type: 'array',
-              description: '선택 가능한 버튼 항목 리스트',
-              items: {
+        type: 'function',
+        function: {
+          name: 'requestTextButtons',
+          description:
+            '유저에게 복잡한 문장형 응답 선택지를 세로 배열 버튼으로 제공합니다. 3개 이상의 선택지가 있고, 각 선택지가 완전한 문장이거나 상세한 설명일 때 사용합니다.',
+          parameters: {
+            type: 'object',
+            properties: {
+              question: {
                 type: 'string',
+                description: '화면에 보여줄 질문 또는 안내 텍스트',
+              },
+              options: {
+                type: 'array',
+                description: '선택 가능한 버튼 항목 리스트',
+                items: {
+                  type: 'string',
+                },
               },
             },
+            required: ['question', 'options'],
           },
-          required: ['question', 'options'],
         },
       },
     ],
@@ -135,12 +158,20 @@ export const streamChat = async (messages, socket, onDelta) => {
   for await (const chunk of streamRes) {
     const delta = chunk.choices[0].delta;
 
-    // function_call 감지
-    if (delta.function_call) {
+    // tool_calls 감지 (새로운 API 형식)
+    if (delta.tool_calls) {
       isFunctionCalled = true;
-      if (delta.function_call.name) functionName = delta.function_call.name;
-      if (delta.function_call.arguments)
-        functionArgsRaw += delta.function_call.arguments;
+      const toolCall = delta.tool_calls[0];
+
+      if (toolCall.function?.name) {
+        functionName = toolCall.function.name;
+        console.log('🎯 Function name detected:', functionName);
+      }
+
+      if (toolCall.function?.arguments) {
+        functionArgsRaw += toolCall.function.arguments;
+        console.log('📝 Adding args chunk:', toolCall.function.arguments);
+      }
       continue;
     }
 
@@ -153,7 +184,20 @@ export const streamChat = async (messages, socket, onDelta) => {
   }
   if (isFunctionCalled) {
     try {
-      const args = functionArgsRaw ? JSON.parse(functionArgsRaw) : {};
+      console.log('🔧 Function called:', functionName);
+      console.log('📄 Raw arguments:', functionArgsRaw);
+
+      let args = {};
+      if (functionArgsRaw) {
+        try {
+          args = JSON.parse(functionArgsRaw);
+        } catch (parseError) {
+          console.error('❌ JSON 파싱 실패:', parseError);
+          console.log('🔍 파싱 실패한 JSON:', functionArgsRaw);
+          // JSON 파싱이 실패하면 빈 객체 사용
+          args = {};
+        }
+      }
 
       switch (functionName) {
         case 'requestOTTServiceList': {
