@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Header from '@/components/common/Header';
 import NewChatIcon from '@/assets/icon/new_chat_icon.svg?react';
 import CallIcon from '@/assets/icon/call_icon.svg?react';
@@ -24,6 +24,26 @@ const ChatbotPage = () => {
   const handleButtonClick = (message: string) => {
     sendMessage(message);
   };
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const prevMessageLengthRef = useRef(0);
+  useEffect(() => {
+    if (!bottomRef.current) return;
+
+    const isNewMessageAdded = messages.length > prevMessageLengthRef.current;
+    prevMessageLengthRef.current = messages.length;
+
+    // 1) 메시지 추가되면 부드럽게 스크롤
+    bottomRef.current.scrollIntoView({
+      behavior: isNewMessageAdded ? 'smooth' : 'smooth',
+    });
+
+    // 2) 300ms 후에 무조건 딱 맨 아래로 스크롤(스크롤 위치 재조정)
+    const timeout = setTimeout(() => {
+      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [messages]);
 
   return (
     <div>
@@ -35,7 +55,7 @@ const ChatbotPage = () => {
         ]}
       />
 
-      <div className="space-y-2 max-w-[560px] mx-auto mt-4 px-4">
+      <div className="space-y-2 max-w-[560px] mx-auto mt-4 px-4 mb-[80px]">
         {messages.map((msg, idx) =>
           msg.type === 'user' ? (
             <UserBubble key={idx} message={msg.text} />
@@ -48,6 +68,7 @@ const ChatbotPage = () => {
             />
           ),
         )}
+        <div ref={bottomRef} />
       </div>
       <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] py-3 bg-transparent flex items-center justify-center z-50">
         <InputBox
