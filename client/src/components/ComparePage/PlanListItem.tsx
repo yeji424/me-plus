@@ -1,4 +1,3 @@
-import Button from '@/components/common/Button';
 import PlanDetailInfo from './PlanDetailInfo';
 import dropdownIcon from '@/assets/icon/dropdown_icon.svg';
 import type { Plan } from '@/components/types/Plan';
@@ -35,12 +34,11 @@ const PlanListItem: React.FC<PlanListItemProps> = ({
       </div>
       {isOpen && (
         <>
-          <PlanDetailInfo plan={plan} />
-          <div className="h-[43px] mt-2">
-            <Button onClick={onSelect} disabled={isDisabled}>
-              선택하기
-            </Button>
-          </div>
+          <PlanDetailInfo
+            plan={plan}
+            onClick={onSelect}
+            disabled={isDisabled}
+          />
         </>
       )}
     </div>

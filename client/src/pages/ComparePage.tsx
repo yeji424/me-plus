@@ -9,6 +9,9 @@ import 'react-spring-bottom-sheet/dist/style.css';
 
 import ComparisonResult from '@/components/ComparePage/ComparisonResult';
 import type { Plan } from '@/components/types/Plan';
+import Modal from '@/components/common/Modal';
+import Button from '@/components/common/Button';
+import { useNavigate } from 'react-router-dom';
 
 const ComparePage: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -22,6 +25,9 @@ const ComparePage: React.FC = () => {
   const [selectedSlot, setSelectedSlot] = useState<'left' | 'right' | null>(
     null,
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const dataList = ['전체', '5G', 'LTE'];
   const priceList = [
@@ -201,11 +207,33 @@ const ComparePage: React.FC = () => {
     }));
   };
 
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   const hasSelectedPlans = selectedLeft && selectedRight;
 
   return (
     <>
-      <Header title="요금제 비교하기" />
+      <Header title="요금제 비교하기" onBackClick={() => openModal()} />
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          modalTitle="요금제 비교하기를 그만두시겠어요?"
+          modalDesc="그만두실 경우, 선택하신 요금제가 모두 초기화됩니다."
+        >
+          <Button color="secondary" isModal onClick={closeModal}>
+            계속할래요
+          </Button>
+          <Button isModal onClick={() => navigate('/')}>
+            그만둘래요
+          </Button>
+        </Modal>
+      )}
       <h1 className="font-semibold text-2xl text-center mt-[20px]">
         비교하고 싶은
         <br />

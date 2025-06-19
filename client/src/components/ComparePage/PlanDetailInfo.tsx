@@ -1,10 +1,17 @@
 import type { Plan } from '@/components/types/Plan';
+import Button from '../common/Button';
 
 interface PlanDetailInfoProps {
   plan: Plan;
+  onClick?: () => void;
+  disabled?: boolean;
 }
 
-const PlanDetailInfo: React.FC<PlanDetailInfoProps> = ({ plan }) => {
+const PlanDetailInfo: React.FC<PlanDetailInfoProps> = ({
+  plan,
+  onClick,
+  disabled,
+}) => {
   const formatBenefits = (plan: Plan): string[] => {
     if (plan.mediaAddons && plan.premiumAddons) {
       const services = [
@@ -45,6 +52,12 @@ const PlanDetailInfo: React.FC<PlanDetailInfoProps> = ({ plan }) => {
       <div className="flex gap-[5px]">
         <p className="min-w-[64px] text-secondary-purple-80">부가서비스</p>
         <p>{formatBenefits(plan)}</p>
+      </div>
+
+      <div className="h-[43px] mt-2">
+        <Button onClick={onClick} disabled={disabled}>
+          선택하기
+        </Button>
       </div>
     </div>
   );
