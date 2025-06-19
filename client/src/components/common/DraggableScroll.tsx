@@ -36,7 +36,10 @@ const DraggableScroll = ({ children, className = '' }: Props) => {
   }, [children]);
 
   return (
-    <div ref={containerRef} className={`overflow-hidden ${className}`}>
+    <div
+      ref={containerRef}
+      className={`${className.includes('overflow-') ? '' : 'overflow-hidden'} ${className}`}
+    >
       <motion.div
         ref={innerRef}
         className={`flex ${className}`}

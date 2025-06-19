@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import ChatButton from '../ChatButton';
-import OIcon from '@/assets/icon/o_icon.svg';
-import XIcon from '@/assets/icon/x_icon.svg';
+import OIcon from '@/assets/icon/o_icon.svg?react';
+import XIcon from '@/assets/icon/x_icon.svg?react';
 import DraggableScroll from '@/components/common/DraggableScroll';
 import type { OXOption } from '../BotBubbleFrame';
 
@@ -26,7 +26,7 @@ const OXButtonGroup = ({ options, onButtonClick }: OXButtonGroupProps) => {
   };
 
   return (
-    <DraggableScroll className="flex flex-nowrap gap-1 hide-scrollbar overflow-visible">
+    <DraggableScroll className="overflow-visible gap-1 items-start px-1 mx-1.5">
       {options.map((option) => (
         <ChatButton
           key={option.id}

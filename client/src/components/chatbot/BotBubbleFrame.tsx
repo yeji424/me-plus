@@ -18,16 +18,32 @@ export interface TextItem {
   id: string;
   label: string;
 }
+
+export interface PlanData {
+  name: string;
+  monthlyFee: number;
+  description: string;
+  dataGb: number;
+  sharedDataGb: string;
+  voiceMinutes: string;
+  bundleBenefit: string;
+  baseBenefit: string;
+  specialBenefit: string;
+  detailUrl: string;
+}
 export interface FunctionCall {
   name:
     | 'requestCarouselButtons'
-    | 'requestOXButtons'
-    | 'requestOttButtons'
-    | 'requestTextButtons';
+    | 'requestOXCarouselButtons'
+    | 'requestOTTServiceList'
+    | 'requestTextButtons'
+    | 'showPlanLists';
   args?: {
     items?: CarouselItem[];
-    options?: OXOption[];
+    options?: string[] | OXOption[];
     textItems?: TextItem[];
+    question?: string;
+    plan?: PlanData;
   };
 }
 export interface BotBubbleFrameProps {
@@ -41,8 +57,7 @@ const BotBubbleFrame = ({
   functionCall,
   onButtonClick,
 }: BotBubbleFrameProps) => {
-    const shouldShowMessage =
-    !functionCall || messageChunks[0]?.trim() !== '';
+  const shouldShowMessage = !functionCall || messageChunks[0]?.trim() !== '';
 
   const buttonGroup = (() => {
     if (!functionCall) return null;
@@ -55,19 +70,39 @@ const BotBubbleFrame = ({
             onButtonClick={onButtonClick}
           />
         ) : null;
-      case 'requestOXButtons':
+      case 'requestOXCarouselButtons':
         return args?.options ? (
-          <OXButtonGroup options={args.options} onButtonClick={onButtonClick} />
-        ) : null;
-      case 'requestOttButtons':
-        return <OttButtonGroup onButtonClick={onButtonClick} />;
-      case 'requestTextButtons':
-        return args?.textItems ? (
-          <TextButtonGroup
-            options={args.textItems}
+          <OXButtonGroup
+            options={
+              Array.isArray(args.options) && typeof args.options[0] === 'string'
+                ? (args.options.map((opt, idx) => ({
+                    id: idx === 0 ? 'o' : 'x',
+                    label: opt,
+                  })) as OXOption[])
+                : (args.options as OXOption[])
+            }
             onButtonClick={onButtonClick}
           />
         ) : null;
+      case 'requestOTTServiceList':
+        return <OttButtonGroup onButtonClick={onButtonClick} />;
+      case 'requestTextButtons':
+        return args?.textItems || args?.options ? (
+          <TextButtonGroup
+            options={
+              args.textItems ||
+              (args.options as string[])?.map((opt, idx) => ({
+                id: idx.toString(),
+                label: opt,
+              })) ||
+              []
+            }
+            onButtonClick={onButtonClick}
+          />
+        ) : null;
+      case 'showPlanLists':
+        // TODO: Plan card 컴포넌트 구현 필요
+        return null;
       default:
         return null;
     }
