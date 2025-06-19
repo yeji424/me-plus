@@ -1,26 +1,38 @@
 import versusIcon from '@/assets/icon/versus_icon.svg';
+import closeIcon from '@/assets/icon/close.svg';
 import type { Plan } from '@/components/types/Plan';
 
 interface PlanSelectionCardProps {
   selectedLeft: Plan | null;
   selectedRight: Plan | null;
   onSelectSlot: (slot: 'left' | 'right') => void;
+  onClearSlot: (slot: 'left' | 'right') => void;
 }
 
 const PlanSelectionCard: React.FC<PlanSelectionCardProps> = ({
   selectedLeft,
   selectedRight,
   onSelectSlot,
+  onClearSlot,
 }) => {
   return (
     <div className="flex justify-center my-[29px]">
       <div className="flex justify-between w-full">
         <div
           onClick={() => onSelectSlot('left')}
-          className={`flex-[2] flex w-full aspect-square rounded-[17px] cursor-pointer bg-background-40 py-4 px-3 justify-center  ${selectedLeft ? 'outline outline-primary-pink flex-col gap-[clamp(0px,2vw,8px)]' : 'shadow-basic items-center '}`}
+          className={`relative flex-[2] flex w-full aspect-square rounded-[17px] cursor-pointer bg-background-40 py-4 px-3 justify-center  ${selectedLeft ? 'outline outline-primary-pink flex-col gap-[clamp(0px,2vw,8px)]' : 'shadow-basic items-center '}`}
         >
           {selectedLeft ? (
             <>
+              <div
+                className="absolute top-0 right-0 p-[10px]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClearSlot('left');
+                }}
+              >
+                <img src={closeIcon} alt="closeIcon" className="w-4 h-4" />
+              </div>
               <p className="text-[15px] font-semibold text-gradation w-fit">
                 {selectedLeft.name}
               </p>
@@ -46,10 +58,19 @@ const PlanSelectionCard: React.FC<PlanSelectionCardProps> = ({
         </div>
         <div
           onClick={() => onSelectSlot('right')}
-          className={`flex-[2] flex w-full aspect-square rounded-[17px] cursor-pointer bg-background-40 py-4 px-3 justify-center  ${selectedRight ? 'outline outline-primary-pink flex-col gap-[8px]' : 'shadow-basic items-center '}`}
+          className={`relative flex-[2] flex w-full aspect-square rounded-[17px] cursor-pointer bg-background-40 py-4 px-3 justify-center  ${selectedRight ? 'outline outline-primary-pink flex-col gap-[8px]' : 'shadow-basic items-center '}`}
         >
           {selectedRight ? (
             <>
+              <div
+                className="absolute top-0 right-0 p-[10px]"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClearSlot('right');
+                }}
+              >
+                <img src={closeIcon} alt="closeIcon" className="w-4 h-4" />
+              </div>
               <p className="text-[15px] font-semibold text-gradation w-fit">
                 {selectedRight.name}
               </p>
