@@ -64,9 +64,11 @@ const ChatbotPage = () => {
           <GradientScroll
             primaryColor="#f6f7fc"
             fadeColor="transparent"
-            fadeHeight="80px"
+            fadeHeight="30px"
           >
-            <div className="space-y-2 max-w-[560px] mx-auto pb-4">
+            <div className="space-y-2 max-w-[560px] mx-auto min-h-full">
+              {/* 최소 높이를 보장하는 더미 요소 */}
+              <div className="h-1" />
               {messages.map((msg, idx) =>
                 msg.type === 'user' ? (
                   <UserBubble key={idx} message={msg.text} />
@@ -80,6 +82,8 @@ const ChatbotPage = () => {
                 ),
               )}
               <div ref={bottomRef} />
+              {/* 하단 여백 */}
+              <div className="h-5" />
             </div>
           </GradientScroll>
         </div>

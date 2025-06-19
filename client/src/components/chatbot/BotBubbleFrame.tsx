@@ -34,7 +34,7 @@ const BotBubbleFrame = ({
   const shouldShowMessage = !functionCall || messageChunks[0]?.trim() !== '';
 
   return (
-    <div className="space-y-2">
+    <div className="">
       {shouldShowMessage && <BotBubble messageChunks={messageChunks} />}
       {functionCall &&
         (() => {

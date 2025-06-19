@@ -135,3 +135,28 @@
   scrollbar-width: none !important; /* Firefox */
   -ms-overflow-style: none !important; /* IE and Edge */
 }
+
+/* GradientScroll 상단 그라데이션 숨기기 - 여러 방법 시도 */
+.gradient-scroll-container > div::before,
+.gradient-scroll-container > div::after {
+  display: none !important;
+}
+
+.gradient-scroll-container > div {
+  background: none !important;
+  background-image: none !important;
+}
+
+/* 상단 그라데이션만 숨기기 */
+.gradient-scroll-container > div:first-child {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0px,
+    black 30px
+  ) !important;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0px,
+    black 30px
+  ) !important;
+}
