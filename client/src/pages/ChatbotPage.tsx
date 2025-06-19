@@ -6,6 +6,7 @@ import UserBubble from '@/components/chatbot/UserBubble';
 import InputBox from '@/components/chatbot/InputBox';
 import BotBubbleFrame from '@/components/chatbot/BotBubbleFrame';
 import { useChatSocket } from '@/hooks/useChatSocket';
+import GradientScroll from 'react-gradient-scroll-indicator';
 
 const ChatbotPage = () => {
   const [input, setInput] = useState('');
@@ -46,37 +47,53 @@ const ChatbotPage = () => {
   }, [messages]);
 
   return (
-    <div>
+    <div className="h-screen flex flex-col">
+      {/* 1. Header - 고정 높이 */}
       <Header
         title="요금제 추천 AI 챗봇 Me+"
         iconButtons={[
           { icon: <NewChatIcon />, onClick: handleNewChat },
           { icon: <CallIcon />, onClick: () => {} },
         ]}
+        isTransparent={false}
       />
 
-      <div className="space-y-2 max-w-[560px] mx-auto mt-4 px-4 mb-[80px]">
-        {messages.map((msg, idx) =>
-          msg.type === 'user' ? (
-            <UserBubble key={idx} message={msg.text} />
-          ) : (
-            <BotBubbleFrame
-              key={idx}
-              messageChunks={msg.messageChunks}
-              functionCall={msg.functionCall}
-              onButtonClick={handleButtonClick}
-            />
-          ),
-        )}
-        <div ref={bottomRef} />
+      {/* 2. 메시지 영역 - 남은 공간 전체 차지 */}
+      <div className="flex-1 overflow-hidden">
+        <GradientScroll
+          primaryColor="#f6f7fc"
+          fadeColor="transparent"
+          fadeHeight="30px"
+          className="h-full"
+        >
+          <div className="space-y-2 max-w-[560px] mx-auto pt-4 pb-4 px-5">
+            {messages.map((msg, idx) =>
+              msg.type === 'user' ? (
+                <UserBubble key={idx} message={msg.text} />
+              ) : (
+                <BotBubbleFrame
+                  key={idx}
+                  messageChunks={msg.messageChunks}
+                  functionCall={msg.functionCall}
+                  onButtonClick={handleButtonClick}
+                />
+              ),
+            )}
+            <div ref={bottomRef} />
+          </div>
+        </GradientScroll>
       </div>
-      <div className="fixed bottom-5 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] py-3 bg-transparent flex items-center justify-center z-50">
-        <InputBox
-          onSend={handleSendMessage}
-          value={input}
-          onChange={(v) => setInput(v)}
-          disabled={isStreaming}
-        />
+
+      {/* 3. InputBox - 고정 높이 */}
+      <div className="flex-shrink-0 w-full max-w-[600px] mx-auto">
+        <div className="bg-background-80 rounded-xl shadow-[0_-3px_10px_rgba(0,0,0,0.1)] border-t border-gray-100 py-3 px-5">
+          <InputBox
+            onSend={handleSendMessage}
+            value={input}
+            onChange={(v) => setInput(v)}
+            disabled={isStreaming}
+          />
+        </div>
       </div>
     </div>
   );
