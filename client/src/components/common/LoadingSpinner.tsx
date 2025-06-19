@@ -1,9 +1,9 @@
-const GradientSpinner = () => {
+const LoadingSpinner = () => {
   return (
-      <div className="spinner-wrapper">
-        <div className="loading-spinner" />
-      </div>
+    <div className="fixed top-[90px] left-1/2 -translate-x-1/2 z-[999]">
+      <div className="loader" aria-label="Loading" role="status" />
+    </div>
   );
 };
 
-export default GradientSpinner;
+export default LoadingSpinner;
