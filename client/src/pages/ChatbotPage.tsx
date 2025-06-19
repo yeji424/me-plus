@@ -47,8 +47,8 @@ const ChatbotPage = () => {
   }, [messages]);
 
   return (
-    <div className="h-screen flex flex-col">
-      {/* 1. Header - 고정 높이 */}
+    <div>
+      {/* 1. Header - Fixed */}
       <Header
         title="요금제 추천 AI 챗봇 Me+"
         iconButtons={[
@@ -58,35 +58,36 @@ const ChatbotPage = () => {
         isTransparent={false}
       />
 
-      {/* 2. 메시지 영역 - 남은 공간 전체 차지 */}
-      <div className="flex-1 overflow-hidden">
-        <GradientScroll
-          primaryColor="#f6f7fc"
-          fadeColor="transparent"
-          fadeHeight="30px"
-          className="h-full"
-        >
-          <div className="space-y-2 max-w-[560px] mx-auto pt-4 pb-4 px-5">
-            {messages.map((msg, idx) =>
-              msg.type === 'user' ? (
-                <UserBubble key={idx} message={msg.text} />
-              ) : (
-                <BotBubbleFrame
-                  key={idx}
-                  messageChunks={msg.messageChunks}
-                  functionCall={msg.functionCall}
-                  onButtonClick={handleButtonClick}
-                />
-              ),
-            )}
-            <div ref={bottomRef} />
-          </div>
-        </GradientScroll>
+      {/* 2. 메시지 영역 - Fixed 위치와 높이 */}
+      <div className="fixed top-[72px] bottom-[65px] left-1/2 transform -translate-x-1/2 w-full max-w-[600px] px-5">
+        <div className="gradient-scroll-container h-full">
+          <GradientScroll
+            primaryColor="#f6f7fc"
+            fadeColor="transparent"
+            fadeHeight="80px"
+          >
+            <div className="space-y-2 max-w-[560px] mx-auto pb-4">
+              {messages.map((msg, idx) =>
+                msg.type === 'user' ? (
+                  <UserBubble key={idx} message={msg.text} />
+                ) : (
+                  <BotBubbleFrame
+                    key={idx}
+                    messageChunks={msg.messageChunks}
+                    functionCall={msg.functionCall}
+                    onButtonClick={handleButtonClick}
+                  />
+                ),
+              )}
+              <div ref={bottomRef} />
+            </div>
+          </GradientScroll>
+        </div>
       </div>
 
-      {/* 3. InputBox - 고정 높이 */}
-      <div className="flex-shrink-0 w-full max-w-[600px] mx-auto">
-        <div className="bg-background-80 rounded-xl shadow-[0_-3px_10px_rgba(0,0,0,0.1)] border-t border-gray-100 py-3 px-5">
+      {/* 3. InputBox - Fixed */}
+      <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] z-50">
+        <div className="bg-background-80 h-[65px]  rounded-xl shadow-[0_-3px_10px_rgba(0,0,0,0.1)] border-t border-gray-100 py-3 px-5">
           <InputBox
             onSend={handleSendMessage}
             value={input}
