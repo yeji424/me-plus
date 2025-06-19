@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import 'tailwindcss';
+@tailwind base;
+@tailwind utilities;
+@tailwind components;
 
 @theme {
   --color-primary-pink: #eb008b;
@@ -23,7 +26,7 @@
   --color-danger: #e94e4e;
   --color-gradation: linear-gradient(
     90deg,
-    var(--color-secondary-purple-80) 0%,
+    #5732a1 0%,
     #5b038c 25%,
     #a0018b 50%,
     #ce018b 75%,
@@ -131,7 +134,22 @@
     }
   }
 }
-
+@layer components {
+  .dot {
+    @apply absolute top-0 w-[6px] h-[6px] rounded-full bg-[#7b2effff] animate-[blink_1s_infinite_both];
+  }
+}
+@keyframes blink {
+  0% {
+    opacity: 0.1;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.1;
+  }
+}
 [data-rsbs-scroll] {
   scrollbar-width: none;
 }
@@ -183,38 +201,22 @@
   );
 }
 /* 로딩 스피너 관련 */
-.spinner-wrapper {
-  position: relative;
-  width: 24px;
-  height: 24px;
+.loader {
+  width: 25px;
+  aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--color-gradation-20);
-  mask: radial-gradient(farthest-side, transparent 73%, black 74%);
-  -webkit-mask: radial-gradient(farthest-side, transparent 73%, black 74%);
+  background:
+    radial-gradient(farthest-side, rgb(123, 46, 255) 94%, #0000) top/4px 4px
+      no-repeat,
+    conic-gradient(
+      #0000 40%,
+      /* rgba(218, 139, 243, 0.867) 70%, */ rgb(123, 46, 255)
+    );
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 4px), #000 0);
+  animation: l13 0.65s infinite linear;
 }
-.loading-spinner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: conic-gradient(
-    from 0deg,
-    #a98de6 0%,
-    #b067e4 5%,
-    #c146db 10%,
-    #d733c3 15%,
-    #eb008b 25%,
-    transparent 25%,
-    transparent 100%
-  );
-  mask: radial-gradient(farthest-side, transparent 73%, black 74%);
-  -webkit-mask: radial-gradient(farthest-side, transparent 73%, black 74%);
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+@keyframes l13 {
+  100% {
+    transform: rotate(1turn);
   }
 }
