@@ -41,6 +41,9 @@ const BotBubbleFrame = ({
   functionCall,
   onButtonClick,
 }: BotBubbleFrameProps) => {
+    const shouldShowMessage =
+    !functionCall || messageChunks[0]?.trim() !== '';
+
   const buttonGroup = (() => {
     if (!functionCall) return null;
     const { name, args } = functionCall;
@@ -72,7 +75,7 @@ const BotBubbleFrame = ({
 
   return (
     <div className="space-y-2">
-      <BotBubble messageChunks={messageChunks} />
+      {shouldShowMessage && <BotBubble messageChunks={messageChunks} />}
       {buttonGroup && (
         <motion.div
           initial={{ opacity: 0, y: 5 }}

@@ -72,6 +72,7 @@
   body {
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE 10+ */
+    overflow: hidden;
   }
   body::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Edge */
@@ -137,4 +138,38 @@
 [data-rsbs-header]:before {
   background-color: var(--color-secondary-purple-80) !important;
   width: 44px !important;
+}
+
+/* GradientScroll 스크롤바 숨기기 */
+.gradient-scroll-container ::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+}
+.gradient-scroll-container * {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+/* GradientScroll 상단 그라데이션 숨기기 - 여러 방법 시도 */
+.gradient-scroll-container > div::before,
+.gradient-scroll-container > div::after {
+  display: none !important;
+}
+
+.gradient-scroll-container > div {
+  background: none !important;
+  background-image: none !important;
+}
+
+/* 상단 그라데이션만 숨기기 */
+.gradient-scroll-container > div:first-child {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0px,
+    black 30px
+  ) !important;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0px,
+    black 30px
+  ) !important;
 }
