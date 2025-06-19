@@ -16,7 +16,9 @@ const Modal: React.FC<ModalProps> = ({
   children,
 }) => {
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) {
+      document.body.style.overflow = 'hidden';
+    }
 
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -28,6 +30,7 @@ const Modal: React.FC<ModalProps> = ({
 
     return () => {
       window.removeEventListener('keydown', handleEsc);
+      document.body.style.overflow = 'auto';
     };
   }, [isOpen, onClose]);
 
