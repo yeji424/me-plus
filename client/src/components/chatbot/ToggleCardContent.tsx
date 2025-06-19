@@ -7,9 +7,10 @@ interface Detail {
 
 interface ToggleCardContentProps {
   details: Detail[];
+  detailUrl: string;
 }
 
-const ToggleCardContent = ({ details }: ToggleCardContentProps) => {
+const ToggleCardContent = ({ details, detailUrl }: ToggleCardContentProps) => {
   const descriptionItem = details.find((item) => item.key === '요금제설명');
   const otherDetails = details.filter((item) => item.key !== '요금제설명');
 
@@ -25,14 +26,19 @@ const ToggleCardContent = ({ details }: ToggleCardContentProps) => {
         {otherDetails.map(({ key, value }, idx) => (
           <React.Fragment key={idx}>
             <div className="text-secondary-purple-60">{key}</div>
-            <div className="text-gray700">{value}</div>
+            <div className="text-gray700 whitespace-pre-line">{value}</div>
           </React.Fragment>
         ))}
       </div>
 
-      <button className="cursor-pointer flex items-center justify-center rounded-[5px] border-secondary-purple-60 bg-white text-secondary-purple-60 text-[12px] py-[10px] border-[0.5px] border-secondary-purple-60">
+      <a
+        href={detailUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="cursor-pointer flex items-center justify-center rounded-[5px] border-secondary-purple-60 bg-white text-secondary-purple-60 text-[12px] py-[10px] border-[0.5px] border-secondary-purple-60 hover:bg-secondary-purple-60 hover:text-white transition-colors duration-200"
+      >
         요금제 자세히 보기
-      </button>
+      </a>
     </div>
   );
 };
