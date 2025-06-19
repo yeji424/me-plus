@@ -6,6 +6,55 @@ import type {
   PlanData,
 } from '@/components/chatbot/BotBubbleFrame';
 
+// 서버 에러 타입 정의
+export interface ServerError {
+  type:
+    | 'FUNCTION_ARGS_PARSE_ERROR'
+    | 'MISSING_FUNCTION_ARGS'
+    | 'UNKNOWN_FUNCTION'
+    | 'FUNCTION_EXECUTION_ERROR'
+    | 'OPENAI_API_ERROR'
+    | 'NETWORK_ERROR'
+    | 'STREAM_ABORTED'
+    | 'REQUEST_TIMEOUT'
+    | 'UNKNOWN_ERROR'
+    | 'INVALID_INPUT'
+    | 'DATABASE_ERROR'
+    | 'PROMPT_BUILD_ERROR'
+    | 'SESSION_SAVE_ERROR'
+    | 'CONTROLLER_ERROR';
+  message: string;
+  details?: unknown;
+}
+
+// 에러 메시지 매핑
+const getErrorMessage = (error: ServerError): string => {
+  switch (error.type) {
+    case 'OPENAI_API_ERROR':
+      return '🤖 AI 서비스가 일시적으로 불안정합니다. 잠시 후 다시 시도해주세요.';
+    case 'NETWORK_ERROR':
+      return '🌐 네트워크 연결을 확인해주세요.';
+    case 'STREAM_ABORTED':
+      return '⏹️ 응답이 중단되었습니다. 다시 시도해주세요.';
+    case 'REQUEST_TIMEOUT':
+      return '⏱️ 응답 시간이 초과되었습니다. 다시 시도해주세요.';
+    case 'DATABASE_ERROR':
+      return '💾 대화 기록 저장에 문제가 있지만 대화는 계속 가능합니다.';
+    case 'SESSION_SAVE_ERROR':
+      return '📝 ' + error.message; // 서버에서 친절한 메시지를 보내줌
+    case 'FUNCTION_ARGS_PARSE_ERROR':
+      return '⚙️ 기능 처리 중 오류가 발생했습니다. 다시 시도해주세요.';
+    case 'MISSING_FUNCTION_ARGS':
+      return '📋 요청 정보가 불완전합니다. 다시 시도해주세요.';
+    case 'UNKNOWN_FUNCTION':
+      return '❓ 요청한 기능을 찾을 수 없습니다.';
+    case 'INVALID_INPUT':
+      return '📝 입력 내용을 확인해주세요.';
+    default:
+      return '❌ ' + error.message;
+  }
+};
+
 type Message =
   | { type: 'user'; text: string }
   | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall };
@@ -159,18 +208,37 @@ export const useChatSocket = () => {
       setIsStreaming(false);
     };
 
-    const handleError = (error: any) => {
-      console.error('❌ Socket error:', error);
+    const handleError = (error: ServerError) => {
+      console.error('❌ Server error:', error);
+
+      // 타입별 로그 레벨 조정
+      if (error.type === 'SESSION_SAVE_ERROR') {
+        console.warn('⚠️ Non-critical error:', error);
+      } else if (
+        error.type === 'OPENAI_API_ERROR' ||
+        error.type === 'NETWORK_ERROR'
+      ) {
+        console.error('🚨 Critical error:', error);
+      }
+
       setIsStreaming(false);
+
+      const userFriendlyMessage = getErrorMessage(error);
+
       setMessages((prev) => [
         ...prev,
         {
           type: 'bot',
-          messageChunks: [
-            '죄송합니다. 연결에 문제가 발생했습니다. 다시 시도해 주세요.',
-          ],
+          messageChunks: [userFriendlyMessage],
         },
       ]);
+
+      // 개발 환경에서만 상세 에러 정보 표시
+      if (import.meta.env.DEV && error.details) {
+        console.group('🔍 Error Details:');
+        console.table(error.details);
+        console.groupEnd();
+      }
     };
 
     const handleDisconnect = () => {
