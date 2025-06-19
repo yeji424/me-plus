@@ -136,6 +136,8 @@ export const useChatSocket = () => {
   useEffect(() => {
     const handleStream = (chunk: string) => {
       responseRef.current += chunk;
+
+      console.log('📥 Stream chunk:', chunk, responseRef.current);
       setMessages((prev) => {
         const last = prev[prev.length - 1];
         if (last?.type === 'bot') {
@@ -153,15 +155,39 @@ export const useChatSocket = () => {
     };
 
     const handleDone = () => {
+      console.log('✅ Stream completed');
+      setIsStreaming(false);
+    };
+
+    const handleError = (error: any) => {
+      console.error('❌ Socket error:', error);
+      setIsStreaming(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: 'bot',
+          messageChunks: [
+            '죄송합니다. 연결에 문제가 발생했습니다. 다시 시도해 주세요.',
+          ],
+        },
+      ]);
+    };
+
+    const handleDisconnect = () => {
+      console.warn('⚠️ Socket disconnected');
       setIsStreaming(false);
     };
 
     socket.on('stream', handleStream);
     socket.on('done', handleDone);
+    socket.on('error', handleError);
+    socket.on('disconnect', handleDisconnect);
 
     return () => {
       socket.off('stream', handleStream);
       socket.off('done', handleDone);
+      socket.off('error', handleError);
+      socket.off('disconnect', handleDisconnect);
     };
   }, []);
 
