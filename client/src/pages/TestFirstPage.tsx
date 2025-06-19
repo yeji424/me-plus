@@ -7,8 +7,8 @@ const TestFirstPage: React.FC = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate('/test1');
-    }, 3000); //3초뒤 이동
+      navigate('/test');
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [navigate]);
