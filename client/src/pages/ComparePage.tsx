@@ -232,10 +232,10 @@ const ComparePage: React.FC = () => {
           modalTitle="요금제 비교하기를 그만두시겠어요?"
           modalDesc="그만두실 경우, 선택하신 요금제가 모두 초기화됩니다."
         >
-          <Button color="secondary" isModal onClick={closeModal}>
+          <Button fullWidth variant="secondary" onClick={closeModal}>
             계속할래요
           </Button>
-          <Button isModal onClick={() => navigate('/')}>
+          <Button fullWidth onClick={() => navigate('/')}>
             그만둘래요
           </Button>
         </Modal>
