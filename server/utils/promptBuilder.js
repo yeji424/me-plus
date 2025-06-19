@@ -27,9 +27,11 @@ export const buildPromptMessages = (plans, fullMessages) => {
 2. 💡 간단한 장점 설명을 아이콘과 함께 추가한 후,
 3. 🚀 관련 요금제를 Function Calling을 통해 추천하시오.
 
-너는 실제 응답에는 function_call만 사용하고,
-functions.함수명(...) 같은 코드는 절대로 사용자에게 보여주지 마.
-반드시 function_call 필드로 전달해야 해.
+🚨 **매우 중요한 규칙**:
+- 절대로 "functions.함수명(...)" 같은 코드를 텍스트로 응답하지 마!
+- 사용자에게 함수 호출 코드를 보여주는 것은 금지!
+- 반드시 실제 tool_call 기능만 사용해!
+- 만약 버튼이나 선택지를 보여주고 싶다면, 텍스트 설명 후 바로 해당 도구를 호출해!
 
 💬 **예시**:
 
