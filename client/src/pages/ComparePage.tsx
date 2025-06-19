@@ -200,6 +200,14 @@ const ComparePage: React.FC = () => {
     setOpen(true);
   };
 
+  const handleClearSlot = (slot: 'left' | 'right') => {
+    if (slot === 'left') {
+      setSelectedLeft(null);
+    } else if (slot === 'right') {
+      setSelectedRight(null);
+    }
+  };
+
   const toggleDropdown = (id: string) => {
     setOpenDropdowns((prev) => ({
       ...prev,
@@ -244,9 +252,20 @@ const ComparePage: React.FC = () => {
         selectedLeft={selectedLeft}
         selectedRight={selectedRight}
         onSelectSlot={openSheetForSlot}
+        onClearSlot={handleClearSlot}
       />
-
-      {hasSelectedPlans ? (
+      {/* {hasSelectedPlans ? (
+        <ComparisonResult
+          selectedLeft={selectedLeft}
+          selectedRight={selectedRight}
+        />
+      ) : (
+        <div className="flex flex-col justify-center items-center text-center text-gray500 mt-[120px]">
+          <p className="text-lg">비교할 요금제가 없습니다</p>
+          <p className="text-xl">버튼을 눌러 요금제를 선택해주세요!</p>
+        </div>
+      )} */}
+      {selectedLeft || selectedRight ? (
         <ComparisonResult
           selectedLeft={selectedLeft}
           selectedRight={selectedRight}
@@ -257,7 +276,6 @@ const ComparePage: React.FC = () => {
           <p className="text-xl">버튼을 눌러 요금제를 선택해주세요!</p>
         </div>
       )}
-
       <BottomSheet
         open={open}
         onDismiss={() => setOpen(false)}
