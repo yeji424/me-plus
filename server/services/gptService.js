@@ -14,7 +14,7 @@ export const streamChat = async (messages, socket, onDelta) => {
     });
 
     const streamPromise = openai.chat.completions.create({
-      model: 'gpt-4-1106-preview',
+      model: 'gpt-4.1-mini-2025-04-14',
       messages,
       stream: true,
       tools: [
