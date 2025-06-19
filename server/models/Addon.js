@@ -16,7 +16,6 @@ export const addonSchema = new Schema(
     category: { type: String, required: true },
     name: { type: String, required: true },
     description: String,
-    monthlyFee: { type: Number, default: 0 },
     detailUrl: String,
   },
   { collection: 'addons', timestamps: true },

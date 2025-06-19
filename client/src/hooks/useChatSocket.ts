@@ -131,7 +131,7 @@ export const useChatSocket = () => {
       ]);
     };
 
-    const handlePlanLists = (plan: PlanData) => {
+    const handlePlanLists = (plans: PlanData[]) => {
       setMessages((prev) => [
         ...prev,
         {
@@ -139,7 +139,7 @@ export const useChatSocket = () => {
           messageChunks: [''],
           functionCall: {
             name: 'showPlanLists',
-            args: { plan },
+            args: { plans },
           },
         },
       ]);

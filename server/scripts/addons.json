@@ -1,0 +1,100 @@
+[
+  {
+    "_id": "1",
+    "category": "MEDIA",
+    "name": "아이들나라 스탠다드+러닝",
+    "description": "청담어학원, 교원 빨간펜 등 검증된 학습콘텐츠와 유아동 베스트셀러 등 2만여 편의\n아이들나라 콘텐츠를 앱으로 만나볼 수 있는 서비스",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-media/LRZ0003315"
+  },
+  {
+    "_id": "2",
+    "category": "MEDIA",
+    "name": "바이브 앱+PC 음악감상",
+    "description": "5G 시그니처 요금제 이용 고객이 ‘미디어 서비스’로 선택해,\n다양한 기기에서 바이브 음악감상을 즐길 수 있는 서비스",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-media/Z202306081"
+  },
+  {
+    "_id": "3",
+    "category": "MEDIA",
+    "name": "바이브 앱 음악감상",
+    "description": "5G 프리미어 슈퍼, 5G 프리미어 플러스, LTE 프리미어 플러스, 다이렉트, 현역병사 요금제 이용 고객이\n‘미디어 서비스’로 선택해, 바이브 모바일 앱에서 음악감상을 즐길 수 있는 서비스",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-media/Z202306082"
+  },
+  {
+    "_id": "4",
+    "category": "MEDIA",
+    "name": "바이브 300회 음악감상",
+    "description": "5G 프리미어 레귤러, LTE 키즈 39, 5G 키즈 39 이상 요금제 이용 고객이 ‘미디어 서비스’로 선택해,\n다양한 기기에서 바이브 음악감상을 월 300회 이용할 수 있는 서비스",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-media/Z202306083"
+  },
+  {
+    "_id": "5",
+    "category": "MEDIA",
+    "name": "유플레이 베이직",
+    "description": "유플레이의 일부 콘텐츠를 저렴한 가격에 시청할 수 있는 실속형 상품입니다. (U+tv, 휴대폰 앱 시청 가능)",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-media/LRZ0003859"
+  },
+  {
+    "_id": "6",
+    "category": "MEDIA",
+    "name": "지니뮤직 앱 음악감상",
+    "description": "5G 프리미어 슈퍼, 5G/LTE 프리미어 플러스, 5G 다이렉트 플러스 69 요금제 이용 고객이\n‘미디어 서비스’로 선택해, 지니뮤직 앱에서 음악감상을 무제한 즐길 수 있는 서비스",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-media/LRZ0002943"
+  },
+  {
+    "_id": "7",
+    "category": "MEDIA",
+    "name": "지니뮤직 300회 음악감상",
+    "description": "5G 프리미어 레귤러 요금제, 일부 키즈 요금제 가입고객이 이용 가능한 요금제 혜택으로,\n지니뮤직 앱/홈페이지에서 음악감상을 월 300회 이용할 수 있는 서비스",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-media/LRZ0002370"
+  },
+  {
+    "_id": "8",
+    "category": "MEDIA",
+    "name": "U+모바일tv 기본 월정액",
+    "description": "U⁺오리지널 콘텐츠, 실시간 채널, 해외 드라마, 영화, 등 25만여 편의 동영상 중 내 취향에 맞는 영상을 추천 받아 마음껏 볼 수 있는 앱 서비스",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-media/LRZ0002797"
+  },
+  {
+    "_id": "9",
+    "category": "MEDIA",
+    "name": "U+모바일t 라이트",
+    "description": "U⁺오리지널 콘텐츠, 실시간 채널, 해외 드라마, 영화, 등 25만여 편의 동영상 중 내 취향에 맞는 영상을 추천 받아 마음껏 볼 수 있는 앱 서비스\n- 라이트 요금제 가입 시 자동으로 제공하며, 기본 월정액 콘텐츠 일부를 제공합니다.",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-media/LRZ0002797"
+  },
+  {
+    "_id": "10",
+    "category": "MEDIA",
+    "name": "티빙 팩",
+    "description": "티빙 팩 혜택이 포함된 카테고리 팩 요금제 가입 고객만 이용할 수 있는 티빙 제공 혜택으로,\n티빙 이용권 할인월 9,500원 할인해주는 서비스",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-media/Z202209301"
+  },
+  {
+    "_id": "11",
+    "category": "MEDIA",
+    "name": "디즈니+ 팩",
+    "description": "디즈니+팩 혜택이 포함된 카테고리 팩 요금제 가입 고객만 이용할 수 있는 디즈니+ 제공 혜택으로,\n디즈니+ 스탠다드 무료로 이용 가능한 서비스",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-media/LRZ1001233"
+  },
+  {
+    "_id": "12",
+    "category": "MEDIA",
+    "name": "넷플릭스 팩",
+    "description": "넷플릭스 팩 혜택이 포함된 카테고리 팩 요금제 가입 고객만 이용할 수 있는 넷플릭스 제공 혜택으로,\n넷플릭스 베이직을 마음껏 즐길 수 있는 서비스",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-media/Z202211233"
+  },
+  {
+    "_id": "13",
+    "category": "DISCOUNT",
+    "name": "밀리의 서재",
+    "description": "10만권 이상의 전자책을 무제한으로 즐길 수 있는 국내 최대 독서 플랫폼 서비스",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-life/LRZ0004257"
+  },
+  {
+    "_id": "14",
+    "category": "DISCOUNT",
+    "name": "삼성 디바이스 할부금 할인",
+    "description": "삼성팩을 선택한 고객이 받을 수 있는 삼성 디바이스 할부금 할인 혜택",
+    "detailUrl": "https://www.lguplus.com/mobile/plan/addon/addon-life/Z202500251"
+  }
+]

@@ -2,39 +2,96 @@ import { useState, useRef, useEffect } from 'react';
 import { useSpring, animated } from 'react-spring';
 import ToggleCardHeader from './ToggleCardHeader';
 import ToggleCardContent from './ToggleCardContent';
+import type { PlanData } from './BotBubbleFrame';
 
-const dummyDetails = [
-  { key: '요금제명', value: '5G 프리미어 플러스' },
-  { key: '가격', value: '95,000원' },
-  {
-    key: '요금제설명',
-    value:
-      'U⁺5G 서비스는 물론, 스마트 기기 2개와 다양한 콘텐츠까지 마음껏 이용할 수 있는 5G 요금제',
-  },
-  { key: '데이터', value: '무제한' },
-  { key: '공유데이터', value: '테더링 + 쉐어링 100GB' },
-  { key: '음성통화', value: '집/이동전화 무제한\n부가 통화 300분' },
-  { key: '결합 할인', value: 'U+ 투게더 할인' },
-  { key: '기본 혜택', value: 'U+ 모바일tv, U+ 멤버십 VVIP 등급 혜택' },
-  {
-    key: '특별 혜택',
-    value: '프리미엄 서비스 기본 제공(택1)\n미디어 서비스 기본 제공(택1)',
-  },
-];
+export interface ColorTheme {
+  textColor: string;
+  borderColor: string;
+  bgColor: string;
+  hoverBgColor: string;
+}
 
-function ToggleCard() {
+interface ToggleCardProps {
+  plan: PlanData;
+}
+
+function ToggleCard({ plan }: ToggleCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(0);
-  // header에 보여줄 요금제명, 가격 데이터
-  const title =
-    dummyDetails.find((item) => item.key === '요금제명')?.value || '';
-  const price = dummyDetails.find((item) => item.key === '가격')?.value || '';
 
-  // content에 보여줄 상세 데이터
-  const contentDetails = dummyDetails.filter(
-    (item) => item.key !== '요금제명' && item.key !== '가격',
-  );
+  // 색상 테마 중앙 관리
+  const colorTheme = {
+    textColor: plan.isPopular
+      ? 'text-primary-pink'
+      : 'text-secondary-purple-60',
+    borderColor: plan.isPopular
+      ? 'border-primary-pink'
+      : 'border-secondary-purple-60',
+    bgColor: plan.isPopular ? 'bg-primary-pink' : 'bg-secondary-purple-60',
+    hoverBgColor: plan.isPopular
+      ? 'hover:bg-primary-pink'
+      : 'hover:bg-secondary-purple-60',
+  };
+
+  // 데이터 포맷팅 함수들
+  const formatPrice = (price: number) => {
+    return price.toLocaleString('ko-KR') + '원';
+  };
+
+  const formatData = (dataGb: number) => {
+    if (dataGb === -1) return '무제한';
+    return `${dataGb}GB`;
+  };
+
+  const formatVoice = (voiceMinutes: number, addonVoiceMinutes: number) => {
+    const base =
+      voiceMinutes === -1 ? '집/이동전화 무제한' : `${voiceMinutes}분`;
+    const addon =
+      addonVoiceMinutes > 0 ? `\n부가 통화 ${addonVoiceMinutes}분` : '';
+    return base + addon;
+  };
+
+  // header에 보여줄 요금제명, 가격 데이터
+  const title = plan.name;
+  const price = formatPrice(plan.monthlyFee);
+
+  // content에 보여줄 상세 데이터 생성
+  const contentDetails = [
+    { key: '요금제설명', value: plan.description },
+    { key: '데이터', value: formatData(plan.dataGb) },
+    { key: '공유데이터', value: `테더링 + 쉐어링 ${plan.sharedDataGb}GB` },
+    {
+      key: '음성통화',
+      value: formatVoice(plan.voiceMinutes, plan.addonVoiceMinutes),
+    },
+    ...(plan.bundleBenefit
+      ? [{ key: '결합 할인', value: plan.bundleBenefit }]
+      : []),
+    { key: '기본 혜택', value: plan.basicService },
+    ...(plan.mediaAddons
+      ? [{ key: '미디어 서비스', value: plan.mediaAddons }]
+      : []),
+    ...(plan.premiumAddons
+      ? [{ key: '프리미엄 서비스', value: plan.premiumAddons }]
+      : []),
+    ...(plan.optionalDiscountAmount > 0
+      ? [
+          {
+            key: '할인 혜택',
+            value: `최대 ${formatPrice(plan.optionalDiscountAmount)} 할인 가능`,
+          },
+        ]
+      : []),
+    ...(plan.ageGroup !== 'ALL'
+      ? [
+          {
+            key: '대상',
+            value: plan.ageGroup === 'YOUTH' ? '청년 전용' : plan.ageGroup,
+          },
+        ]
+      : []),
+  ];
 
   useEffect(() => {
     if (!contentRef.current) return;
@@ -56,8 +113,17 @@ function ToggleCard() {
       className="w-[309px] bg-background-40 rounded-lg relative cursor-pointer overflow-hidden"
       onClick={() => setIsOpen(!isOpen)}
     >
-      <div className="absolute top-0 left-0 w-[5px] h-full bg-secondary-purple-60" />
-      <ToggleCardHeader title={title} price={price} isOpen={isOpen} />
+      <div
+        className={`absolute top-0 left-0 w-[5px] h-full ${colorTheme.bgColor}`}
+      />
+
+      <ToggleCardHeader
+        title={title}
+        price={price}
+        isOpen={isOpen}
+        isPopular={plan.isPopular}
+        colorTheme={colorTheme}
+      />
       <animated.div
         style={{
           ...animationStyles,
@@ -68,7 +134,11 @@ function ToggleCard() {
         className="px-4"
       >
         <div ref={contentRef} className="">
-          <ToggleCardContent details={contentDetails} />
+          <ToggleCardContent
+            details={contentDetails}
+            detailUrl={plan.detailUrl}
+            colorTheme={colorTheme}
+          />
         </div>
       </animated.div>
     </div>

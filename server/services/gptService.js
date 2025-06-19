@@ -73,63 +73,101 @@ export const streamChat = async (messages, socket, onDelta) => {
           function: {
             name: 'showPlanLists',
             description:
-              '유저에게 하나의 요금제 상세 정보를 카드 형식으로 제공합니다.',
+              '유저에게 여러 요금제 상세 정보를 카드 형식으로 제공합니다. 보통 3개 이상의 요금제를 추천할 때 사용합니다.',
             parameters: {
               type: 'object',
               properties: {
-                plan: {
-                  type: 'object',
-                  properties: {
-                    name: { type: 'string', description: '요금제 이름' },
-                    monthlyFee: { type: 'number', description: '월 요금' },
-                    description: {
-                      type: 'string',
-                      description: '요금제 요약 설명',
+                plans: {
+                  type: 'array',
+                  description: '추천할 요금제 목록',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      _id: { type: 'string', description: '요금제 고유 ID' },
+                      category: {
+                        type: 'string',
+                        description: '요금제 카테고리 (5G, LTE 등)',
+                      },
+                      name: { type: 'string', description: '요금제 이름' },
+                      description: {
+                        type: 'string',
+                        description: '요금제 설명',
+                      },
+                      isPopular: {
+                        type: 'boolean',
+                        description: '인기 요금제 여부',
+                      },
+                      dataGb: {
+                        type: 'number',
+                        description: '기본 데이터 제공량 (-1은 무제한)',
+                      },
+                      sharedDataGb: {
+                        type: 'number',
+                        description: '공유/테더링 데이터 (GB)',
+                      },
+                      voiceMinutes: {
+                        type: 'number',
+                        description: '음성통화 시간 (-1은 무제한)',
+                      },
+                      addonVoiceMinutes: {
+                        type: 'number',
+                        description: '추가 음성통화 시간',
+                      },
+                      smsCount: {
+                        type: 'number',
+                        description: 'SMS 개수 (-1은 무제한)',
+                      },
+                      monthlyFee: { type: 'number', description: '월 요금' },
+                      optionalDiscountAmount: {
+                        type: 'number',
+                        description: '최대 할인 가능 금액',
+                      },
+                      ageGroup: {
+                        type: 'string',
+                        description: '대상 연령대 (ALL, YOUTH 등)',
+                      },
+                      detailUrl: {
+                        type: 'string',
+                        description: '자세히 보기 링크 URL',
+                      },
+                      bundleBenefit: {
+                        type: ['string', 'null'],
+                        description: '결합 할인 정보',
+                      },
+                      mediaAddons: {
+                        type: ['string', 'null'],
+                        description: '미디어 부가서비스',
+                      },
+                      premiumAddons: {
+                        type: ['string', 'null'],
+                        description: '프리미엄 부가서비스',
+                      },
+                      basicService: {
+                        type: 'string',
+                        description: '기본 제공 서비스',
+                      },
                     },
-                    dataGb: {
-                      type: 'number',
-                      description: '기본 데이터 제공량',
-                    },
-                    sharedDataGb: {
-                      type: 'string',
-                      description: '공유/테더링 데이터',
-                    },
-                    voiceMinutes: {
-                      type: 'string',
-                      description: '음성통화 내용',
-                    },
-                    bundleBenefit: {
-                      type: 'string',
-                      description: '결합 할인 정보',
-                    },
-                    baseBenefit: {
-                      type: 'string',
-                      description: '기본 제공 혜택',
-                    },
-                    specialBenefit: {
-                      type: 'string',
-                      description: '특별 제공 혜택',
-                    },
-                    detailUrl: {
-                      type: 'string',
-                      description: '자세히 보기 링크 URL',
-                    },
+                    required: [
+                      '_id',
+                      'category',
+                      'name',
+                      'description',
+                      'isPopular',
+                      'dataGb',
+                      'sharedDataGb',
+                      'voiceMinutes',
+                      'addonVoiceMinutes',
+                      'smsCount',
+                      'monthlyFee',
+                      'optionalDiscountAmount',
+                      'ageGroup',
+                      'detailUrl',
+                      'basicService',
+                    ],
                   },
-                  required: [
-                    'name',
-                    'monthlyFee',
-                    'description',
-                    'dataGb',
-                    'sharedDataGb',
-                    'voiceMinutes',
-                    'bundleBenefit',
-                    'baseBenefit',
-                    'specialBenefit',
-                    'detailUrl',
-                  ],
                 },
               },
-              required: ['plan'],
+              required: ['plans'],
             },
           },
         },
@@ -253,16 +291,16 @@ export const streamChat = async (messages, socket, onDelta) => {
           }
 
           case 'showPlanLists': {
-            const { plan } = args;
-            if (!plan) {
+            const { plans } = args;
+            if (!plans) {
               socket.emit('error', {
                 type: 'MISSING_FUNCTION_ARGS',
-                message: 'showPlanLists에 필요한 plan이 없습니다.',
+                message: 'showPlanLists에 필요한 plans가 없습니다.',
                 details: { functionName, args },
               });
               return;
             }
-            socket.emit('plan-lists', plan);
+            socket.emit('plan-lists', plans);
             break;
           }
 

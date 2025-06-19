@@ -3,6 +3,7 @@ import CarouselButtonGroup from './ChatButtonGroups/CarouselButtonGroup';
 import OttButtonGroup from './ChatButtonGroups/OttButtonGroup';
 import OXButtonGroup from './ChatButtonGroups/OXButtonGroup';
 import TextButtonGroup from './ChatButtonGroups/TextButtonGroup';
+import ToggleCard from './ToggleCard';
 import { motion } from 'framer-motion';
 
 export interface OXOption {
@@ -20,16 +21,24 @@ export interface TextItem {
 }
 
 export interface PlanData {
+  _id: string;
+  category: string;
   name: string;
-  monthlyFee: number;
   description: string;
+  isPopular: boolean;
   dataGb: number;
-  sharedDataGb: string;
-  voiceMinutes: string;
-  bundleBenefit: string;
-  baseBenefit: string;
-  specialBenefit: string;
+  sharedDataGb: number;
+  voiceMinutes: number;
+  addonVoiceMinutes: number;
+  smsCount: number;
+  monthlyFee: number;
+  optionalDiscountAmount: number;
+  ageGroup: string;
   detailUrl: string;
+  bundleBenefit: string | null;
+  mediaAddons: string | null;
+  premiumAddons: string | null;
+  basicService: string;
 }
 export interface FunctionCall {
   name:
@@ -44,6 +53,7 @@ export interface FunctionCall {
     textItems?: TextItem[];
     question?: string;
     plan?: PlanData;
+    plans?: PlanData[];
   };
 }
 export interface BotBubbleFrameProps {
@@ -101,8 +111,13 @@ const BotBubbleFrame = ({
           />
         ) : null;
       case 'showPlanLists':
-        // TODO: Plan card 컴포넌트 구현 필요
-        return null;
+        return args?.plans ? (
+          <div className="space-y-3">
+            {args.plans.map((plan, index) => (
+              <ToggleCard key={plan._id || index} plan={plan} />
+            ))}
+          </div>
+        ) : null;
       default:
         return null;
     }
