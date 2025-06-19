@@ -126,3 +126,12 @@
   background-color: var(--color-secondary-purple-80) !important;
   width: 44px !important;
 }
+
+/* GradientScroll 스크롤바 숨기기 */
+.gradient-scroll-container ::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+}
+.gradient-scroll-container * {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
