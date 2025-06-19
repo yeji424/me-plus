@@ -4,7 +4,7 @@ interface UserBubbleProps {
 
 function UserBubble({ message }: UserBubbleProps) {
   return (
-    <div className="user-bubble w-fit max-w-[309px] p-2 rounded-tl-lg rounded-br-lg rounded-bl-lg text-[14px] text-white leading-5 whitespace-pre-wrap break-words overflow-hidden ml-auto">
+    <div className="user-bubble w-fit max-w-[309px] p-[10px] rounded-tl-xl rounded-br-xl rounded-bl-xl text-sm text-white leading-5 whitespace-pre-wrap break-words overflow-hidden ml-auto">
       {message}
     </div>
   );

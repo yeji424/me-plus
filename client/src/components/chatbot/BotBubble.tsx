@@ -48,8 +48,8 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
         style={springStyles}
         className="
       max-w-[309px]
-      p-2
-      rounded-tr-lg rounded-br-lg rounded-bl-lg
+      p-[10px]
+      rounded-tr-xl rounded-br-xl rounded-bl-xl
       bg-background-40
       text-[14px]
       leading-5

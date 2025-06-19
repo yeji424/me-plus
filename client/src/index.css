@@ -159,7 +159,15 @@
   background: none !important;
   background-image: none !important;
 }
-
+.custom-header {
+  padding-bottom: 45px !important;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 1) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
 /* 상단 그라데이션만 숨기기 */
 .gradient-scroll-container > div:first-child {
   -webkit-mask-image: linear-gradient(
