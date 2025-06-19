@@ -45,7 +45,7 @@ const ComparePage: React.FC = () => {
       description:
         'U⁺5G 서비스와 프리미엄 혜택을 마음껏 즐기고, 가족과 공유할 수 있는 데이터까지 추가로 받는 5G 요금제',
       isPopular: false,
-      dataGb: -1.0,
+      dataGb: -1,
       sharedDataGb: 120,
       voiceMinutes: -1,
       addonVoiceMinutes: 300,
