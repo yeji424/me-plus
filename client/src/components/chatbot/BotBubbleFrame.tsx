@@ -18,6 +18,19 @@ export interface TextItem {
   id: string;
   label: string;
 }
+
+export interface PlanData {
+  name: string;
+  monthlyFee: number;
+  description: string;
+  dataGb: number;
+  sharedDataGb: string;
+  voiceMinutes: string;
+  bundleBenefit: string;
+  baseBenefit: string;
+  specialBenefit: string;
+  detailUrl: string;
+}
 export interface FunctionCall {
   name:
     | 'requestCarouselButtons'
