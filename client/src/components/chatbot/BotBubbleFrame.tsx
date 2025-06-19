@@ -2,6 +2,7 @@ import BotBubble from './BotBubble';
 import CarouselButtonGroup from './ChatButtonGroups/CarouselButtonGroup';
 import OttButtonGroup from './ChatButtonGroups/OttButtonGroup';
 import OXButtonGroup from './ChatButtonGroups/OXButtonGroup';
+import TextButtonGroup from './ChatButtonGroups/TextButtonGroup';
 
 export interface OXOption {
   id: 'o' | 'x';
@@ -12,12 +13,20 @@ export interface CarouselItem {
   id: string;
   label: string;
 }
-
+export interface TextItem {
+  id: string;
+  label: string;
+}
 export interface FunctionCall {
-  name: 'requestCarouselButtons' | 'requestOXButtons' | 'requestOttButtons';
+  name:
+    | 'requestCarouselButtons'
+    | 'requestOXButtons'
+    | 'requestOttButtons'
+    | 'requestTextButtons';
   args?: {
     items?: CarouselItem[];
     options?: OXOption[];
+    textItems?: TextItem[];
   };
 }
 export interface BotBubbleFrameProps {
@@ -54,6 +63,14 @@ const BotBubbleFrame = ({
               ) : null;
             case 'requestOttButtons':
               return <OttButtonGroup onButtonClick={onButtonClick} />;
+            case 'requestTextButtons':
+              return args?.textItems ? (
+                <TextButtonGroup
+                  options={args.textItems}
+                  onButtonClick={onButtonClick}
+                />
+              ) : null;
+
             default:
               return null;
           }

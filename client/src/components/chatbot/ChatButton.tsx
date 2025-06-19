@@ -21,13 +21,13 @@ const ChatButton = ({
     <button
       onClick={handleClick}
       disabled={disabled}
-      className={`flex items-center p-2 gap-[6px] rounded-[12px] shadow-small min-w-fit whitespace-nowrap transition-all ${
+      className={`flex items-center p-[10px] gap-[6px] rounded-[12px] shadow-small min-w-fit whitespace-nowrap transition-all ${
         disabled ? 'bg-white ' : 'bg-white hover:bg-gray-50 cursor-pointer'
       }`}
     >
       {icon && <span className={disabled ? 'opacity-50' : ''}>{icon}</span>}
       <span
-        className={`text-xs leading-[19px] ${disabled ? 'text-gray-400' : 'text-gray-700'}`}
+        className={`text-[14px] leading-[19px] ${disabled ? 'text-gray-400' : 'text-gray-700'}`}
       >
         {label}
       </span>
