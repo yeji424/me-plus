@@ -8,7 +8,7 @@ const TestWaitingPage: React.FC = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate('/test-result');
-    }, 1000000);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, [navigate]);
