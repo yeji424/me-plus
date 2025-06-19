@@ -1,27 +1,6 @@
-import Button from '@/components/common/Button';
 import PlanDetailInfo from './PlanDetailInfo';
 import dropdownIcon from '@/assets/icon/dropdown_icon.svg';
-
-interface Plan {
-  id: string;
-  category: string;
-  name: string;
-  monthlyFee: number;
-  bundleBenefit?: {
-    _id: string;
-    name: string;
-  };
-  basicBenefits?: Array<{
-    _id: string;
-    name: string;
-    description: string;
-  }>;
-  specialBenefits?: {
-    premiumServices: Array<{ _id: string; name: string }>;
-    mediaServices: Array<{ _id: string; name: string }>;
-  };
-  benefits?: string;
-}
+import type { Plan } from '@/components/types/Plan';
 
 interface PlanListItemProps {
   plan: Plan;
@@ -55,12 +34,11 @@ const PlanListItem: React.FC<PlanListItemProps> = ({
       </div>
       {isOpen && (
         <>
-          <PlanDetailInfo plan={plan} />
-          <div className="h-[43px] mt-2">
-            <Button onClick={onSelect} disabled={isDisabled}>
-              선택하기
-            </Button>
-          </div>
+          <PlanDetailInfo
+            plan={plan}
+            onClick={onSelect}
+            disabled={isDisabled}
+          />
         </>
       )}
     </div>

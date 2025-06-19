@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import Modal from '@/components/common/Modal';
 import { useNavigate } from 'react-router-dom';
+import { TestResult } from '@/data/TestResult';
+import { questions } from '@/data/Questions';
 import Button from '@/components/common/Button';
 import SelectButton from '@/components/testPage/SelectButton';
 import SelectButton3 from '@/components/testPage/SelectButton3';
@@ -11,84 +14,6 @@ import tips from '../assets/icon/tips.png';
 import next from '../assets/icon/next_icon.svg';
 import back from '../assets/icon/back_icon.svg';
 
-const questions = [
-  {
-    id: 1,
-    text: 'Wi-Fi 환경보다는 모바일 데이터를 더 자주 사용하시나요?',
-    tag: '고용량 데이터',
-    type: 'binary',
-    tip: {
-      highlight: '그렇다',
-      rest: '를 선택했을 경우, 데이터 사용량이 많은 가능성이 높아요!',
-    },
-  },
-  {
-    id: 2,
-    text: '음악이나 영상처럼 데이터 사용량이 큰 콘텐츠를 자주 이용하시나요?',
-    tag: '고용량 데이터',
-    type: 'binary',
-    tip: {
-      highlight: '그렇다',
-      rest: '를 선택했을 경우, 데이터 사용량이 많은 가능성이 높아요!',
-    },
-  },
-  {
-    id: 3,
-    text: '음악 스트리밍 서비스를 자주 사용하시나요?',
-    tag: '음악 구독 결합',
-    type: 'binary',
-    tip: {
-      highlight: '그렇다',
-      rest: '를 선택했을 경우, 음악 구독 결합 혜택이 좋을 것 같아요!',
-    },
-  },
-  {
-    id: 4,
-    text: 'OTT(구독형 영상 서비스)를 자주 사용하시나요?',
-    tag: 'OTT 구독 결합',
-    type: 'binary',
-    tip: {
-      highlight: '그렇다',
-      rest: '를 선택했을 경우, OTT 구독 결합 혜택이 좋을 것 같아요!',
-    },
-  },
-  {
-    id: 5,
-    text: '연락할 때는 어떤 소통 방식을 선호하시나요?',
-    tag: '고용량 데이터',
-    type: 'multiple',
-    options: [
-      '전화 및 문자',
-      '메신저, SNS 등의 모바일 앱',
-      '화상 통화 및 영상 회의',
-    ],
-    tip: {
-      highlight: '메신저, SNS 등의 모바일 앱',
-      rest: '을 선택했을 경우, 데이터 사용량이 많을 가능성이 높아요!',
-    },
-  },
-  {
-    id: 6,
-    text: '해외 여행이나 출장이 자주 있으신가요?',
-    tag: '로밍 결합',
-    type: 'binary',
-    tip: {
-      highlight: '그렇다',
-      rest: '를 선택했을 경우, 해외로밍 비용이 저렴한게 좋아요!',
-    },
-  },
-  {
-    id: 7,
-    text: '통화 시간이 긴 편인가요?',
-    tag: '통화량',
-    type: 'binary',
-    tip: {
-      highlight: '그렇다',
-      rest: '를 선택했을 경우, 음성통화량 무제한이 좋아요!',
-    },
-  },
-];
-
 const TestPage = () => {
   const navigate = useNavigate();
 
@@ -96,14 +21,19 @@ const TestPage = () => {
   const [selectedOptions, setSelectedOptions] = useState<{
     [id: number]: string;
   }>({});
+  const [showBackModal, setShowBackModal] = useState(false);
 
   const currentQuestion = questions[currentIndex];
   const selected = selectedOptions[currentQuestion.id];
   const isAnswered = selected !== undefined;
   const moonerSrc = isAnswered ? moonerAhaImage : moonerImage;
 
-  const handleGoHome = () => {
-    navigate('/'); // 메인페이지로 이동
+  // const handleGoHome = () => {
+  //   navigate('/'); // 메인페이지로 이동
+  // };
+
+  const handleBackClick = () => {
+    setShowBackModal(true);
   };
 
   const handleSelect = (value: string) => {
@@ -126,9 +56,17 @@ const TestPage = () => {
     (q) => selectedOptions[q.id] !== undefined,
   );
 
+  const getRecommendedPlan = (answers: { [key: number]: string }) => {
+    return TestResult.find((plan) => plan.condition(answers))!;
+  };
+
   return (
     <div className="h-screen flex flex-col">
-      <Header title="나에게 잘 어울리는 요금제는?" onBackClick={handleGoHome} />
+      <Header
+        title="나에게 잘 어울리는 요금제는?"
+        onBackClick={handleBackClick}
+      />
+
       <ProgressBar
         currentStep={currentIndex + 1}
         totalSteps={questions.length}
@@ -201,7 +139,16 @@ const TestPage = () => {
             </p>{' '}
             {allAnswered && (
               <div className="w-full mt-10">
-                <Button onClick={() => navigate('/test-wait')}>
+                <Button
+                  onClick={() => {
+                    const plan = getRecommendedPlan(selectedOptions);
+                    localStorage.setItem(
+                      'recommendedPlan',
+                      JSON.stringify(plan),
+                    );
+                    navigate('/test-wait');
+                  }}
+                >
                   Me플러스 맞춤 추천 받기
                 </Button>
               </div>
@@ -209,6 +156,30 @@ const TestPage = () => {
           </div>
         </div>
       </div>
+      {showBackModal && (
+        <Modal
+          isOpen={showBackModal}
+          onClose={() => setShowBackModal(false)}
+          modalTitle="맞춤형 요금제 찾기를 그만두시겠어요?"
+          modalDesc="홈으로 이동하면 현재 진행 중인 테스트는 초기화됩니다."
+        >
+          <button
+            onClick={() => setShowBackModal(false)}
+            className="bg-secondary-purple-40 text-gray700 text-[14px] px-4 py-[10px] rounded-[10px] font-medium w-full"
+          >
+            계속할래요
+          </button>
+          <button
+            onClick={() => {
+              navigate('/');
+              setShowBackModal(false);
+            }}
+            className="bg-secondary-purple-60 text-white text-[14px] px-4 py-[10px] rounded-[10px] font-medium w-full"
+          >
+            그만둘래요
+          </button>
+        </Modal>
+      )}
     </div>
   );
 };
