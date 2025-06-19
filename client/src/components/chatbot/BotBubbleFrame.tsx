@@ -31,9 +31,11 @@ const BotBubbleFrame = ({
   functionCall,
   onButtonClick,
 }: BotBubbleFrameProps) => {
+  const shouldShowMessage = !functionCall || messageChunks[0]?.trim() !== '';
+
   return (
     <div className="space-y-2">
-      <BotBubble messageChunks={messageChunks} />
+      {shouldShowMessage && <BotBubble messageChunks={messageChunks} />}
       {functionCall &&
         (() => {
           const { name, args } = functionCall;

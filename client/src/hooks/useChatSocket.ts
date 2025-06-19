@@ -41,7 +41,7 @@ export const useChatSocket = () => {
         ...prev,
         {
           type: 'bot',
-          messageChunks: ['다음 항목 중 하나를 선택해주세요:'],
+          messageChunks: [''],
           functionCall: {
             name: 'requestCarouselButtons',
             args: { items },
