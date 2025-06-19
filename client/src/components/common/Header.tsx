@@ -25,7 +25,7 @@ const Header = ({
     if (onBackClick) {
       onBackClick();
     } else {
-      navigate(-1);
+      navigate('/');
     }
   };
   return (
