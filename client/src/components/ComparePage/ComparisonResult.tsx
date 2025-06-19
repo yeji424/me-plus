@@ -21,50 +21,45 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
     }
   };
 
-  // 선택된 요금제가 있는지 확인
-  const hasLeftPlan = selectedLeft !== null;
-  const hasRightPlan = selectedRight !== null;
-  const hasBothPlans = hasLeftPlan && hasRightPlan;
-
   // 데이터 값 계산
-  const leftDataValue = hasLeftPlan
+  const leftDataValue = selectedLeft
     ? selectedLeft.dataGb === -1
       ? 300
       : selectedLeft.dataGb || 0
     : 0;
-  const rightDataValue = hasRightPlan
+  const rightDataValue = selectedRight
     ? selectedRight.dataGb === -1
       ? 300
       : selectedRight.dataGb || 0
     : 0;
-  const leftSharedDataValue = hasLeftPlan
+  const leftSharedDataValue = selectedLeft
     ? selectedLeft.sharedDataGb === -1
       ? 300
       : selectedLeft.sharedDataGb || 0
     : 0;
-  const rightSharedDataValue = hasRightPlan
+  const rightSharedDataValue = selectedRight
     ? selectedRight.sharedDataGb === -1
       ? 300
       : selectedRight.sharedDataGb || 0
     : 0;
 
   // 데이터 라벨 계산
-  const leftDataLabel = hasLeftPlan
+  const leftDataLabel = selectedLeft
     ? selectedLeft.dataGb === -1
       ? '무제한'
       : `${selectedLeft.dataGb}GB`
     : '';
-  const rightDataLabel = hasRightPlan
+  const rightDataLabel = selectedRight
     ? selectedRight.dataGb === -1
       ? '무제한'
       : `${selectedRight.dataGb}GB`
     : '';
-  const leftSharedDataLabel = hasLeftPlan
+  const leftSharedDataLabel = selectedLeft
     ? selectedLeft.sharedDataGb === -1
       ? '무제한'
       : `${selectedLeft.sharedDataGb}GB`
     : '';
-  const rightSharedDataLabel = hasRightPlan
+  const rightSharedDataLabel = selectedRight
     ? selectedRight.sharedDataGb === -1
       ? '무제한'
       : `${selectedRight.sharedDataGb}GB`
@@ -145,8 +140,8 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
       </div>
 
       <ComparisonActionButtons
-        leftButtonText={hasLeftPlan ? '자세히 보기' : ''}
-        rightButtonText={hasRightPlan ? '자세히 보기' : ''}
+        leftButtonText={selectedLeft ? '자세히 보기' : ''}
+        rightButtonText={selectedRight ? '자세히 보기' : ''}
         onLeftClick={() => handleDetailClick(selectedLeft?.detailUrl)}
         onRightClick={() => handleDetailClick(selectedRight?.detailUrl)}
       />

@@ -222,8 +222,6 @@ const ComparePage: React.FC = () => {
     setIsModalOpen(false);
   };
 
-  const hasSelectedPlans = selectedLeft && selectedRight;
-
   return (
     <>
       <Header title="요금제 비교하기" onBackClick={() => openModal()} />
@@ -254,17 +252,6 @@ const ComparePage: React.FC = () => {
         onSelectSlot={openSheetForSlot}
         onClearSlot={handleClearSlot}
       />
-      {/* {hasSelectedPlans ? (
-        <ComparisonResult
-          selectedLeft={selectedLeft}
-          selectedRight={selectedRight}
-        />
-      ) : (
-        <div className="flex flex-col justify-center items-center text-center text-gray500 mt-[120px]">
-          <p className="text-lg">비교할 요금제가 없습니다</p>
-          <p className="text-xl">버튼을 눌러 요금제를 선택해주세요!</p>
-        </div>
-      )} */}
       {selectedLeft || selectedRight ? (
         <ComparisonResult
           selectedLeft={selectedLeft}
