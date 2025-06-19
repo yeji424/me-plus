@@ -12,46 +12,36 @@ const PlanDetailInfo: React.FC<PlanDetailInfoProps> = ({
   onClick,
   disabled,
 }) => {
-  const formatBenefits = (plan: Plan): string[] => {
-    if (plan.mediaAddons && plan.premiumAddons) {
-      const services = [
-        ...(plan.mediaAddons || []),
-        ...', ',
-        ...(plan.premiumAddons || []),
-      ];
-      return services;
-    } else if (plan.mediaAddons) {
-      const services = [...(plan.mediaAddons || [])];
-      return services;
-    } else if (plan.premiumAddons) {
-      const services = [...(plan.premiumAddons || [])];
-      return services;
-    }
-
-    return ['-'];
-  };
-
+  const formattedData = plan.dataGb === -1 ? '무제한' : `${plan.dataGb}GB`;
+  const formattedVoiceMinutes =
+    plan.voiceMinutes === -1 ? '무제한' : `${plan.voiceMinutes}분`;
+  const formattedSmsCount =
+    plan.smsCount === -1 ? '무제한' : `${plan.smsCount}건`;
   return (
     <div className="bg-background rounded-b-[7px] p-3 text-[13px] flex flex-col gap-2">
       <div className="flex gap-[5px]">
-        <p className="min-w-[64px] text-secondary-purple-80">전화</p>
-        <p>무제한</p>
+        <p className="min-w-[90px] text-secondary-purple-80">전화</p>
+        <p className="w-full">{formattedVoiceMinutes}</p>
       </div>
       <div className="flex gap-[5px]">
-        <p className="min-w-[64px] text-secondary-purple-80">문자</p>
-        <p>무제한</p>
+        <p className="min-w-[90px] text-secondary-purple-80">문자</p>
+        <p className="w-full">{formattedSmsCount}</p>
       </div>
       <div className="flex gap-[5px]">
-        <p className="min-w-[64px] text-secondary-purple-80">데이터</p>
-        <p>무제한</p>
+        <p className="min-w-[90px] text-secondary-purple-80">데이터</p>
+        <p className="w-full">{formattedData}</p>
       </div>
       <div className="flex gap-[5px]">
-        <p className="min-w-[64px] text-secondary-purple-80">요금</p>
-        <p>월 {plan.monthlyFee.toLocaleString()}원</p>
+        <p className="min-w-[90px] text-secondary-purple-80">요금</p>
+        <p className="w-full">월 {plan.monthlyFee.toLocaleString()}원</p>
       </div>
       <div className="flex gap-[5px]">
-        <p className="min-w-[64px] text-secondary-purple-80">부가서비스</p>
-        <p>{formatBenefits(plan)}</p>
+        <p className="min-w-[90px] text-secondary-purple-80">프리미엄 서비스</p>
+        <p className="">{plan.premiumAddons ? plan.premiumAddons : '-'}</p>
+      </div>
+      <div className="flex gap-[5px]">
+        <p className="min-w-[90px] text-secondary-purple-80">미디어 서비스</p>
+        <p className="w-full">{plan.mediaAddons ? plan.mediaAddons : ' - '}</p>
       </div>
 
       <div className="h-[43px] mt-2">
