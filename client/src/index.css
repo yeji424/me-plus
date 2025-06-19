@@ -102,6 +102,19 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
 }
+.user-bubble {
+  background: linear-gradient(
+      180deg,
+      #5732a1 0%,
+      #5b038c 25%,
+      #a0018b 50%,
+      #ce018b 75%,
+      #eb008b 100%
+    )
+    no-repeat center;
+  background-attachment: fixed;
+}
+
 /* 테일윈드 사용한 유틸리티 클래스(재사용 가능한 class) 여기 넣으면 됩니다! */
 @layer utilities {
   .icon-button {
