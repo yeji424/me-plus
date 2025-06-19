@@ -57,8 +57,7 @@ const BotBubbleFrame = ({
   functionCall,
   onButtonClick,
 }: BotBubbleFrameProps) => {
-    const shouldShowMessage =
-    !functionCall || messageChunks[0]?.trim() !== '';
+  const shouldShowMessage = !functionCall || messageChunks[0]?.trim() !== '';
 
   const buttonGroup = (() => {
     if (!functionCall) return null;
@@ -85,15 +84,25 @@ const BotBubbleFrame = ({
             onButtonClick={onButtonClick}
           />
         ) : null;
-      case 'requestOttButtons':
+      case 'requestOTTServiceList':
         return <OttButtonGroup onButtonClick={onButtonClick} />;
       case 'requestTextButtons':
-        return args?.textItems ? (
+        return args?.textItems || args?.options ? (
           <TextButtonGroup
-            options={args.textItems}
+            options={
+              args.textItems ||
+              (args.options as string[])?.map((opt, idx) => ({
+                id: idx.toString(),
+                label: opt,
+              })) ||
+              []
+            }
             onButtonClick={onButtonClick}
           />
         ) : null;
+      case 'showPlanLists':
+        // TODO: Plan card 컴포넌트 구현 필요
+        return null;
       default:
         return null;
     }
