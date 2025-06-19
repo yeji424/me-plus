@@ -3,6 +3,7 @@ import BenefitComparisonRow from './BenefitComparisonRow';
 import ComparisonActionButtons from './ComparisonActionButtons';
 import togetherIcon from '@/assets/image/card_family.png';
 import premiumAddonsIcon from '@/assets/icon/special.png';
+import mediaAddonsIcon from '@/assets/icon/media.png';
 import type { Plan } from '@/components/types/Plan';
 
 interface ComparisonResultProps {
@@ -107,6 +108,9 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
                 : null
             }
             title="미디어 서비스"
+            leftIcon={selectedLeft.mediaAddons ? mediaAddonsIcon : undefined}
+            rightIcon={selectedRight.mediaAddons ? mediaAddonsIcon : undefined}
+            iconAlt="premiumIcon"
           />
         </div>
       </div>
