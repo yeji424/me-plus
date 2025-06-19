@@ -34,13 +34,16 @@ export interface PlanData {
 export interface FunctionCall {
   name:
     | 'requestCarouselButtons'
-    | 'requestOXButtons'
-    | 'requestOttButtons'
-    | 'requestTextButtons';
+    | 'requestOXCarouselButtons'
+    | 'requestOTTServiceList'
+    | 'requestTextButtons'
+    | 'showPlanLists';
   args?: {
     items?: CarouselItem[];
-    options?: OXOption[];
+    options?: string[] | OXOption[];
     textItems?: TextItem[];
+    question?: string;
+    plan?: PlanData;
   };
 }
 export interface BotBubbleFrameProps {
@@ -68,9 +71,19 @@ const BotBubbleFrame = ({
             onButtonClick={onButtonClick}
           />
         ) : null;
-      case 'requestOXButtons':
+      case 'requestOXCarouselButtons':
         return args?.options ? (
-          <OXButtonGroup options={args.options} onButtonClick={onButtonClick} />
+          <OXButtonGroup
+            options={
+              Array.isArray(args.options) && typeof args.options[0] === 'string'
+                ? (args.options.map((opt, idx) => ({
+                    id: idx === 0 ? 'o' : 'x',
+                    label: opt,
+                  })) as OXOption[])
+                : (args.options as OXOption[])
+            }
+            onButtonClick={onButtonClick}
+          />
         ) : null;
       case 'requestOttButtons':
         return <OttButtonGroup onButtonClick={onButtonClick} />;

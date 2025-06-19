@@ -3,6 +3,7 @@ import { socket } from '@/utils/socket';
 import type {
   CarouselItem,
   FunctionCall,
+  PlanData,
 } from '@/components/chatbot/BotBubbleFrame';
 
 type Message =
@@ -50,14 +51,84 @@ export const useChatSocket = () => {
       ]);
     };
 
+    const handleOXCarouselButtons = (data: { options: string[] }) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: 'bot',
+          messageChunks: [''],
+          functionCall: {
+            name: 'requestOXCarouselButtons',
+            args: { options: data.options },
+          },
+        },
+      ]);
+    };
+
+    const handleOTTServiceList = (data: {
+      question: string;
+      options: string[];
+    }) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: 'bot',
+          messageChunks: [''],
+          functionCall: {
+            name: 'requestOTTServiceList',
+            args: { question: data.question, options: data.options },
+          },
+        },
+      ]);
+    };
+
+    const handlePlanLists = (plan: PlanData) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: 'bot',
+          messageChunks: [''],
+          functionCall: {
+            name: 'showPlanLists',
+            args: { plan },
+          },
+        },
+      ]);
+    };
+
+    const handleTextButtons = (data: {
+      question: string;
+      options: string[];
+    }) => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: 'bot',
+          messageChunks: [''],
+          functionCall: {
+            name: 'requestTextButtons',
+            args: { question: data.question, options: data.options },
+          },
+        },
+      ]);
+    };
+
     socket.on('session-id', handleSessionId);
     socket.on('session-history', handleSessionHistory);
     socket.on('carousel-buttons', handleCarouselButtons);
+    socket.on('ox-carousel-buttons', handleOXCarouselButtons);
+    socket.on('ott-service-list', handleOTTServiceList);
+    socket.on('plan-lists', handlePlanLists);
+    socket.on('text-buttons', handleTextButtons);
 
     return () => {
       socket.off('session-id', handleSessionId);
       socket.off('session-history', handleSessionHistory);
       socket.off('carousel-buttons', handleCarouselButtons);
+      socket.off('ox-carousel-buttons', handleOXCarouselButtons);
+      socket.off('ott-service-list', handleOTTServiceList);
+      socket.off('plan-lists', handlePlanLists);
+      socket.off('text-buttons', handleTextButtons);
     };
   }, []);
 
