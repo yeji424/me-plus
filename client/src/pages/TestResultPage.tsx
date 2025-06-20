@@ -118,18 +118,12 @@ const TestResultPage = () => {
         {plan.name}
       </div>
 
-      <div className="mt-2 px-4 py-1 bg-gradation rounded-full text-[17px] text-white font-semibold inline-flex items-center gap-1">
-        <img src={plus} alt="더해서" className="w-[16px] h-[16px]" />
-        {plan.id === 'ott-plus' && '넷플릭스 / 왓챠 제휴 결합'}
-        {plan.id === 'music-plus' && '지니뮤직 제휴 결합'}
-        {plan.id === 'family' && 'U+ 투게더 결합'}
-        {plan.id === 'youth1-special' && '데이터 무제한 최대 1Mbps 속도'}
-        {plan.id === 'youth2-special' && '데이터 무제한 최대 5Mbps 속도'}
-        {plan.id === 'youth3-special' && '실버지킴이'}
-        {plan.id === 'max-data' && '데이터 무제한'}
-        {plan.id === 'max-high' && '데이터 무제한 최대 5Mbps 속도'}
-        {plan.id === 'max-data' && '데이터 무제한 최대 1Mbps 속도'}
-      </div>
+      {plan.tagLine && (
+        <div className="mt-2 px-4 py-1 bg-gradation rounded-full text-[17px] text-white font-semibold inline-flex items-center gap-1">
+          <img src={plus} alt="더해서" className="w-[16px] h-[16px]" />
+          {plan.tagLine}
+        </div>
+      )}
 
       <div className="relative w-full flex justify-center items-center mt-6">
         <img
