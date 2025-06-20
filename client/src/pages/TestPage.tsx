@@ -148,6 +148,9 @@ const TestPage = () => {
                     );
                     navigate('/test-wait');
                   }}
+                  fullWidth
+                  variant="primary"
+                  size="large"
                 >
                   Me플러스 맞춤 추천 받기
                 </Button>

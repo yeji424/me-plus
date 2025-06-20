@@ -45,7 +45,12 @@ const PlanDetailInfo: React.FC<PlanDetailInfoProps> = ({
       </div>
 
       <div className="h-[43px] mt-2">
-        <Button onClick={onClick} disabled={disabled}>
+        <Button
+          fullWidth
+          variant="primary"
+          onClick={onClick}
+          disabled={disabled}
+        >
           선택하기
         </Button>
       </div>
