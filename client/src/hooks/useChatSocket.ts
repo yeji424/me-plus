@@ -83,25 +83,26 @@ export const useChatSocket = () => {
     [],
   );
 
-  const handleLoading = useCallback((data: {
-      type: 'searching' | 'waiting' | 'dbcalling';
-    }) => {
-    setMessages((prev) => [
-      ...prev,
+  const handleLoading = useCallback(
+    (data: { type: 'searching' | 'waiting' | 'dbcalling' }) => {
+      setMessages((prev) => [
+        ...prev,
         {
           type: 'loading',
           loadingType: data.type,
         },
       ]);
-    };
+    },
+    [],
+  );
 
-    const handleLoadingEnd = () => {
-      setMessages((prev) => prev.filter((msg) => msg.type !== 'loading'));
-    };
+  const handleLoadingEnd = useCallback(() => {
+    setMessages((prev) => prev.filter((msg) => msg.type !== 'loading'));
+  }, []);
 
-    const handleCarouselButtons = (items: CarouselItem[]) => {
-      setMessages((prev) => [
-        ...prev.filter((msg) => msg.type !== 'loading'),
+  const handleCarouselButtons = useCallback((items: CarouselItem[]) => {
+    setMessages((prev) => [
+      ...prev.filter((msg) => msg.type !== 'loading'),
       {
         type: 'bot',
         messageChunks: [''],

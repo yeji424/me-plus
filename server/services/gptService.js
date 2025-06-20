@@ -581,10 +581,7 @@ export const streamChat = async (messages, socket, onDelta) => {
           .trim();
 
         if (cleanedContent) {
-          socket.emit(
-            'stream',
-            cleanedContent.substring(responseRef.current.length),
-          );
+          socket.emit('stream', cleanedContent);
         }
       }
 

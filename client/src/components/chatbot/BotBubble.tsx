@@ -71,19 +71,6 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
     );
   }, []); // 의존성 배열 비움
 
-  // 크기 측정 함수
-  const measureSize = () => {
-    if (ghostRef.current) {
-      const { offsetWidth, offsetHeight } = ghostRef.current;
-      setBoxSize((prev) => {
-        // 크기가 이전보다 작아지지 않도록 보장 (텍스트가 줄어들 때만 예외)
-        const newWidth = Math.max(offsetWidth, prev.width * 0.8);
-        const newHeight = Math.max(offsetHeight, prev.height * 0.8);
-        return { width: newWidth, height: newHeight };
-      });
-    }
-  };
-
   // 여러 번 크기 측정을 시도하여 안정적인 크기 확보
   const scheduleMeasurement = () => {
     // 기존 타이머 클리어
@@ -141,9 +128,7 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
       <div
         ref={ghostRef}
         className="absolute invisible max-w-[309px] p-2 text-[14px] leading-5 whitespace-pre-wrap break-words"
-        style={{ minHeight: '24px' }} // 최소 높이 보장
-        className="absolute invisible max-w-[309px] p-3 text-[14px] leading-5 whitespace-pre-wrap break-words"
-        style={{ padding: '12px' }} // 더 여유로운 패딩
+        style={{ minHeight: '24px', padding: '12px' }}
       >
         <MarkedText chars={chars} />
       </div>
