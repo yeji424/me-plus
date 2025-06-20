@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import SendIcon from '@/assets/icon/send.svg?react'; // 이 라인 추가
 
 interface InputBoxProps {
   value: string;
@@ -13,6 +14,26 @@ const InputBox = ({
   onSend,
   disabled = false,
 }: InputBoxProps) => {
+  const inputRef = useRef<HTMLInputElement>(null); // 추가
+
+  // 컴포넌트 마운트 시 포커스 설정
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // disabled 상태가 변경될 때 포커스 처리
+  useEffect(() => {
+    if (!disabled) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [disabled]);
+
   const handleSubmit = () => {
     if (!value.trim() || disabled) return;
     onSend(value);
@@ -24,24 +45,29 @@ const InputBox = ({
   };
 
   return (
-    <div className="bg-white rounded-full px-4 py-2 shadow flex items-center w-full max-w-[560px]">
+    <div className=" border-gray-100 flex items-center w-full max-w-[560px]">
       <input
+        ref={inputRef}
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="AI챗봇에게 물어보고 싶은 내용을 질문하세요."
-        className="flex-grow focus:outline-none text-gray-700 placeholder-gray-400 h-10 rounded-full px-3"
+        className="flex-grow h-10 bg-white rounded-full focus:outline-none text-gray-700 placeholder-gray-400 text-sm px-5"
         disabled={disabled}
+        autoFocus
       />
       <button
         type="button"
         onClick={handleSubmit}
         disabled={disabled}
-        className={`ml-2 rounded-full px-4 py-2 h-10 flex items-center justify-center transition
-        ${disabled ? 'bg-gray-300 cursor-not-allowed text-white' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}
+        className={`ml-3 rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 ${
+          disabled
+            ? 'bg-gray-300 cursor-not-allowed'
+            : 'bg-secondary-purple-80 hover:bg-secondary-purple-60 active:scale-95'
+        }`}
       >
-        {disabled ? '응답 중' : '전송'}
+        <SendIcon className="w-[18px] h-[18px]" />
       </button>
     </div>
   );

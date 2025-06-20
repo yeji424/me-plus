@@ -32,12 +32,27 @@ const refineData = (plans) => {
 /** 전체 요금제 목록 */
 export const getPlans = async () => {
   try {
-    const plans = await Plan.find({}).select(EXCLUDED_FIELDS).limit(10);
+    const plans = await Plan.find({}).select(EXCLUDED_FIELDS);
     const data = refineData(plans);
 
     return { plans: data };
   } catch (error) {
     console.error('getPlans >>', error);
+    throw error;
+  }
+};
+
+/** 인기 요금제 목록 */
+export const getPopularPlans = async () => {
+  try {
+    const popularPlans = await Plan.find({ isPopular: true }).select(
+      EXCLUDED_FIELDS,
+    );
+    const data = refineData(popularPlans);
+
+    return { plans: data };
+  } catch (error) {
+    console.error('getPopularPlans >>', error);
     throw error;
   }
 };

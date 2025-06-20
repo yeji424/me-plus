@@ -26,6 +26,7 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
 
   // 스트리밍 응답에 맞게 단순화
   useEffect(() => {
+    console.log(messageChunks);
     if (messageChunks.length > 0) {
       setDisplayText(messageChunks[0]);
     }
@@ -38,7 +39,7 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
       {/* 숨겨진 텍스트로 크기 측정용 박스*/}
       <div
         ref={ghostRef}
-        className="absolute invisible max-w-[309px] p-2 text-xs leading-5 whitespace-pre-wrap break-words"
+        className="absolute invisible max-w-[309px] p-2 text-[14px] leading-5 whitespace-pre-wrap break-words"
       >
         <MarkedText chars={chars} />
       </div>
@@ -48,10 +49,10 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
         style={springStyles}
         className="
       max-w-[309px]
-      p-2
-      rounded-tr-lg rounded-br-lg rounded-bl-lg
+      p-[10px]
+      rounded-tr-xl rounded-br-xl rounded-bl-xl
       bg-background-40
-      text-xs
+      text-[14px]
       leading-5
       whitespace-pre-wrap
       break-words
