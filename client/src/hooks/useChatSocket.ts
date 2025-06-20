@@ -186,7 +186,7 @@ export const useChatSocket = () => {
     const handleStream = (chunk: string) => {
       responseRef.current += chunk;
 
-      console.log('📥 Stream chunk:', chunk, responseRef.current);
+      // console.log('📥 Stream chunk:', chunk, responseRef.current);
       setMessages((prev) => {
         const last = prev[prev.length - 1];
         if (last?.type === 'bot') {
