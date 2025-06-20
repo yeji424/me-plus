@@ -37,13 +37,14 @@ async function insertPlans() {
         dataGb: plan.dataGb,
         sharedDataGb: plan.sharedDataGb,
         voiceMinutes: plan.voiceMinutes,
+        addonVoiceMinutes: plan.addonVoiceMinutes,
         smsCount: plan.smsCount,
+        bundleBenefit: plan.bundleBenefit,
         optionalDiscountAmount: plan.optionalDiscountAmount,
         ageGroup: plan.ageGroup,
-        // _id 제거 (MongoDB가 자동 생성)
-        // bundleBenefit은 문자열이면 null로, 객체면 그대로 사용
-        bundleBenefit:
-          typeof plan.bundleBenefit === 'string' ? null : plan.bundleBenefit,
+        mediaAddons: plan.mediaAddons,
+        premiumAddons: plan.premiumAddons,
+        basicService: plan.basicService,
       };
       return transformed;
     });
