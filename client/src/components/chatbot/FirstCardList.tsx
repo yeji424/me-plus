@@ -92,11 +92,17 @@ const FirstCardList = ({
   };
 
   return (
-    <DraggableScroll className="mx-1 flex flex-nowrap gap-[6px] hide-scrollbar overflow-visible">
-      {cardData.map((item) => (
-        <CardItem key={item.id} item={item} onButtonClick={handleButtonClick} />
-      ))}
-    </DraggableScroll>
+    <div className="mx-1 w-full max-w-[450px]">
+      <DraggableScroll className="flex flex-nowrap gap-[6px] hide-scrollbar overflow-visible">
+        {cardData.map((item) => (
+          <CardItem
+            key={item.id}
+            item={item}
+            onButtonClick={handleButtonClick}
+          />
+        ))}
+      </DraggableScroll>
+    </div>
   );
 };
 
