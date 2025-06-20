@@ -200,7 +200,7 @@ const ChatbotPage = () => {
         {/* 마진으로 안하고 패딩으로 한 이유 : 마진으로 하면 그라데이션 넣은 이유 사라짐 */}
         <div
           ref={containerRef}
-          className="border-1 relative flex-1 overflow-y-auto mt-[50px] pb-[60px] flex flex-col-reverse"
+          className="relative flex-1 overflow-y-auto mt-[50px] pb-[60px] flex flex-col-reverse"
         >
           <div className="gap-5 max-w-[560px] min-h-full flex flex-col-reverse">
             {reversedMessages.map((msg, idx) => {
