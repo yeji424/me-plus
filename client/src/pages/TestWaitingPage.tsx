@@ -1,17 +1,19 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import moonerImage from '../assets/image/mooner_hmm.png';
 
 const TestWaitingPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const planId = location.state?.planId;
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigate('/test-result');
+      navigate('/test-result', { state: { planId } });
     }, 1500);
 
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, planId]);
 
   return (
     <>

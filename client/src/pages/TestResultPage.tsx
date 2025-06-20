@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import type { PlanResult } from '@/components/types/TestResult';
-import TestResult from '@/data/TestResult';
+import { planResults } from '@/data/TestResult';
 
 import UsageBar from '@/components/testPage/UsageBar';
 import moonerFunImage from '../assets/image/mooner_fun.png';
@@ -42,17 +43,22 @@ const generateChatbotURL = (userProfile: UserProfile): string => {
 
 const TestResultPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const planId = location.state?.planId as string | undefined;
   const [plan, setPlan] = useState<PlanResult | null>(null);
 
   useEffect(() => {
-    const savedId = localStorage.getItem('recommendedPlanId');
-    if (savedId) {
-      const result = TestResult.find((p) => p.result.id === savedId);
-      if (result) {
-        setPlan(result.result);
+    if (planId) {
+      const matched = planResults.find((p) => p.id === planId);
+      if (matched) {
+        setPlan(matched);
       }
     }
-  }, []);
+  }, [planId]);
+
+  if (!planId) {
+    return <div>추천 정보가 없습니다. 테스트를 다시 시작해주세요.</div>;
+  }
 
   const handleBackClick = () => {
     navigate('/');
