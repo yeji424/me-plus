@@ -3,6 +3,8 @@
 @tailwind base;
 @tailwind utilities;
 @tailwind components;
+@import 'swiper/css';
+@import 'swiper/css/pagination';
 
 @theme {
   --color-primary-pink: #eb008b;
@@ -234,4 +236,29 @@
   100% {
     transform: rotate(1turn);
   }
+
+/* 서비스 가이드 스와이퍼 */
+.swiper-pagination {
+  z-index: -1;
+  top: 250px !important;
+  /* height: 640px; */
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  left: 50% !important;
+  transform: translateX(-50%);
+  aspect-ratio: 1 / 2;
+  bottom: auto !important;
+  max-width: 200px !important;
+  width: 63% !important;
+}
+.swiper-pagination-bullet {
+  border-radius: 100px;
+  transition-property: width;
+  transition-duration: 0.1s;
+  height: 4px;
+}
+.swiper-pagination-bullet-active {
+  background-color: var(--color-primary-pink);
+  width: 22px;
 }
