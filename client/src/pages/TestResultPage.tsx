@@ -9,6 +9,37 @@ import Header from '@/components/common/Header';
 import confetti from '../assets/image/confetti.png';
 import plus from '@/assets/icon/plus.png';
 
+// 사용자 정보 타입 정의
+interface UserProfile {
+  plan: {
+    id: string;
+    name: string;
+    monthlyFee: number;
+    benefits: string[];
+  };
+  usage: {
+    call: number;
+    message: number;
+    data: number;
+  };
+  preferences: string[];
+  source: 'plan-test'; // 어디서 온 사용자인지 구분
+}
+
+// 사용자 정보를 URL 파라미터로 인코딩하는 함수
+const generateChatbotURL = (userProfile: UserProfile): string => {
+  try {
+    // UTF-8 문자를 올바르게 인코딩하기 위한 방법
+    const encodedProfile = btoa(
+      unescape(encodeURIComponent(JSON.stringify(userProfile))),
+    );
+    return `/chatbot?profile=${encodedProfile}`;
+  } catch (error) {
+    console.error('URL 생성 실패:', error);
+    return '/chatbot';
+  }
+};
+
 const TestResultPage = () => {
   const navigate = useNavigate();
   const [plan, setPlan] = useState<PlanResult | null>(null);
@@ -25,6 +56,51 @@ const TestResultPage = () => {
 
   const handleBackClick = () => {
     navigate('/');
+  };
+
+  const handleChatbotClick = () => {
+    if (!plan) return;
+
+    // 플랜 ID에 따른 혜택 매핑
+    const getBenefits = (planId: string): string[] => {
+      switch (planId) {
+        case 'ott-plus':
+          return ['넷플릭스', '왓챠', '무제한 데이터'];
+        case 'music-plus':
+          return ['지니뮤직', '무제한 데이터'];
+        case 'family':
+          return ['U+ 투게더', '가족 할인'];
+        case 'youth1-special':
+        case 'youth2-special':
+        case 'youth3-special':
+          return ['청소년 전용', '데이터 무제한'];
+        case 'max-data':
+        case 'max-high':
+          return ['데이터 무제한', '고속 인터넷'];
+        default:
+          return ['기본 혜택'];
+      }
+    };
+
+    // 실제 플랜 데이터를 기반으로 UserProfile 생성
+    const userProfile: UserProfile = {
+      plan: {
+        id: plan.id,
+        name: plan.name,
+        monthlyFee: plan.price || 0,
+        benefits: getBenefits(plan.id),
+      },
+      usage: {
+        call: plan.callUsage,
+        message: plan.messageUsage,
+        data: plan.dataUsage,
+      },
+      preferences: plan.description.split('\n').filter((line) => line.trim()),
+      source: 'plan-test',
+    };
+
+    const chatbotURL = generateChatbotURL(userProfile);
+    navigate(chatbotURL);
   };
 
   if (!plan) {
@@ -86,7 +162,7 @@ const TestResultPage = () => {
 
       <div className="flex gap-4 mt-6 w-full max-w-md">
         <button
-          onClick={() => navigate('/chatbot')}
+          onClick={handleChatbotClick}
           className="w-1/2 rounded-xl bg-secondary-purple-40 text-gray600 text-sm font-semibold py-3"
         >
           챗봇 상담하기
