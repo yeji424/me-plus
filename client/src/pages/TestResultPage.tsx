@@ -58,6 +58,51 @@ const TestResultPage = () => {
     navigate('/');
   };
 
+  const handleChatbotClick = () => {
+    if (!plan) return;
+
+    // 플랜 ID에 따른 혜택 매핑
+    const getBenefits = (planId: string): string[] => {
+      switch (planId) {
+        case 'ott-plus':
+          return ['넷플릭스', '왓챠', '무제한 데이터'];
+        case 'music-plus':
+          return ['지니뮤직', '무제한 데이터'];
+        case 'family':
+          return ['U+ 투게더', '가족 할인'];
+        case 'youth1-special':
+        case 'youth2-special':
+        case 'youth3-special':
+          return ['청소년 전용', '데이터 무제한'];
+        case 'max-data':
+        case 'max-high':
+          return ['데이터 무제한', '고속 인터넷'];
+        default:
+          return ['기본 혜택'];
+      }
+    };
+
+    // 실제 플랜 데이터를 기반으로 UserProfile 생성
+    const userProfile: UserProfile = {
+      plan: {
+        id: plan.id,
+        name: plan.name,
+        monthlyFee: plan.price || 0,
+        benefits: getBenefits(plan.id),
+      },
+      usage: {
+        call: plan.callUsage,
+        message: plan.messageUsage,
+        data: plan.dataUsage,
+      },
+      preferences: plan.description.split('\n').filter((line) => line.trim()),
+      source: 'plan-test',
+    };
+
+    const chatbotURL = generateChatbotURL(userProfile);
+    navigate(chatbotURL);
+  };
+
   if (!plan) {
     return <div>로딩 중...</div>; // 또는 로딩 UI
   }
