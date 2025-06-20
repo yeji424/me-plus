@@ -266,20 +266,46 @@ export const streamChat = async (messages, socket, onDelta) => {
       const delta = chunk.choices[0].delta;
 
       // tool_calls 감지 (새로운 API 형식)
-      if (delta.tool_calls) {
-        isFunctionCalled = true;
+      if (delta.tool_calls && delta.tool_calls.length > 0) {
+        // console.log('🛠️ Tool calls detected:', delta.tool_calls);
+
+        // 처음 tool_calls 감지 시 로딩 시작
+        if (!isFunctionCalled) {
+          isFunctionCalled = true;
+
+          // Function calling 시작 - 로딩 상태 emit
+          const toolCall = delta.tool_calls[0];
+          const detectedFunctionName = toolCall.function?.name || 'unknown';
+          socket.emit('loading', {
+            type: detectedFunctionName.includes('Plan')
+              ? 'dbcalling'
+              : 'searching',
+            functionName: detectedFunctionName,
+          });
+          console.log('🔄 로딩 시작:', detectedFunctionName);
+        }
+
         const toolCall = delta.tool_calls[0];
 
         if (toolCall.function?.name) {
           functionName = toolCall.function.name;
-          console.log('🎯 Function name detected:', functionName);
+          // console.log('🎯 Function name detected:', functionName);
         }
 
         if (toolCall.function?.arguments) {
           functionArgsRaw += toolCall.function.arguments;
-          console.log('📝 Adding args chunk:', toolCall.function.arguments);
+          // console.log('📝 Adding args chunk:', toolCall.function.arguments);
         }
         continue;
+      }
+      // console.log('🔍 delta:', delta);
+
+      // delta 구조 상세 확인
+      if (delta.tool_calls) {
+        console.log('✅ tool_calls 존재:', delta.tool_calls);
+      }
+      if (delta.function_call) {
+        console.log('✅ function_call 존재:', delta.function_call);
       }
 
       // 일반 메시지 content
@@ -287,9 +313,9 @@ export const streamChat = async (messages, socket, onDelta) => {
       if (content) {
         accumulatedContent += content;
 
-        // 텍스트에서 function call 패턴 감지
+        // 텍스트에서 function call 패턴 감지 (더 엄격한 패턴)
         const functionCallMatch = accumulatedContent.match(
-          /functions?\.(\w+)\s*\(\s*\{([\s\S]*?)\}\s*\)$/,
+          /functions?\.(\w+)\s*\(\s*\{([\s\S]*?)\}\s*\)\s*$/,
         );
 
         if (functionCallMatch) {
@@ -300,30 +326,59 @@ export const streamChat = async (messages, socket, onDelta) => {
 
           // function call 부분을 제거한 텍스트만 전송
           const cleanContent = accumulatedContent
-            .replace(/functions?\.(\w+)\s*\(\s*\{[\s\S]*?}\s*\)$/, '')
+            .replace(/functions?\.(\w+)\s*\(\s*\{[\s\S]*?}\s*\)\s*$/, '')
             .trim();
 
-          if (cleanContent) {
-            socket.emit('stream', cleanContent);
-            onDelta?.(cleanContent);
-          }
+          // 스트리밍 종료 신호 먼저 전송
+          socket.emit('done');
 
           // function call 실행
           isFunctionCalled = true;
           functionName = functionCallMatch[1];
 
+          // 텍스트 기반 function call 감지 시 로딩 시작
+          socket.emit('loading', {
+            type: functionName.includes('Plan') ? 'dbcalling' : 'searching',
+            functionName: functionName,
+          });
+          console.log('🔄 텍스트 기반 로딩 시작:', functionName);
+
           try {
             functionArgsRaw = `{${functionCallMatch[2]}}`;
-            console.log('📄 Parsed function args:', functionArgsRaw);
           } catch (e) {
             console.error('❌ Failed to parse function args from text:', e);
           }
 
           break; // 스트리밍 종료
         } else {
-          // 정상 텍스트 전송
-          socket.emit('stream', content);
-          onDelta?.(content);
+          // function call이 시작되는 패턴 감지 (전송 중단)
+          if (
+            accumulatedContent.includes('functions.') ||
+            accumulatedContent.includes('function.')
+          ) {
+            // function call이 완성되기를 기다리므로 전송하지 않음
+            // console.log(
+            //   '🔍 Function call 시작 감지, 스트리밍 중단:',
+            //   accumulatedContent.substring(
+            //     accumulatedContent.lastIndexOf('function'),
+            //   ),
+            // );
+          } else {
+            // "functions" 또는 "function" 단어만 있는 경우 체크
+            if (
+              accumulatedContent.includes(' functions') ||
+              accumulatedContent.includes(' function') ||
+              accumulatedContent.endsWith('functions') ||
+              accumulatedContent.endsWith('function')
+            ) {
+              // 다음 청크를 기다려서 완전한 function call인지 확인
+              console.log('🔍 Function 키워드 감지, 다음 청크 대기 중...');
+            } else {
+              // 정상 텍스트 전송
+              socket.emit('stream', content);
+              onDelta?.(content);
+            }
+          }
         }
       }
     }
@@ -333,30 +388,63 @@ export const streamChat = async (messages, socket, onDelta) => {
         console.log('🔧 Function called:', functionName);
         console.log('📄 Raw arguments:', functionArgsRaw);
 
+        // 로딩 시작은 이미 tool_calls 감지 시 처리됨 (제거)
+
         let args = {};
         if (functionArgsRaw) {
           try {
-            args = JSON.parse(functionArgsRaw);
-          } catch (parseError) {
-            console.error('❌ JSON 파싱 실패:', parseError);
-            console.log('🔍 파싱 실패한 JSON:', functionArgsRaw);
+            // JavaScript 객체 형식을 JSON으로 변환 (더 정교한 변환)
+            let fixedJson = functionArgsRaw
+              // 1. 키에 따옴표 추가 (단어로 시작하는 키들만)
+              .replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":')
+              // 2. 작은따옴표를 큰따옴표로 변환
+              .replace(/'/g, '"')
+              // 3. 숫자 뒤의 불필요한 소수점 제거 (-1.0 → -1)
+              .replace(/(-?\d+)\.0(?=[,\s\]\}])/g, '$1')
+              // 4. 줄바꿈과 연속된 공백 정리
+              .replace(/\n\s*/g, ' ')
+              .replace(/\s+/g, ' ')
+              .trim();
 
-            // JSON 파싱 실패 에러를 클라이언트에게 전송
-            socket.emit('error', {
-              type: 'FUNCTION_ARGS_PARSE_ERROR',
-              message: 'Function arguments 파싱에 실패했습니다.',
-              details: {
-                functionName,
-                rawArgs: functionArgsRaw,
-                parseError: parseError.message,
-              },
-            });
-            return;
+            console.log(
+              '🔄 변환 시도 (처음 200자):',
+              fixedJson.substring(0, 200) + '...',
+            );
+            args = JSON.parse(fixedJson);
+            console.log('✅ JavaScript 객체 → JSON 변환 성공');
+          } catch (secondParseError) {
+            // 더 강력한 방법: eval 사용 (보안상 주의 필요하지만 서버에서만 사용)
+            try {
+              console.warn('🔄 eval 방식으로 재시도...');
+              args = eval(`(${functionArgsRaw})`);
+              console.log('✅ eval 방식으로 변환 성공');
+            } catch (evalError) {
+              console.error('❌ 최종 JSON 파싱 실패:', secondParseError);
+              console.error('❌ eval 방식도 실패:', evalError);
+              console.log('🔍 원본:', functionArgsRaw);
+              console.log('🔍 변환 시도:', fixedJson);
+
+              // 로딩 종료
+              socket.emit('loading-end');
+
+              // JSON 파싱 실패 에러를 클라이언트에게 전송
+              socket.emit('error', {
+                type: 'FUNCTION_ARGS_PARSE_ERROR',
+                message: 'Function arguments 파싱에 실패했습니다.',
+                details: {
+                  functionName,
+                  rawArgs: functionArgsRaw,
+                  parseError: secondParseError.message,
+                },
+              });
+              return;
+            }
           }
         }
 
         switch (functionName) {
           case 'requestOTTServiceList': {
+            socket.emit('loading-end');
             socket.emit('ott-service-list', {
               question: '어떤 OTT 서비스를 함께 사용 중이신가요?',
               options: ['넷플릭스', '디즈니+', '티빙', '왓챠'],
@@ -365,6 +453,7 @@ export const streamChat = async (messages, socket, onDelta) => {
           }
 
           case 'requestOXCarouselButtons': {
+            socket.emit('loading-end');
             socket.emit('ox-carousel-buttons', {
               options: ['예', '아니오'],
             });
@@ -374,6 +463,7 @@ export const streamChat = async (messages, socket, onDelta) => {
           case 'requestCarouselButtons': {
             const { items } = args;
             if (!items) {
+              socket.emit('loading-end');
               socket.emit('error', {
                 type: 'MISSING_FUNCTION_ARGS',
                 message: 'requestCarouselButtons에 필요한 items가 없습니다.',
@@ -381,6 +471,7 @@ export const streamChat = async (messages, socket, onDelta) => {
               });
               return;
             }
+            socket.emit('loading-end');
             socket.emit('carousel-buttons', items);
             break;
           }
@@ -388,6 +479,7 @@ export const streamChat = async (messages, socket, onDelta) => {
           case 'showPlanLists': {
             const { plans } = args;
             if (!plans) {
+              socket.emit('loading-end');
               socket.emit('error', {
                 type: 'MISSING_FUNCTION_ARGS',
                 message: 'showPlanLists에 필요한 plans가 없습니다.',
@@ -395,6 +487,7 @@ export const streamChat = async (messages, socket, onDelta) => {
               });
               return;
             }
+            socket.emit('loading-end');
             socket.emit('plan-lists', plans);
             break;
           }
@@ -402,6 +495,7 @@ export const streamChat = async (messages, socket, onDelta) => {
           case 'requestTextCard': {
             const { title, description, url, buttonText, imageUrl } = args;
             if (!title || !description || !url || !buttonText) {
+              socket.emit('loading-end');
               socket.emit('error', {
                 type: 'MISSING_FUNCTION_ARGS',
                 message:
@@ -410,6 +504,7 @@ export const streamChat = async (messages, socket, onDelta) => {
               });
               return;
             }
+            socket.emit('loading-end');
 
             // imageUrl이 없으면 URL에서 메타데이터 추출
             let finalImageUrl = imageUrl;
@@ -429,7 +524,14 @@ export const streamChat = async (messages, socket, onDelta) => {
             break;
           }
 
+          case 'showFirstCardList': {
+            socket.emit('loading-end');
+            socket.emit('first-card-list');
+            break;
+          }
+
           default:
+            socket.emit('loading-end');
             socket.emit('error', {
               type: 'UNKNOWN_FUNCTION',
               message: `알 수 없는 function: ${functionName}`,
@@ -441,6 +543,7 @@ export const streamChat = async (messages, socket, onDelta) => {
           `Function call 처리 실패 (${functionName}):`,
           functionError,
         );
+        socket.emit('loading-end');
         socket.emit('error', {
           type: 'FUNCTION_EXECUTION_ERROR',
           message: '기능 처리 중 오류가 발생했습니다.',
@@ -453,7 +556,40 @@ export const streamChat = async (messages, socket, onDelta) => {
       }
     }
 
-    socket.emit('done');
+    // function call이 처리되지 않은 경우에만 done 신호 전송
+    if (!isFunctionCalled) {
+      // function call 시작 패턴이 있지만 완성되지 않은 경우 처리
+      if (
+        accumulatedContent.includes('functions.') ||
+        accumulatedContent.includes('function.') ||
+        accumulatedContent.includes(' functions') ||
+        accumulatedContent.includes(' function') ||
+        accumulatedContent.endsWith('functions') ||
+        accumulatedContent.endsWith('function')
+      ) {
+        console.warn(
+          '⚠️ 불완전한 function call 감지:',
+          accumulatedContent.substring(
+            Math.max(0, accumulatedContent.lastIndexOf('function') - 20),
+          ),
+        );
+
+        // 불완전한 function call 부분 제거 후 전송
+        const cleanedContent = accumulatedContent
+          .replace(/\s*functions?\s*$/, '')
+          .replace(/\s*function\s*$/, '')
+          .trim();
+
+        if (cleanedContent) {
+          socket.emit(
+            'stream',
+            cleanedContent.substring(responseRef.current.length),
+          );
+        }
+      }
+
+      socket.emit('done');
+    }
   } catch (error) {
     console.error('❌ GPT Service Error:', error);
 

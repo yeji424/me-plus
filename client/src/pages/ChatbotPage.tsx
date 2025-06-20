@@ -1,13 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Header from '@/components/common/Header';
 import NewChatIcon from '@/assets/icon/new_chat_icon.svg?react';
 import CallIcon from '@/assets/icon/call_icon.svg?react';
 import UserBubble from '@/components/chatbot/UserBubble';
 import InputBox from '@/components/chatbot/InputBox';
 import BotBubbleFrame from '@/components/chatbot/BotBubbleFrame';
+import LoadingBubble from '@/components/chatbot/LoadingBubble';
 import type { FunctionCall } from '@/components/chatbot/BotBubbleFrame';
 import { useChatSocket } from '@/hooks/useChatSocket';
+import ChatbotIcon from '@/assets/icon/meplus_icon.png';
 
 // 사용자 정보 타입 (TestResultPage와 동일)
 interface UserProfile {
@@ -28,7 +30,8 @@ interface UserProfile {
 
 type Message =
   | { type: 'user'; text: string }
-  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall };
+  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall }
+  | { type: 'loading'; loadingType: 'searching' | 'waiting' | 'dbcalling' };
 
 // URL 파라미터에서 사용자 정보 파싱 함수
 const parseUserProfileFromURL = (
@@ -152,36 +155,34 @@ const ChatbotPage = () => {
     sendMessage(message);
   };
 
-  const bottomRef = useRef<HTMLDivElement | null>(null);
-  const prevMessageLengthRef = useRef(0);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   // 모든 메시지 (초기 메시지 + 실제 메시지)
-  const allMessages = [...initialMessages, ...messages];
-
-  // 마지막 메시지에 functionCall이 있는지 확인 (선택 버튼들이 있으면 자동 포커스 안함)
+  const allMessages = useMemo(
+    () => [...initialMessages, ...messages],
+    [initialMessages, messages],
+  );
+  const prevMessageLengthRef = useRef(allMessages.length);
   const lastMessage = allMessages[allMessages.length - 1];
   const hasActiveFunctionCall =
     lastMessage?.type === 'bot' && lastMessage.functionCall;
+  const isNewMessageAdded = allMessages.length > prevMessageLengthRef.current;
 
+  // 새 메시지가 추가되었을 때만 스크롤 조정
   useEffect(() => {
-    if (!bottomRef.current) return;
-
-    const isNewMessageAdded = allMessages.length > prevMessageLengthRef.current;
+    if (!containerRef.current || !isNewMessageAdded) return;
+    const container = containerRef.current;
+    container.scrollTop = container.scrollHeight - container.clientHeight;
     prevMessageLengthRef.current = allMessages.length;
+  }, [allMessages, isNewMessageAdded]);
 
-    // 1) 메시지 추가되면 부드럽게 스크롤
-    bottomRef.current.scrollIntoView({
-      behavior: isNewMessageAdded ? 'smooth' : 'smooth',
-    });
-
-    // 2) 300ms 후에 무조건 딱 맨 아래로 스크롤(스크롤 위치 재조정)
-    const timeout = setTimeout(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 1000);
-
-    return () => clearTimeout(timeout);
-  }, [allMessages]);
-
+  const reversedMessages = useMemo(
+    () =>
+      allMessages
+        .map((msg, index) => ({ ...msg, tempKey: `${msg.type}-${index}` }))
+        .reverse(),
+    [allMessages],
+  );
   return (
     <>
       {/* 1. Header - Fixed */}
@@ -200,32 +201,50 @@ const ChatbotPage = () => {
       <div className="gradient-scroll-container flex flex-col h-[100vh]">
         {/* 패딩으로 보이는 영역 조절 (= 스크롤 가능 영역) */}
         {/* 마진으로 안하고 패딩으로 한 이유 : 마진으로 하면 그라데이션 넣은 이유 사라짐 */}
-        <div className="relative flex-1 overflow-y-auto pt-[94px] pb-[60px]">
-          {/* 메시지 리스트 */}
-          <div className="space-y-2 max-w-[560px] min-h-full px-1 -mx-1">
-            <div className="h-1" />
-            {allMessages.map((msg, idx) => {
-              // 이전 메시지가 봇 메시지인지 확인
-              const prevMessage = idx > 0 ? allMessages[idx - 1] : null;
-              const isPreviousBot = prevMessage?.type === 'bot';
+        <div
+          ref={containerRef}
+          className="relative flex-1 overflow-y-auto mt-[50px] pb-[60px] flex flex-col-reverse"
+        >
+          <div className="gap-5 max-w-[560px] min-h-full flex flex-col-reverse">
+            {reversedMessages.map((msg, idx) => {
+              // 역순 배열에서 이전 메시지 확인 (역순이므로 다음 인덱스가 실제로는 이전 메시지)
+              const nextMessage =
+                idx < reversedMessages.length - 1
+                  ? reversedMessages[idx + 1]
+                  : null;
+              const isNextBot = nextMessage?.type === 'bot';
               const isCurrentBot = msg.type === 'bot';
 
-              // 연속된 봇 메시지 중 첫 번째인지 확인
-              const showChatbotIcon = isCurrentBot && !isPreviousBot;
+              // 연속된 봇 메시지 중 마지막인지 확인 (역순이므로 마지막이 실제로는 첫 번째)
+              const showChatbotIcon = isCurrentBot && !isNextBot;
 
-              return msg.type === 'user' ? (
-                <UserBubble key={idx} message={msg.text} />
-              ) : (
-                <BotBubbleFrame
-                  key={idx}
-                  messageChunks={msg.messageChunks}
-                  functionCall={msg.functionCall}
-                  onButtonClick={handleButtonClick}
-                  showChatbotIcon={showChatbotIcon}
-                />
-              );
+              if (msg.type === 'user') {
+                return <UserBubble key={idx} message={msg.text} />;
+              } else if (msg.type === 'loading') {
+                return (
+                  <div key={msg.tempKey} className="flex gap-3 items-start">
+                    <div className="flex-shrink-0 w-8 h-8">
+                      <img
+                        src={ChatbotIcon}
+                        alt="챗봇"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <LoadingBubble type={msg.loadingType} />
+                  </div>
+                );
+              } else {
+                return (
+                  <BotBubbleFrame
+                    key={msg.tempKey}
+                    messageChunks={msg.messageChunks}
+                    functionCall={msg.functionCall}
+                    onButtonClick={handleButtonClick}
+                    showChatbotIcon={showChatbotIcon}
+                  />
+                );
+              }
             })}
-            <div ref={bottomRef} />
           </div>
         </div>
       </div>
