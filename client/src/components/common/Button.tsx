@@ -2,7 +2,7 @@ interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
-  variant?: 'primary' | 'secondary' | 'outline' | 'gradient' | 'danger';
+  variant?: 'primary' | 'secondary';
   size?: 'small' | 'medium' | 'large';
   fullWidth?: boolean;
   className?: string;
@@ -14,7 +14,7 @@ const Button: React.FC<ButtonProps> = ({
   onClick,
   disabled = false,
   variant = 'primary',
-  size = 'medium',
+  size = '',
   fullWidth = false,
   className = '',
   type = 'button',
@@ -25,12 +25,6 @@ const Button: React.FC<ButtonProps> = ({
         return 'bg-secondary-purple-80 text-white hover:bg-secondary-purple-90';
       case 'secondary':
         return 'bg-secondary-purple-40 text-gray700 hover:bg-secondary-purple-50';
-      case 'outline':
-        return 'border-2 border-secondary-purple-80 text-secondary-purple-80 bg-transparent hover:bg-secondary-purple-10';
-      case 'gradient':
-        return 'bg-gradation text-white hover:opacity-90';
-      case 'danger':
-        return 'bg-red-500 text-white hover:bg-red-600';
       default:
         return 'bg-secondary-purple-80 text-white hover:bg-secondary-purple-90';
     }
@@ -41,6 +35,7 @@ const Button: React.FC<ButtonProps> = ({
     fontSize: string;
     height: string;
     borderRadius: string;
+    fontWeight: string;
   } => {
     switch (size) {
       case 'small':
@@ -49,27 +44,31 @@ const Button: React.FC<ButtonProps> = ({
           fontSize: 'text-xs',
           height: 'h-8',
           borderRadius: 'rounded-md',
+          fontWeight: 'font-medium',
         };
       case 'medium':
         return {
           padding: 'px-4 py-[9px]',
-          fontSize: 'text-sm',
+          fontSize: 'text-[15px]',
           height: 'h-[42px]',
           borderRadius: 'rounded-[10px]',
+          fontWeight: 'font-semibold',
         };
       case 'large':
         return {
           padding: 'px-6 py-3',
-          fontSize: 'text-base',
-          height: 'h-12',
+          fontSize: 'text-[15px]',
+          height: 'h-[54px]',
           borderRadius: 'rounded-[12px]',
+          fontWeight: 'font-semibold',
         };
       default:
         return {
           padding: 'px-4 py-[9px]',
-          fontSize: 'text-sm',
+          fontSize: 'text-[15px]',
           height: 'h-[42px]',
           borderRadius: 'rounded-[10px]',
+          fontWeight: 'font-medium',
         };
     }
   };
@@ -87,10 +86,10 @@ const Button: React.FC<ButtonProps> = ({
         ${sizeStyles.fontSize} 
         ${sizeStyles.height} 
         ${sizeStyles.borderRadius}
+        ${sizeStyles.fontWeight}
         ${variantStyles}
         ${fullWidth ? 'w-full' : 'w-auto'}
-        font-semibold
-        focus:outline-none focus:ring-2 focus:ring-secondary-purple-50
+        focus:outline-none
         ${
           disabled
             ? 'opacity-50 cursor-not-allowed hover:opacity-50'

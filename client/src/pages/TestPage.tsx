@@ -201,7 +201,12 @@ const TestPage = () => {
             </p>{' '}
             {allAnswered && (
               <div className="w-full mt-10">
-                <Button onClick={() => navigate('/test-wait')}>
+                <Button
+                  fullWidth
+                  variant="primary"
+                  size="large"
+                  onClick={() => navigate('/test-wait')}
+                >
                   Me플러스 맞춤 추천 받기
                 </Button>
               </div>
