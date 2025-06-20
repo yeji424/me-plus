@@ -19,7 +19,7 @@ const MarkedText = ({ chars, withAnimation = false }: MarkedTextProps) => {
             key={idx}
             className={`${item.isBold ? 'text-primary-pink' : ''} ${withAnimation ? 'fade-in' : ''}`}
             style={
-              withAnimation ? { animationDelay: `${idx * 10}ms` } : undefined
+              withAnimation ? { animationDelay: `${idx * 5}ms` } : undefined
             }
           >
             {item.char}

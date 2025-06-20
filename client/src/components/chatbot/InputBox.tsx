@@ -6,6 +6,7 @@ interface InputBoxProps {
   onChange: (value: string) => void;
   onSend: (message: string) => void;
   disabled?: boolean;
+  shouldAutoFocus?: boolean;
 }
 
 const InputBox = ({
@@ -13,26 +14,29 @@ const InputBox = ({
   onChange,
   onSend,
   disabled = false,
+  shouldAutoFocus = true,
 }: InputBoxProps) => {
   const inputRef = useRef<HTMLInputElement>(null); // 추가
 
   // 컴포넌트 마운트 시 포커스 설정
   useEffect(() => {
-    const timer = setTimeout(() => {
-      inputRef.current?.focus();
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  // disabled 상태가 변경될 때 포커스 처리
-  useEffect(() => {
-    if (!disabled) {
+    if (shouldAutoFocus) {
       const timer = setTimeout(() => {
         inputRef.current?.focus();
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [disabled]);
+  }, [shouldAutoFocus]);
+
+  // disabled 상태가 변경될 때 포커스 처리
+  useEffect(() => {
+    if (!disabled && shouldAutoFocus) {
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [disabled, shouldAutoFocus]);
 
   const handleSubmit = () => {
     if (!value.trim() || disabled) return;
@@ -55,7 +59,7 @@ const InputBox = ({
         placeholder="AI챗봇에게 물어보고 싶은 내용을 질문하세요."
         className="flex-grow h-10 bg-white rounded-full focus:outline-none text-gray-700 placeholder-gray-400 text-sm px-5"
         disabled={disabled}
-        autoFocus
+        autoFocus={shouldAutoFocus}
       />
       <button
         type="button"

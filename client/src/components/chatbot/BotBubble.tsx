@@ -26,7 +26,6 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
 
   // 스트리밍 응답에 맞게 단순화
   useEffect(() => {
-    console.log(messageChunks);
     if (messageChunks.length > 0) {
       setDisplayText(messageChunks[0]);
     }
