@@ -1,5 +1,12 @@
-export type TestPlan = {
+export type Answer = string;
+
+export type PlanResult = {
   id: string;
   name: string;
-  condition: (answers: { [key: number]: string }) => boolean;
+  description: string;
+  priority: number;
+  dataUsage: number;
+  callUsage: number;
+  messageUsage: number;
+  price: number;
 };
