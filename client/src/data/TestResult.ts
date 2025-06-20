@@ -19,6 +19,7 @@ const TestResult: Rule[] = [
       callUsage: 100,
       messageUsage: 100,
       price: 95000,
+      tagLine: '지니뮤직 제휴 결합',
     },
   },
   //OTT
@@ -34,6 +35,7 @@ const TestResult: Rule[] = [
       callUsage: 100,
       messageUsage: 100,
       price: 105000,
+      tagLine: '넷플릭스 / 왓챠 제휴 결합',
     },
   },
   //결합
@@ -49,6 +51,7 @@ const TestResult: Rule[] = [
       callUsage: 100,
       messageUsage: 100,
       price: 85000,
+      tagLine: 'U+ 투게더 결합',
     },
   },
   // 청소년
@@ -64,6 +67,7 @@ const TestResult: Rule[] = [
       callUsage: 100,
       messageUsage: 100,
       price: 45000,
+      tagLine: '데이터 무제한 최대 1Mbps 속도',
     },
   },
 
@@ -79,6 +83,7 @@ const TestResult: Rule[] = [
       callUsage: 100,
       messageUsage: 100,
       price: 75000,
+      tagLine: '데이터 무제한 최대 5Mbps 속도',
     },
   },
 
@@ -94,6 +99,7 @@ const TestResult: Rule[] = [
       callUsage: 100,
       messageUsage: 100,
       price: 33000,
+      tagLine: '실버지킴이 서비스',
     },
   },
 
@@ -115,6 +121,7 @@ const TestResult: Rule[] = [
       callUsage: 100,
       messageUsage: 100,
       price: 85000,
+      tagLine: '데이터 무제한',
     },
   },
   {
@@ -135,6 +142,7 @@ const TestResult: Rule[] = [
       callUsage: 100,
       messageUsage: 100,
       price: 75000,
+      tagLine: '데이터 무제한 최대 5Mbps 속도',
     },
   },
   {
@@ -155,6 +163,7 @@ const TestResult: Rule[] = [
       callUsage: 100,
       messageUsage: 100,
       price: 66000,
+      tagLine: '데이터 무제한 최대 1Mbps 속도',
     },
   },
 ];

@@ -2,8 +2,12 @@ import LinkCard from '@/components/MainPage/LinkCard';
 import chatbotIcon from '@/assets/icon/chatbot_icon.png';
 import testIcon from '@/assets/icon/test_icon.png';
 import compareIcon from '@/assets/icon/compare_icon.png';
+import ServiceGuide from '@/components/ServiceGuide/ServiceGuide';
+import { useState } from 'react';
 
 const MainPage: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <main>
       <div className="mb-[37px]">
@@ -57,14 +61,16 @@ const MainPage: React.FC = () => {
 
           <div className="flex-[1]">
             <LinkCard
-              to="/#"
+              to=""
               title="서비스 가이드"
               variant="shadow"
               size="medium"
+              onClick={() => setIsOpen(true)}
             />
           </div>
         </div>
       </div>
+      {isOpen && <ServiceGuide onClose={() => setIsOpen(false)} />}
     </main>
   );
 };
