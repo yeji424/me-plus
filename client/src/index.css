@@ -139,6 +139,10 @@
   background-color: var(--color-secondary-purple-80) !important;
   width: 44px !important;
 }
+[data-rsbs-overlay],
+[data-rsbs-backdrop] {
+  z-index: 100 !important;
+}
 
 /* GradientScroll 스크롤바 숨기기 */
 .gradient-scroll-container ::-webkit-scrollbar {

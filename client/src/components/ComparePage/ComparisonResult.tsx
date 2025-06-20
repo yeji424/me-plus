@@ -24,22 +24,22 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
   // 데이터 값 계산
   const leftDataValue = selectedLeft
     ? selectedLeft.dataGb === -1
-      ? 300
+      ? 250
       : selectedLeft.dataGb || 0
     : 0;
   const rightDataValue = selectedRight
     ? selectedRight.dataGb === -1
-      ? 300
+      ? 250
       : selectedRight.dataGb || 0
     : 0;
   const leftSharedDataValue = selectedLeft
     ? selectedLeft.sharedDataGb === -1
-      ? 300
+      ? 250
       : selectedLeft.sharedDataGb || 0
     : 0;
   const rightSharedDataValue = selectedRight
     ? selectedRight.sharedDataGb === -1
-      ? 300
+      ? 250
       : selectedRight.sharedDataGb || 0
     : 0;
 
