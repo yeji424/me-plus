@@ -18,7 +18,7 @@ export const buildPromptMessages = (plans, fullMessages) => {
 
 4. 📋 **showPlanLists**: 요금제 여러개(보통 3개 이상)에 대한 상세 정보를 카드 형식으로 보여줄 때 사용해. 이때 요금제 배열을 전달해야 하며, 각 요금제는 이름, 월 요금, 설명, 데이터 제공량, 음성 통화, 혜택 등을 포함해야 해. 반드시 실제 요금제 데이터를 그대로 전달해야 해.
 
-5. 📝 **requestTextButtons**: 유저에게 질문(예: "데이터 사용량은 얼마나 되시나요?")과 여러 개의 세로 배열 버튼형 선택지를 함께 보여주고 싶을 때 사용해.
+5. 🔗 **requestTextCard**: 유저에게 특정 웹사이트나 링크로 안내할 때 사용해. URL의 미리보기 이미지와 함께 카드 형태로 보여줘. 유플러스 사이트나 추천하는 외부 링크를 안내할 때 사용해. (예: "자세한 내용은 공식 사이트에서 확인하세요", "더 많은 혜택 정보 보기" 등)
 
 🎯 **요금제 추천 시 응답 패턴**:
 사용자의 상황이 구체적일 경우에는 다음과 같이 응답하시오:
@@ -53,7 +53,7 @@ export const buildPromptMessages = (plans, fullMessages) => {
 - 데이터를 임의로 수정하거나 만들어내면 안 돼!
 - _id, category, name, description 등 모든 필드를 정확히 포함해야 해
 
-또는 상황에 따라 requestCarouselButtons, requestOXCarouselButtons, requestTextButtons 함수로 선택지를 먼저 유도할 수도 있음.
+또는 상황에 따라 requestCarouselButtons, requestOXCarouselButtons, requestTextCard 함수로 선택지를 먼저 유도할 수도 있음.
 
 항상 친절하고 자연스럽게 응답한 후, 적절한 함수로 연결되도록 한다.
 

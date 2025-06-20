@@ -145,9 +145,12 @@ export const useChatSocket = () => {
       ]);
     };
 
-    const handleTextButtons = (data: {
-      question: string;
-      options: string[];
+    const handleTextCard = (data: {
+      title: string;
+      description: string;
+      url: string;
+      buttonText: string;
+      imageUrl?: string;
     }) => {
       setMessages((prev) => [
         ...prev,
@@ -155,8 +158,14 @@ export const useChatSocket = () => {
           type: 'bot',
           messageChunks: [''],
           functionCall: {
-            name: 'requestTextButtons',
-            args: { question: data.question, options: data.options },
+            name: 'requestTextCard',
+            args: {
+              title: data.title,
+              description: data.description,
+              url: data.url,
+              buttonText: data.buttonText,
+              imageUrl: data.imageUrl,
+            },
           },
         },
       ]);
@@ -168,7 +177,7 @@ export const useChatSocket = () => {
     socket.on('ox-carousel-buttons', handleOXCarouselButtons);
     socket.on('ott-service-list', handleOTTServiceList);
     socket.on('plan-lists', handlePlanLists);
-    socket.on('text-buttons', handleTextButtons);
+    socket.on('text-card', handleTextCard);
 
     return () => {
       socket.off('session-id', handleSessionId);
@@ -177,7 +186,7 @@ export const useChatSocket = () => {
       socket.off('ox-carousel-buttons', handleOXCarouselButtons);
       socket.off('ott-service-list', handleOTTServiceList);
       socket.off('plan-lists', handlePlanLists);
-      socket.off('text-buttons', handleTextButtons);
+      socket.off('text-card', handleTextCard);
     };
   }, []);
 
