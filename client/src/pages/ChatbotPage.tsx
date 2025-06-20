@@ -154,29 +154,32 @@ const ChatbotPage = () => {
   };
 
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const reversedMessages = useMemo(
-    () =>
-      messages
-        .map((msg, index) => ({ ...msg, tempKey: `${msg.type}-${index}` }))
-        .reverse(),
-    [messages],
-  );
 
   // 모든 메시지 (초기 메시지 + 실제 메시지)
-  const allMessages = [...initialMessages, ...messages];
-
-  // 마지막 메시지에 functionCall이 있는지 확인 (선택 버튼들이 있으면 자동 포커스 안함)
+  const allMessages = useMemo(
+    () => [...initialMessages, ...messages],
+    [initialMessages, messages],
+  );
+  const prevMessageLengthRef = useRef(allMessages.length);
   const lastMessage = allMessages[allMessages.length - 1];
   const hasActiveFunctionCall =
     lastMessage?.type === 'bot' && lastMessage.functionCall;
-    const isNewMessageAdded = allMessages.length > prevMessageLengthRef.current;
-    prevMessageLengthRef.current = allMessages.length;
+  const isNewMessageAdded = allMessages.length > prevMessageLengthRef.current;
+  prevMessageLengthRef.current = allMessages.length;
+  
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
     container.scrollTop = container.scrollHeight - container.clientHeight;
-  }, [allMessages]);
+  }, [allMessages]); 
 
+    const reversedMessages = useMemo(
+    () =>
+      allMessages
+        .map((msg, index) => ({ ...msg, tempKey: `${msg.type}-${index}` }))
+        .reverse(),
+    [allMessages],
+  );
   return (
     <>
       {/* 1. Header - Fixed */}
@@ -201,7 +204,7 @@ const ChatbotPage = () => {
         >
           <div className=" space-y-2 max-w-[560px] min-h-full flex flex-col-reverse">
             <div className="h-1" />
-            {allMessages.map((msg, idx) => {
+            {reversedMessages.map((msg, idx) => {
               // 이전 메시지가 봇 메시지인지 확인
               const prevMessage = idx > 0 ? allMessages[idx - 1] : null;
               const isPreviousBot = prevMessage?.type === 'bot';
@@ -220,7 +223,8 @@ const ChatbotPage = () => {
                   onButtonClick={handleButtonClick}
                   showChatbotIcon={showChatbotIcon}
                 />
-              ),
+              );
+            }
             )}
           </div>
         </div>
