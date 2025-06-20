@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { socket } from '@/utils/socket';
 import type {
   CarouselItem,
@@ -65,59 +65,53 @@ export const useChatSocket = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const responseRef = useRef('');
 
-  // 세션 초기화 및 히스토리 로드
-  useEffect(() => {
-    const existing = localStorage.getItem('sessionId');
-    socket.emit('init-session', existing || null);
+  const handleSessionId = useCallback((id: string) => {
+    setSessionId(id);
+    localStorage.setItem('sessionId', id);
+  }, []);
 
-    const handleSessionId = (id: string) => {
-      setSessionId(id);
-      localStorage.setItem('sessionId', id);
-    };
-
-    const handleSessionHistory = (
-      logs: { role: string; content: string }[],
-    ) => {
+  const handleSessionHistory = useCallback(
+    (logs: { role: string; content: string }[]) => {
       const converted: Message[] = logs.map((msg) =>
         msg.role === 'user'
           ? { type: 'user', text: msg.content }
           : { type: 'bot', messageChunks: [msg.content] },
       );
       setMessages(converted);
-    };
+    },
+    [],
+  );
 
-    const handleCarouselButtons = (items: CarouselItem[]) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          type: 'bot',
-          messageChunks: [''],
-          functionCall: {
-            name: 'requestCarouselButtons',
-            args: { items },
-          },
+  const handleCarouselButtons = useCallback((items: CarouselItem[]) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: 'bot',
+        messageChunks: [''],
+        functionCall: {
+          name: 'requestCarouselButtons',
+          args: { items },
         },
-      ]);
-    };
+      },
+    ]);
+  }, []);
 
-    const handleOXCarouselButtons = (data: { options: string[] }) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          type: 'bot',
-          messageChunks: [''],
-          functionCall: {
-            name: 'requestOXCarouselButtons',
-            args: { options: data.options },
-          },
+  const handleOXCarouselButtons = useCallback((data: { options: string[] }) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: 'bot',
+        messageChunks: [''],
+        functionCall: {
+          name: 'requestOXCarouselButtons',
+          args: { options: data.options },
         },
-      ]);
-    };
+      },
+    ]);
+  }, []);
 
-    const handleOTTServiceList = (data: {
-      question: string;
-      options: string[];
-    }) => {
+  const handleOTTServiceList = useCallback(
+    (data: { question: string; options: string[] }) => {
       setMessages((prev) => [
         ...prev,
         {
@@ -129,23 +123,26 @@ export const useChatSocket = () => {
           },
         },
       ]);
-    };
+    },
+    [],
+  );
 
-    const handlePlanLists = (plans: PlanData[]) => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          type: 'bot',
-          messageChunks: [''],
-          functionCall: {
-            name: 'showPlanLists',
-            args: { plans },
-          },
+  const handlePlanLists = useCallback((plans: PlanData[]) => {
+    setMessages((prev) => [
+      ...prev,
+      {
+        type: 'bot',
+        messageChunks: [''],
+        functionCall: {
+          name: 'showPlanLists',
+          args: { plans },
         },
-      ]);
-    };
+      },
+    ]);
+  }, []);
 
-    const handleTextCard = (data: {
+  const handleTextCard = useCallback(
+    (data: {
       title: string;
       description: string;
       url: string;
@@ -169,7 +166,14 @@ export const useChatSocket = () => {
           },
         },
       ]);
-    };
+    },
+    [],
+  );
+
+  // 세션 초기화 및 히스토리 로드
+  useEffect(() => {
+    const existing = localStorage.getItem('sessionId');
+    socket.emit('init-session', existing || null);
 
     socket.on('session-id', handleSessionId);
     socket.on('session-history', handleSessionHistory);
@@ -188,7 +192,15 @@ export const useChatSocket = () => {
       socket.off('plan-lists', handlePlanLists);
       socket.off('text-card', handleTextCard);
     };
-  }, []);
+  }, [
+    handleSessionId,
+    handleSessionHistory,
+    handleCarouselButtons,
+    handleOXCarouselButtons,
+    handleOTTServiceList,
+    handlePlanLists,
+    handleTextCard,
+  ]);
 
   // 스트리밍 응답 처리
   useEffect(() => {
