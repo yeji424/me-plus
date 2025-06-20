@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import React from 'react';
 import Header from '@/components/common/Header';
 import NewChatIcon from '@/assets/icon/new_chat_icon.svg?react';
 import CallIcon from '@/assets/icon/call_icon.svg?react';
@@ -77,6 +78,13 @@ const parseUserProfileFromURL = (
   }
 };
 
+// 컴포넌트들을 메모이제이션하여 불필요한 재렌더링 방지
+const MemoizedHeader = React.memo(Header);
+const MemoizedInputBox = React.memo(InputBox);
+const MemoizedUserBubble = React.memo(UserBubble);
+const MemoizedBotBubbleFrame = React.memo(BotBubbleFrame);
+const MemoizedLoadingBubble = React.memo(LoadingBubble);
+
 const ChatbotPage = () => {
   const [input, setInput] = useState('');
   const { messages, isStreaming, sendMessage, startNewChat } = useChatSocket();
@@ -84,8 +92,11 @@ const ChatbotPage = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [searchParams] = useSearchParams();
 
-  // 사용자 정보 확인: URL 파라미터에서만 읽음
-  const userProfile = parseUserProfileFromURL(searchParams);
+  // 사용자 정보 확인: URL 파라미터에서만 읽음 - 메모이제이션으로 최적화
+  const userProfile = useMemo(
+    () => parseUserProfileFromURL(searchParams),
+    [searchParams],
+  );
 
   // userProfile이 있으면 새 채팅 시작
   useEffect(() => {
@@ -138,22 +149,32 @@ const ChatbotPage = () => {
     }
   }, [isInitialized, userProfile]);
 
-  // 새 채팅 시작할 때만 초기 메시지 리셋
-  const handleNewChat = () => {
+  // 인라인 함수들을 useCallback으로 최적화
+  const handleInputChange = useCallback((value: string) => {
+    setInput(value);
+  }, []);
+
+  const handleNewChat = useCallback(() => {
     startNewChat();
     setInput('');
     setIsInitialized(false);
     setInitialMessages([]);
-  };
+  }, [startNewChat]);
 
-  const handleSendMessage = (text: string) => {
-    sendMessage(text);
-    setInput('');
-  };
+  const handleSendMessage = useCallback(
+    (text: string) => {
+      sendMessage(text);
+      setInput('');
+    },
+    [sendMessage],
+  );
 
-  const handleButtonClick = (message: string) => {
-    sendMessage(message);
-  };
+  const handleButtonClick = useCallback(
+    (message: string) => {
+      sendMessage(message);
+    },
+    [sendMessage],
+  );
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -183,15 +204,22 @@ const ChatbotPage = () => {
         .reverse(),
     [allMessages],
   );
+
+  // Header 아이콘 버튼들도 메모이제이션
+  const iconButtons = useMemo(
+    () => [
+      { icon: <NewChatIcon />, onClick: handleNewChat },
+      { icon: <CallIcon />, onClick: () => {} },
+    ],
+    [handleNewChat],
+  );
+
   return (
     <>
       {/* 1. Header - Fixed */}
-      <Header
+      <MemoizedHeader
         title="요금제 추천 AI 챗봇 Me+"
-        iconButtons={[
-          { icon: <NewChatIcon />, onClick: handleNewChat },
-          { icon: <CallIcon />, onClick: () => {} },
-        ]}
+        iconButtons={iconButtons}
         isTransparent={true}
         className="custom-header"
       />
@@ -219,7 +247,9 @@ const ChatbotPage = () => {
               const showChatbotIcon = isCurrentBot && !isNextBot;
 
               if (msg.type === 'user') {
-                return <UserBubble key={idx} message={msg.text} />;
+                return (
+                  <MemoizedUserBubble key={msg.tempKey} message={msg.text} />
+                );
               } else if (msg.type === 'loading') {
                 return (
                   <div key={msg.tempKey} className="flex gap-3 items-start">
@@ -230,12 +260,12 @@ const ChatbotPage = () => {
                         className="w-full h-full object-contain"
                       />
                     </div>
-                    <LoadingBubble type={msg.loadingType} />
+                    <MemoizedLoadingBubble type={msg.loadingType} />
                   </div>
                 );
               } else {
                 return (
-                  <BotBubbleFrame
+                  <MemoizedBotBubbleFrame
                     key={msg.tempKey}
                     messageChunks={msg.messageChunks}
                     functionCall={msg.functionCall}
@@ -251,10 +281,10 @@ const ChatbotPage = () => {
       {/* 3. InputBox - Fixed */}
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] z-50">
         <div className="bg-background-80 h-[65px]  rounded-xl shadow-[0_-3px_15px_rgba(0,0,0,0.15)] border-t border-gray-100 py-3 px-5">
-          <InputBox
+          <MemoizedInputBox
             onSend={handleSendMessage}
             value={input}
-            onChange={(v) => setInput(v)}
+            onChange={handleInputChange}
             disabled={isStreaming}
             shouldAutoFocus={!hasActiveFunctionCall}
           />
