@@ -13,9 +13,11 @@ import moonerAhaImage from '../assets/image/mooner_aha.png';
 import tips from '../assets/icon/tips.png';
 import next from '../assets/icon/next_icon.svg';
 import back from '../assets/icon/back_icon.svg';
+import { useRef } from 'react';
 
 const TestPage = () => {
   const navigate = useNavigate();
+  const timeoutRef = useRef<number | null>(null);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<{
@@ -38,6 +40,14 @@ const TestPage = () => {
 
   const handleSelect = (value: string) => {
     setSelectedOptions((prev) => ({ ...prev, [currentQuestion.id]: value }));
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      if (currentIndex < questions.length - 1) {
+        setCurrentIndex((prev) => prev + 1);
+      }
+    }, 1000);
   };
 
   const handleNext = () => {
