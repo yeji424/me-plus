@@ -6,8 +6,10 @@ import CallIcon from '@/assets/icon/call_icon.svg?react';
 import UserBubble from '@/components/chatbot/UserBubble';
 import InputBox from '@/components/chatbot/InputBox';
 import BotBubbleFrame from '@/components/chatbot/BotBubbleFrame';
+import LoadingBubble from '@/components/chatbot/LoadingBubble';
 import type { FunctionCall } from '@/components/chatbot/BotBubbleFrame';
 import { useChatSocket } from '@/hooks/useChatSocket';
+import ChatbotIcon from '@/assets/icon/meplus_icon.png';
 
 // 사용자 정보 타입 (TestResultPage와 동일)
 interface UserProfile {
@@ -28,7 +30,8 @@ interface UserProfile {
 
 type Message =
   | { type: 'user'; text: string }
-  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall };
+  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall }
+  | { type: 'loading'; loadingType: 'searching' | 'waiting' | 'dbcalling' };
 
 // URL 파라미터에서 사용자 정보 파싱 함수
 const parseUserProfileFromURL = (
@@ -215,17 +218,32 @@ const ChatbotPage = () => {
               // 연속된 봇 메시지 중 마지막인지 확인 (역순이므로 마지막이 실제로는 첫 번째)
               const showChatbotIcon = isCurrentBot && !isNextBot;
 
-              return msg.type === 'user' ? (
-                <UserBubble key={idx} message={msg.text} />
-              ) : (
-                <BotBubbleFrame
-                  key={msg.tempKey}
-                  messageChunks={msg.messageChunks}
-                  functionCall={msg.functionCall}
-                  onButtonClick={handleButtonClick}
-                  showChatbotIcon={showChatbotIcon}
-                />
-              );
+              if (msg.type === 'user') {
+                return <UserBubble key={idx} message={msg.text} />;
+              } else if (msg.type === 'loading') {
+                return (
+                  <div key={msg.tempKey} className="flex gap-3 items-start">
+                    <div className="flex-shrink-0 w-8 h-8">
+                      <img
+                        src={ChatbotIcon}
+                        alt="챗봇"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <LoadingBubble type={msg.loadingType} />
+                  </div>
+                );
+              } else {
+                return (
+                  <BotBubbleFrame
+                    key={msg.tempKey}
+                    messageChunks={msg.messageChunks}
+                    functionCall={msg.functionCall}
+                    onButtonClick={handleButtonClick}
+                    showChatbotIcon={showChatbotIcon}
+                  />
+                );
+              }
             })}
           </div>
         </div>
