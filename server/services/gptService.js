@@ -211,7 +211,7 @@ export const streamChat = async (messages, socket, onDelta) => {
 
       // tool_calls 감지 (새로운 API 형식)
       if (delta.tool_calls && delta.tool_calls.length > 0) {
-        console.log('🛠️ Tool calls detected:', delta.tool_calls);
+        // console.log('🛠️ Tool calls detected:', delta.tool_calls);
 
         // 처음 tool_calls 감지 시 로딩 시작
         if (!isFunctionCalled) {
@@ -233,16 +233,16 @@ export const streamChat = async (messages, socket, onDelta) => {
 
         if (toolCall.function?.name) {
           functionName = toolCall.function.name;
-          console.log('🎯 Function name detected:', functionName);
+          // console.log('🎯 Function name detected:', functionName);
         }
 
         if (toolCall.function?.arguments) {
           functionArgsRaw += toolCall.function.arguments;
-          console.log('📝 Adding args chunk:', toolCall.function.arguments);
+          // console.log('📝 Adding args chunk:', toolCall.function.arguments);
         }
         continue;
       }
-      console.log('🔍 delta:', delta);
+      // console.log('🔍 delta:', delta);
 
       // delta 구조 상세 확인
       if (delta.tool_calls) {
@@ -301,12 +301,12 @@ export const streamChat = async (messages, socket, onDelta) => {
             accumulatedContent.includes('function.')
           ) {
             // function call이 완성되기를 기다리므로 전송하지 않음
-            console.log(
-              '🔍 Function call 시작 감지, 스트리밍 중단:',
-              accumulatedContent.substring(
-                accumulatedContent.lastIndexOf('function'),
-              ),
-            );
+            // console.log(
+            //   '🔍 Function call 시작 감지, 스트리밍 중단:',
+            //   accumulatedContent.substring(
+            //     accumulatedContent.lastIndexOf('function'),
+            //   ),
+            // );
           } else {
             // "functions" 또는 "function" 단어만 있는 경우 체크
             if (
