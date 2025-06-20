@@ -1,4 +1,3 @@
-
 import { useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Header from '@/components/common/Header';
@@ -165,15 +164,16 @@ const ChatbotPage = () => {
   const hasActiveFunctionCall =
     lastMessage?.type === 'bot' && lastMessage.functionCall;
   const isNewMessageAdded = allMessages.length > prevMessageLengthRef.current;
-  prevMessageLengthRef.current = allMessages.length;
-  
+
+  // 새 메시지가 추가되었을 때만 스크롤 조정
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !isNewMessageAdded) return;
     const container = containerRef.current;
     container.scrollTop = container.scrollHeight - container.clientHeight;
-  }, [allMessages]); 
+    prevMessageLengthRef.current = allMessages.length;
+  }, [allMessages, isNewMessageAdded]);
 
-    const reversedMessages = useMemo(
+  const reversedMessages = useMemo(
     () =>
       allMessages
         .map((msg, index) => ({ ...msg, tempKey: `${msg.type}-${index}` }))
@@ -224,8 +224,7 @@ const ChatbotPage = () => {
                   showChatbotIcon={showChatbotIcon}
                 />
               );
-            }
-            )}
+            })}
           </div>
         </div>
       </div>
