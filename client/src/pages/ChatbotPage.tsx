@@ -7,7 +7,6 @@ import InputBox from '@/components/chatbot/InputBox';
 import BotBubbleFrame from '@/components/chatbot/BotBubbleFrame';
 import type { FunctionCall } from '@/components/chatbot/BotBubbleFrame';
 import { useChatSocket } from '@/hooks/useChatSocket';
-// import GradientScroll from 'react-gradient-scroll-indicator';
 
 type Message =
   | { type: 'user'; text: string }
@@ -65,6 +64,11 @@ const ChatbotPage = () => {
   // 모든 메시지 (초기 메시지 + 실제 메시지)
   const allMessages = [...initialMessages, ...messages];
 
+  // 마지막 메시지에 functionCall이 있는지 확인 (선택 버튼들이 있으면 자동 포커스 안함)
+  const lastMessage = allMessages[allMessages.length - 1];
+  const hasActiveFunctionCall =
+    lastMessage?.type === 'bot' && lastMessage.functionCall;
+
   useEffect(() => {
     if (!bottomRef.current) return;
 
@@ -106,8 +110,16 @@ const ChatbotPage = () => {
           {/* 메시지 리스트 */}
           <div className="space-y-2 max-w-[560px] min-h-full px-1 -mx-1">
             <div className="h-1" />
-            {allMessages.map((msg, idx) =>
-              msg.type === 'user' ? (
+            {allMessages.map((msg, idx) => {
+              // 이전 메시지가 봇 메시지인지 확인
+              const prevMessage = idx > 0 ? allMessages[idx - 1] : null;
+              const isPreviousBot = prevMessage?.type === 'bot';
+              const isCurrentBot = msg.type === 'bot';
+
+              // 연속된 봇 메시지 중 첫 번째인지 확인
+              const showChatbotIcon = isCurrentBot && !isPreviousBot;
+
+              return msg.type === 'user' ? (
                 <UserBubble key={idx} message={msg.text} />
               ) : (
                 <BotBubbleFrame
@@ -115,9 +127,10 @@ const ChatbotPage = () => {
                   messageChunks={msg.messageChunks}
                   functionCall={msg.functionCall}
                   onButtonClick={handleButtonClick}
+                  showChatbotIcon={showChatbotIcon}
                 />
-              ),
-            )}
+              );
+            })}
             <div ref={bottomRef} />
           </div>
         </div>
@@ -130,6 +143,7 @@ const ChatbotPage = () => {
             value={input}
             onChange={(v) => setInput(v)}
             disabled={isStreaming}
+            shouldAutoFocus={!hasActiveFunctionCall}
           />
         </div>
       </div>
