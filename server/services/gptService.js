@@ -301,11 +301,27 @@ export const streamChat = async (messages, socket, onDelta) => {
             accumulatedContent.includes('function.')
           ) {
             // function call이 완성되기를 기다리므로 전송하지 않음
-            // continue 대신 아무것도 하지 않고 다음 청크를 기다림
+            console.log(
+              '🔍 Function call 시작 감지, 스트리밍 중단:',
+              accumulatedContent.substring(
+                accumulatedContent.lastIndexOf('function'),
+              ),
+            );
           } else {
-            // 정상 텍스트 전송
-            socket.emit('stream', content);
-            onDelta?.(content);
+            // "functions" 또는 "function" 단어만 있는 경우 체크
+            if (
+              accumulatedContent.includes(' functions') ||
+              accumulatedContent.includes(' function') ||
+              accumulatedContent.endsWith('functions') ||
+              accumulatedContent.endsWith('function')
+            ) {
+              // 다음 청크를 기다려서 완전한 function call인지 확인
+              console.log('🔍 Function 키워드 감지, 다음 청크 대기 중...');
+            } else {
+              // 정상 텍스트 전송
+              socket.emit('stream', content);
+              onDelta?.(content);
+            }
           }
         }
       }
@@ -471,6 +487,36 @@ export const streamChat = async (messages, socket, onDelta) => {
 
     // function call이 처리되지 않은 경우에만 done 신호 전송
     if (!isFunctionCalled) {
+      // function call 시작 패턴이 있지만 완성되지 않은 경우 처리
+      if (
+        accumulatedContent.includes('functions.') ||
+        accumulatedContent.includes('function.') ||
+        accumulatedContent.includes(' functions') ||
+        accumulatedContent.includes(' function') ||
+        accumulatedContent.endsWith('functions') ||
+        accumulatedContent.endsWith('function')
+      ) {
+        console.warn(
+          '⚠️ 불완전한 function call 감지:',
+          accumulatedContent.substring(
+            Math.max(0, accumulatedContent.lastIndexOf('function') - 20),
+          ),
+        );
+
+        // 불완전한 function call 부분 제거 후 전송
+        const cleanedContent = accumulatedContent
+          .replace(/\s*functions?\s*$/, '')
+          .replace(/\s*function\s*$/, '')
+          .trim();
+
+        if (cleanedContent) {
+          socket.emit(
+            'stream',
+            cleanedContent.substring(responseRef.current.length),
+          );
+        }
+      }
+
       socket.emit('done');
     }
   } catch (error) {
