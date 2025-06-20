@@ -6,6 +6,7 @@ import UserBubble from '@/components/chatbot/UserBubble';
 import InputBox from '@/components/chatbot/InputBox';
 import BotBubbleFrame from '@/components/chatbot/BotBubbleFrame';
 import { useChatSocket } from '@/hooks/useChatSocket';
+import { InitialScreen } from '@/components/chatbot/InitialScreen';
 // import GradientScroll from 'react-gradient-scroll-indicator';
 
 const ChatbotPage = () => {
@@ -66,19 +67,23 @@ const ChatbotPage = () => {
         {/* 마진으로 안하고 패딩으로 한 이유 : 마진으로 하면 그라데이션 넣은 이유 사라짐 */}
         <div className="relative flex-1 overflow-y-auto pt-[94px] pb-[60px]">
           {/* 메시지 리스트 */}
-          <div className="space-y-2 max-w-[560px]  min-h-full px-1 -mx-1">
+          <div className="space-y-2 max-w-[560px] min-h-full px-1 -mx-1">
             <div className="h-1" />
-            {messages.map((msg, idx) =>
-              msg.type === 'user' ? (
-                <UserBubble key={idx} message={msg.text} />
-              ) : (
-                <BotBubbleFrame
-                  key={idx}
-                  messageChunks={msg.messageChunks}
-                  functionCall={msg.functionCall}
-                  onButtonClick={handleButtonClick}
-                />
-              ),
+            {messages.length === 0 ? (
+              <InitialScreen onButtonClick={handleButtonClick} />
+            ) : (
+              messages.map((msg, idx) =>
+                msg.type === 'user' ? (
+                  <UserBubble key={idx} message={msg.text} />
+                ) : (
+                  <BotBubbleFrame
+                    key={idx}
+                    messageChunks={msg.messageChunks}
+                    functionCall={msg.functionCall}
+                    onButtonClick={handleButtonClick}
+                  />
+                ),
+              )
             )}
             <div ref={bottomRef} />
           </div>
