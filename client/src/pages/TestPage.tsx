@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TestResult } from '@/data/TestResult';
+import TestResult from '@/data/TestResult';
 import { questions } from '@/data/Questions';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
@@ -17,7 +17,7 @@ import { useRef } from 'react';
 
 const TestPage = () => {
   const navigate = useNavigate();
-  const timeoutRef = useRef<number | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<{
@@ -43,6 +43,7 @@ const TestPage = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
+
     timeoutRef.current = setTimeout(() => {
       if (currentIndex < questions.length - 1) {
         setCurrentIndex((prev) => prev + 1);
@@ -152,10 +153,7 @@ const TestPage = () => {
                 <Button
                   onClick={() => {
                     const plan = getRecommendedPlan(selectedOptions);
-                    localStorage.setItem(
-                      'recommendedPlan',
-                      JSON.stringify(plan),
-                    );
+                    localStorage.setItem('recommendedPlanId', plan.result.id);
                     navigate('/test-wait');
                   }}
                   fullWidth
