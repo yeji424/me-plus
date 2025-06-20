@@ -319,28 +319,31 @@ export const useChatSocket = () => {
   }, []);
 
   // 메시지 전송
-  const sendMessage = (text: string) => {
-    if (!text.trim() || !sessionId) return;
+  const sendMessage = useCallback(
+    (text: string) => {
+      if (!text.trim() || !sessionId) return;
 
-    const payload = {
-      sessionId,
-      message: text.trim(),
-    };
+      const payload = {
+        sessionId,
+        message: text.trim(),
+      };
 
-    setMessages((prev) => [...prev, { type: 'user', text }]);
-    setIsStreaming(true);
-    responseRef.current = '';
+      setMessages((prev) => [...prev, { type: 'user', text }]);
+      setIsStreaming(true);
+      responseRef.current = '';
 
-    socket.emit('recommend-plan', payload);
-  };
+      socket.emit('recommend-plan', payload);
+    },
+    [sessionId],
+  );
 
   // 새 채팅 시작
-  const startNewChat = () => {
+  const startNewChat = useCallback(() => {
     if (!sessionId) return;
     socket.emit('reset-session', { sessionId });
     setMessages([]);
     responseRef.current = '';
-  };
+  }, [sessionId]);
 
   return {
     messages,
