@@ -52,7 +52,7 @@ const CardItem = ({
   onButtonClick: (message: string) => void;
 }) => {
   return (
-    <div className="w-[152px] shrink-0 flex flex-col items-center gap-[18px] p-[10px] rounded-[12px] bg-gradation-background shadow-small">
+    <div className="w-[180px] shrink-0 flex flex-col items-center gap-[18px] p-[10px] rounded-[12px] bg-gradation-background shadow-small">
       <img
         src={item.image}
         alt={item.title}
@@ -60,10 +60,10 @@ const CardItem = ({
         className="w-full h-auto object-contain"
       />
       <div className="w-full flex flex-col items-center gap-2">
-        <div className="text-[14px] font-semibold leading-[14px]">
+        <div className="text-[16px] font-semibold leading-[14px]">
           {item.title}
         </div>
-        <div className="flex flex-col items-center text-[10px]">
+        <div className="flex flex-col items-center text-[12px]">
           <div className="text-gray700">{item.content}</div>
           <div className=" font-semibold tracking-[-0.06em] text-secondary-purple-80">
             {item.subcontent}
@@ -71,7 +71,7 @@ const CardItem = ({
         </div>
       </div>
       <button
-        className="cursor-pointer w-full px-[15px] py-[6px] rounded-[5.5px] bg-primary-pink text-white font-semibold text-[9px] text-center"
+        className="cursor-pointer w-full px-[15px] py-[6px] rounded-[5.5px] bg-primary-pink text-white font-semibold text-[12px] text-center"
         onClick={() => onButtonClick(item.message)}
       >
         {item.buttonText}
