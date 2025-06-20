@@ -4,6 +4,7 @@ import OttButtonGroup from './ChatButtonGroups/OttButtonGroup';
 import OXButtonGroup from './ChatButtonGroups/OXButtonGroup';
 import TextButtonGroup from './ChatButtonGroups/TextButtonGroup';
 import ToggleCard from './ToggleCard';
+import FirstCardList from './FirstCardList';
 import { motion } from 'framer-motion';
 
 export interface OXOption {
@@ -46,7 +47,8 @@ export interface FunctionCall {
     | 'requestOXCarouselButtons'
     | 'requestOTTServiceList'
     | 'requestTextButtons'
-    | 'showPlanLists';
+    | 'showPlanLists'
+    | 'showFirstCardList';
   args?: {
     items?: CarouselItem[];
     options?: string[] | OXOption[];
@@ -118,6 +120,8 @@ const BotBubbleFrame = ({
             ))}
           </div>
         ) : null;
+      case 'showFirstCardList':
+        return <FirstCardList onButtonClick={onButtonClick} />;
       default:
         return null;
     }

@@ -5,34 +5,71 @@ import CallIcon from '@/assets/icon/call_icon.svg?react';
 import UserBubble from '@/components/chatbot/UserBubble';
 import InputBox from '@/components/chatbot/InputBox';
 import BotBubbleFrame from '@/components/chatbot/BotBubbleFrame';
+import type { FunctionCall } from '@/components/chatbot/BotBubbleFrame';
 import { useChatSocket } from '@/hooks/useChatSocket';
-import { InitialScreen } from '@/components/chatbot/InitialScreen';
 // import GradientScroll from 'react-gradient-scroll-indicator';
+
+type Message =
+  | { type: 'user'; text: string }
+  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall };
 
 const ChatbotPage = () => {
   const [input, setInput] = useState('');
   const { messages, isStreaming, sendMessage, startNewChat } = useChatSocket();
+  const [initialMessages, setInitialMessages] = useState<Message[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // 초기 메시지 설정 (한 번만 설정하고 계속 유지)
+  useEffect(() => {
+    if (!isInitialized) {
+      setInitialMessages([
+        {
+          type: 'bot',
+          messageChunks: [
+            '안녕하세요! 요금제 추천 AI 챗봇 Me+입니다 👋\n\n고객님의 사용 패턴과 요구사항을 바탕으로 최적의 요금제를 추천해드립니다.\n\n아래 카드 중 하나를 선택하거나 직접 질문해주세요!',
+          ],
+        },
+        {
+          type: 'bot',
+          messageChunks: [''],
+          functionCall: {
+            name: 'showFirstCardList',
+            args: {},
+          },
+        },
+      ]);
+      setIsInitialized(true);
+    }
+  }, [isInitialized]);
+
+  // 새 채팅 시작할 때만 초기 메시지 리셋
+  const handleNewChat = () => {
+    startNewChat();
+    setInput('');
+    setIsInitialized(false);
+    setInitialMessages([]);
+  };
 
   const handleSendMessage = (text: string) => {
     sendMessage(text);
     setInput('');
   };
 
-  const handleNewChat = () => {
-    startNewChat();
-    setInput('');
-  };
-
   const handleButtonClick = (message: string) => {
     sendMessage(message);
   };
+
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const prevMessageLengthRef = useRef(0);
+
+  // 모든 메시지 (초기 메시지 + 실제 메시지)
+  const allMessages = [...initialMessages, ...messages];
+
   useEffect(() => {
     if (!bottomRef.current) return;
 
-    const isNewMessageAdded = messages.length > prevMessageLengthRef.current;
-    prevMessageLengthRef.current = messages.length;
+    const isNewMessageAdded = allMessages.length > prevMessageLengthRef.current;
+    prevMessageLengthRef.current = allMessages.length;
 
     // 1) 메시지 추가되면 부드럽게 스크롤
     bottomRef.current.scrollIntoView({
@@ -45,7 +82,7 @@ const ChatbotPage = () => {
     }, 1000);
 
     return () => clearTimeout(timeout);
-  }, [messages]);
+  }, [allMessages]);
 
   return (
     <>
@@ -69,21 +106,17 @@ const ChatbotPage = () => {
           {/* 메시지 리스트 */}
           <div className="space-y-2 max-w-[560px] min-h-full px-1 -mx-1">
             <div className="h-1" />
-            {messages.length === 0 ? (
-              <InitialScreen onButtonClick={handleButtonClick} />
-            ) : (
-              messages.map((msg, idx) =>
-                msg.type === 'user' ? (
-                  <UserBubble key={idx} message={msg.text} />
-                ) : (
-                  <BotBubbleFrame
-                    key={idx}
-                    messageChunks={msg.messageChunks}
-                    functionCall={msg.functionCall}
-                    onButtonClick={handleButtonClick}
-                  />
-                ),
-              )
+            {allMessages.map((msg, idx) =>
+              msg.type === 'user' ? (
+                <UserBubble key={idx} message={msg.text} />
+              ) : (
+                <BotBubbleFrame
+                  key={idx}
+                  messageChunks={msg.messageChunks}
+                  functionCall={msg.functionCall}
+                  onButtonClick={handleButtonClick}
+                />
+              ),
             )}
             <div ref={bottomRef} />
           </div>
