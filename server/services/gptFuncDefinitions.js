@@ -3,39 +3,14 @@ import { PlanAddon } from '../models/PlanAddon.js';
 
 /** GPT에게 넘길 데이터를 JSON으로 반환합니다. */
 
-const EXCLUDED_FIELDS = '-updatedAt -createdAt';
-
-const refineData = (plans) => {
-  return plans.map(
-    ({
-      _id,
-      name,
-      description,
-      dataGb,
-      sharedDataGb,
-      monthlyFee,
-      detailUrl,
-      bundleBenefit,
-    }) => ({
-      _id,
-      name,
-      description,
-      dataGb,
-      sharedDataGb,
-      monthlyFee,
-      detailUrl,
-      bundleBenefit,
-    }),
-  );
-};
+const EXCLUDED_FIELDS = '-updatedAt -createdAt -__v';
 
 /** 전체 요금제 목록 */
 export const getPlans = async () => {
   try {
-    const plans = await Plan.find({}).select(EXCLUDED_FIELDS);
-    const data = refineData(plans);
+    const plans = await Plan.find().select(EXCLUDED_FIELDS);
 
-    return { plans: data };
+    return { plans: plans };
   } catch (error) {
     console.error('getPlans >>', error);
     throw error;
@@ -48,9 +23,8 @@ export const getPopularPlans = async () => {
     const popularPlans = await Plan.find({ isPopular: true }).select(
       EXCLUDED_FIELDS,
     );
-    const data = refineData(popularPlans);
 
-    return { plans: data };
+    return { plans: popularPlans };
   } catch (error) {
     console.error('getPopularPlans >>', error);
     throw error;
@@ -64,9 +38,8 @@ export const getUnlimitedDataPlans = async () => {
       dataGb: -1,
       isPopular: true, // 인기 요금제만
     }).select(EXCLUDED_FIELDS);
-    const data = refineData(unlimitedDataPlans);
 
-    return { plans: data };
+    return { plans: unlimitedDataPlans };
   } catch (error) {
     console.error('getUnlimitedDataPlans >>', error);
     throw error;
@@ -90,9 +63,8 @@ export const getOTTBundlePlans = async () => {
     const plans = await Plan.find({
       _id: { $in: planIds },
     }).select(EXCLUDED_FIELDS);
-    const data = refineData(plans);
 
-    return { plans: data };
+    return { plans: plans };
   } catch (error) {
     console.error('getOTTBundlePlans >>', error);
     throw error;
@@ -105,9 +77,8 @@ export const getAffordablePlans = async () => {
     const affordablePlans = await Plan.find({
       monthlyFee: { $lte: 50000 },
     }).select(EXCLUDED_FIELDS);
-    const data = refineData(affordablePlans);
 
-    return { plans: data };
+    return { plans: affordablePlans };
   } catch (error) {
     console.error('getAffordablePlans >>', error);
     throw error;
@@ -122,9 +93,8 @@ export const getFamilyBundlePlans = async () => {
     })
       .select(EXCLUDED_FIELDS)
       .limit(5);
-    const data = refineData(bundlePlans);
 
-    return { plans: data };
+    return { plans: bundlePlans };
   } catch (error) {
     console.error('getFamilyBundlePlans >>', error);
     throw error;
