@@ -18,6 +18,7 @@ import { useRef } from 'react';
 const TestPage = () => {
   const navigate = useNavigate();
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<{
@@ -40,6 +41,7 @@ const TestPage = () => {
 
   const handleSelect = (value: string) => {
     setSelectedOptions((prev) => ({ ...prev, [currentQuestion.id]: value }));
+    setIsTransitioning(true);
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -48,6 +50,7 @@ const TestPage = () => {
       if (currentIndex < questions.length - 1) {
         setCurrentIndex((prev) => prev + 1);
       }
+      setIsTransitioning(false);
     }, 1000);
   };
 
@@ -94,7 +97,7 @@ const TestPage = () => {
 
             <button
               onClick={handleBack}
-              disabled={currentIndex === 0}
+              disabled={currentIndex === 0 || isTransitioning}
               className="absolute left-0 top-1/2 -translate-y-1/2"
             >
               <img src={back} alt="이전질문" className="w-[8px] h-[16px]" />
@@ -102,7 +105,9 @@ const TestPage = () => {
 
             <button
               onClick={handleNext}
-              disabled={currentIndex === questions.length - 1}
+              disabled={
+                currentIndex === questions.length - 1 || isTransitioning
+              }
               className="absolute right-0 top-1/2 -translate-y-1/2"
             >
               <img src={next} alt="다음질문" className="w-[8px] h-[16px]" />
