@@ -6,7 +6,7 @@ import TextButtonGroup from './ChatButtonGroups/TextButtonGroup';
 import ToggleCard from './ToggleCard';
 import FirstCardList from './FirstCardList';
 import { motion } from 'framer-motion';
-import ChatbotIcon from '@/assets/icon/chatbot_icon.png';
+import ChatbotIcon from '@/assets/icon/meplus_icon.png';
 
 export interface OXOption {
   id: 'o' | 'x';
