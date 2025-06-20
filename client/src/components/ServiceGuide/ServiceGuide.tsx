@@ -12,7 +12,6 @@ import serviceGuideIcon2 from '@/assets/icon/chatbot_icon.png';
 import serviceGuideIcon34 from '@/assets/icon/test_icon.png';
 import serviceGuideIcon5 from '@/assets/icon/compare_icon.png';
 import guideCloseIcon from '@/assets/icon/guide_close.svg';
-import Button from '../common/Button';
 
 interface ServiceGuideProps {
   onClose: () => void;
