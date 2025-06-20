@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TestResult } from '@/data/TestResult';
+import TestResult from '@/data/TestResult';
 import { questions } from '@/data/Questions';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
@@ -13,9 +13,12 @@ import moonerAhaImage from '../assets/image/mooner_aha.png';
 import tips from '../assets/icon/tips.png';
 import next from '../assets/icon/next_icon.svg';
 import back from '../assets/icon/back_icon.svg';
+import { useRef } from 'react';
 
 const TestPage = () => {
   const navigate = useNavigate();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedOptions, setSelectedOptions] = useState<{
@@ -38,6 +41,17 @@ const TestPage = () => {
 
   const handleSelect = (value: string) => {
     setSelectedOptions((prev) => ({ ...prev, [currentQuestion.id]: value }));
+    setIsTransitioning(true);
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      if (currentIndex < questions.length - 1) {
+        setCurrentIndex((prev) => prev + 1);
+      }
+      setIsTransitioning(false);
+    }, 1000);
   };
 
   const handleNext = () => {
@@ -83,7 +97,7 @@ const TestPage = () => {
 
             <button
               onClick={handleBack}
-              disabled={currentIndex === 0}
+              disabled={currentIndex === 0 || isTransitioning}
               className="absolute left-0 top-1/2 -translate-y-1/2"
             >
               <img src={back} alt="이전질문" className="w-[8px] h-[16px]" />
@@ -91,7 +105,9 @@ const TestPage = () => {
 
             <button
               onClick={handleNext}
-              disabled={currentIndex === questions.length - 1}
+              disabled={
+                currentIndex === questions.length - 1 || isTransitioning
+              }
               className="absolute right-0 top-1/2 -translate-y-1/2"
             >
               <img src={next} alt="다음질문" className="w-[8px] h-[16px]" />
@@ -142,10 +158,7 @@ const TestPage = () => {
                 <Button
                   onClick={() => {
                     const plan = getRecommendedPlan(selectedOptions);
-                    localStorage.setItem(
-                      'recommendedPlan',
-                      JSON.stringify(plan),
-                    );
+                    localStorage.setItem('recommendedPlanId', plan.result.id);
                     navigate('/test-wait');
                   }}
                   fullWidth

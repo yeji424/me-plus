@@ -204,6 +204,7 @@ export const streamChat = async (messages, socket, onDelta) => {
     let isFunctionCalled = false;
     let functionName = '';
     let functionArgsRaw = '';
+    let accumulatedContent = ''; // 텍스트 누적용
 
     for await (const chunk of streamRes) {
       const delta = chunk.choices[0].delta;
@@ -228,8 +229,46 @@ export const streamChat = async (messages, socket, onDelta) => {
       // 일반 메시지 content
       const content = delta?.content;
       if (content) {
-        socket.emit('stream', content);
-        onDelta?.(content);
+        accumulatedContent += content;
+
+        // 텍스트에서 function call 패턴 감지
+        const functionCallMatch = accumulatedContent.match(
+          /functions?\.(\w+)\s*\(\s*\{([\s\S]*?)\}\s*\)$/,
+        );
+
+        if (functionCallMatch) {
+          console.log(
+            '🔍 Text-based function call detected:',
+            functionCallMatch[0],
+          );
+
+          // function call 부분을 제거한 텍스트만 전송
+          const cleanContent = accumulatedContent
+            .replace(/functions?\.(\w+)\s*\(\s*\{[\s\S]*?}\s*\)$/, '')
+            .trim();
+
+          if (cleanContent) {
+            socket.emit('stream', cleanContent);
+            onDelta?.(cleanContent);
+          }
+
+          // function call 실행
+          isFunctionCalled = true;
+          functionName = functionCallMatch[1];
+
+          try {
+            functionArgsRaw = `{${functionCallMatch[2]}}`;
+            console.log('📄 Parsed function args:', functionArgsRaw);
+          } catch (e) {
+            console.error('❌ Failed to parse function args from text:', e);
+          }
+
+          break; // 스트리밍 종료
+        } else {
+          // 정상 텍스트 전송
+          socket.emit('stream', content);
+          onDelta?.(content);
+        }
       }
     }
 

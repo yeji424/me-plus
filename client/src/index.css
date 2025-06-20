@@ -67,6 +67,14 @@
     -moz-osx-font-smoothing: grayscale;
     word-break: keep-all;
   }
+  html {
+    /* 스크롤바 숨기기 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+  }
+  html::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+  }
   html,
   body {
     background-color: var(--color-gray300);
@@ -75,7 +83,6 @@
   body {
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE 10+ */
-    overflow: hidden;
   }
   body::-webkit-scrollbar {
     display: none; /* Chrome, Safari, Edge */
@@ -85,6 +92,10 @@
     @apply pr-[20px] pb-[0px] pl-[20px];
     box-shadow: var(--shadow-basic);
     background-color: var(--color-background);
+    /* 스크롤바 숨기기 */
+  }
+  #root::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
   }
   main {
     @apply flex-1;
@@ -156,6 +167,10 @@
 [data-rsbs-header]:before {
   background-color: var(--color-secondary-purple-80) !important;
   width: 44px !important;
+}
+[data-rsbs-overlay],
+[data-rsbs-backdrop] {
+  z-index: 100 !important;
 }
 
 /* GradientScroll 스크롤바 숨기기 */

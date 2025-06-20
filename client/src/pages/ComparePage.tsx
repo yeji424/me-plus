@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/common/Header';
 import { BottomSheet } from 'react-spring-bottom-sheet';
 import PlanSelectionCard from '@/components/ComparePage/PlanSelectionCard';
@@ -12,6 +12,7 @@ import type { Plan } from '@/components/types/Plan';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
 import { useNavigate } from 'react-router-dom';
+import { getAllPlans } from '@/api/plan';
 
 const ComparePage: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -26,6 +27,7 @@ const ComparePage: React.FC = () => {
     null,
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [plans, setPlans] = useState([]);
 
   const navigate = useNavigate();
 
@@ -35,130 +37,6 @@ const ComparePage: React.FC = () => {
     '5만원 미만',
     '5만원 이상 10만원 미만',
     '10만원 이상',
-  ];
-
-  const plans: Plan[] = [
-    {
-      _id: '1',
-      category: '5G',
-      name: '5G 시그니처',
-      description:
-        'U⁺5G 서비스와 프리미엄 혜택을 마음껏 즐기고, 가족과 공유할 수 있는 데이터까지 추가로 받는 5G 요금제',
-      isPopular: false,
-      dataGb: -1,
-      sharedDataGb: 120,
-      voiceMinutes: -1,
-      addonVoiceMinutes: 300,
-      smsCount: -1,
-      monthlyFee: 130000,
-      optionalDiscountAmount: 92250,
-      ageGroup: 'ALL',
-      detailUrl:
-        'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-unlimited/Z202205253',
-      bundleBenefit:
-        'U+ 투게더 결합, 5G 시그니처 가족할인, 태블릿/스마트기기 월정액 할인, 프리미어 요금제 약정할인, 로밍 혜택 프로모션',
-      mediaAddons:
-        '아이들나라 스탠다드+러닝, 바이브 앱+PC 음악감상, 유플레이, 밀리의 서재, 지니뮤직 앱+PC 음악감상',
-      premiumAddons:
-        '폰교체 패스, 삼성팩, 티빙 이용권 할인, 디즈니+, 넷플릭스, 헬로렌탈구독, 일리커피구독, 우리집지킴이 Easy2+, 우리집돌봄이 Kids, 신한카드 Air, 유튜브 프리미엄 할인',
-      basicService: 'U+ 모바일tv 기본 월정액 무료, U+멤버십 VVIP 등급 혜택',
-    },
-    {
-      _id: '2',
-      category: '5G',
-      name: '5G 프리미어 슈퍼',
-      description:
-        'U⁺5G 서비스와 프리미엄 혜택을 마음껏 즐기고, 가족과 공유할 수 있는 데이터까지 추가로 받는 5G 요금제',
-      isPopular: false,
-      dataGb: -1.0,
-      sharedDataGb: 100,
-      voiceMinutes: -1,
-      addonVoiceMinutes: 300,
-      smsCount: -1,
-      monthlyFee: 115000,
-      optionalDiscountAmount: 81000,
-      ageGroup: 'ALL',
-      detailUrl:
-        'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-unlimited/Z202205251',
-      bundleBenefit:
-        'U+ 투게더 결합, 태블릿/스마트기기 월정액 할인, 프리미어 요금제 약정할인, 로밍 혜택 프로모션',
-      mediaAddons:
-        '아이들나라 스탠다드+러닝, 유플레이, 밀리의 서재, 지니뮤직 앱+PC 음악감상, 바이브 앱 음악감상',
-      premiumAddons:
-        '폰교체 패스, 삼성팩, 티빙 이용권 할인, 디즈니+, 넷플릭스, 헬로렌탈구독, 일리커피구독, 우리집지킴이 Easy2+, 우리집돌봄이 Kids, 신한카드 Air, 유튜브 프리미엄 할인',
-      basicService: 'U+ 모바일tv 기본 월정액 무료, U+멤버십 VVIP 등급 혜택',
-    },
-    {
-      _id: '3',
-      category: '5G',
-      name: '5G 프리미어 플러스',
-      description:
-        'U⁺5G 서비스는 물론, 스마트 기기 2개와 다양한 콘텐츠까지 마음껏 이용할 수 있는 5G 요금제',
-      isPopular: false,
-      dataGb: -1.0,
-      sharedDataGb: 100,
-      voiceMinutes: -1,
-      addonVoiceMinutes: 300,
-      smsCount: -1,
-      monthlyFee: 105000,
-      optionalDiscountAmount: 73500,
-      ageGroup: 'ALL',
-      detailUrl:
-        'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-unlimited/Z202205252',
-      bundleBenefit:
-        'U+ 투게더 결합, 태블릿/스마트기기 월정액 할인, 프리미어 요금제 약정할인, 로밍 혜택 프로모션',
-      mediaAddons:
-        '아이들나라 스탠다드+러닝, 유플레이, 밀리의 서재, 지니뮤직 앱+PC 음악감상, 바이브 앱 음악감상',
-      premiumAddons:
-        '폰교체 패스, 삼성팩, 티빙 이용권 할인, 넷플릭스, 디즈니+, 헬로렌탈구독, 일리커피구독, 우리집지킴이 Easy2+, 우리집돌봄이 Kids, 신한카드 Air, 유튜브 프리미엄 할인',
-      basicService: 'U+ 모바일tv 기본 월정액 무료, U+멤버십 VVIP 등급 혜택',
-    },
-    {
-      _id: '4',
-      category: '5G',
-      name: '5G 프리미어 레귤러',
-      description:
-        'U⁺5G 서비스는 물론, 스마트기기 1개와 다양한 콘텐츠까지 마음껏 이용할 수 있는 5G 요금제',
-      isPopular: true,
-      dataGb: -1.0,
-      sharedDataGb: 80,
-      voiceMinutes: -1,
-      addonVoiceMinutes: 300,
-      smsCount: -1,
-      monthlyFee: 95000,
-      optionalDiscountAmount: 66000,
-      ageGroup: 'ALL',
-      detailUrl:
-        'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-unlimited/LPZ0000433',
-      bundleBenefit:
-        'U+ 투게더 결합, 태블릿/스마트기기 월정액 할인, 프리미어 요금제 약정할인, 로밍 혜택 프로모션',
-      mediaAddons:
-        '아이들나라 스탠다드+러닝, 유플레이, 밀리의 서재, 바이브 300회 음악감상, 지니뮤직 300회 음악감상',
-      premiumAddons: null,
-      basicService: 'U+ 모바일tv 기본 월정액 무료, U+멤버십 VVIP 등급 혜택',
-    },
-    {
-      _id: '5',
-      category: '5G',
-      name: '5G 프리미어 에센셜',
-      description: 'U⁺5G 서비스를 마음껏 즐길 수 있는 5G 요금제',
-      isPopular: true,
-      dataGb: -1.0,
-      sharedDataGb: 70,
-      voiceMinutes: -1,
-      addonVoiceMinutes: 300,
-      smsCount: -1,
-      monthlyFee: 85000,
-      optionalDiscountAmount: 58500,
-      ageGroup: 'ALL',
-      detailUrl:
-        'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-unlimited/LPZ0000409',
-      bundleBenefit:
-        'U+ 투게더 결합, 태블릿/스마트기기 월정액 할인, 프리미어 요금제 약정할인, 로밍 혜택 프로모션',
-      mediaAddons: null,
-      premiumAddons: null,
-      basicService: 'U+ 모바일tv 기본 월정액 무료, U+멤버십 VIP 등급 혜택',
-    },
   ];
 
   const filteredPlans = usePlanFilter(
@@ -221,6 +99,19 @@ const ComparePage: React.FC = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      try {
+        const res = await getAllPlans();
+        setPlans(res.plans);
+      } catch (error) {
+        console.error('요금제 가져오기 실패:', error);
+      }
+    };
+
+    fetchPlans();
+  }, []);
 
   return (
     <>
