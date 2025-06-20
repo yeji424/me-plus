@@ -200,18 +200,20 @@ const ChatbotPage = () => {
         {/* 마진으로 안하고 패딩으로 한 이유 : 마진으로 하면 그라데이션 넣은 이유 사라짐 */}
         <div
           ref={containerRef}
-          className="border-1 relative flex-1 overflow-y-auto mt-[94px] pb-[60px] flex flex-col-reverse"
+          className="border-1 relative flex-1 overflow-y-auto mt-[50px] pb-[60px] flex flex-col-reverse"
         >
-          <div className=" space-y-2 max-w-[560px] min-h-full flex flex-col-reverse">
-            <div className="h-1" />
+          <div className="gap-5 max-w-[560px] min-h-full flex flex-col-reverse">
             {reversedMessages.map((msg, idx) => {
-              // 이전 메시지가 봇 메시지인지 확인
-              const prevMessage = idx > 0 ? allMessages[idx - 1] : null;
-              const isPreviousBot = prevMessage?.type === 'bot';
+              // 역순 배열에서 이전 메시지 확인 (역순이므로 다음 인덱스가 실제로는 이전 메시지)
+              const nextMessage =
+                idx < reversedMessages.length - 1
+                  ? reversedMessages[idx + 1]
+                  : null;
+              const isNextBot = nextMessage?.type === 'bot';
               const isCurrentBot = msg.type === 'bot';
 
-              // 연속된 봇 메시지 중 첫 번째인지 확인
-              const showChatbotIcon = isCurrentBot && !isPreviousBot;
+              // 연속된 봇 메시지 중 마지막인지 확인 (역순이므로 마지막이 실제로는 첫 번째)
+              const showChatbotIcon = isCurrentBot && !isNextBot;
 
               return msg.type === 'user' ? (
                 <UserBubble key={idx} message={msg.text} />
