@@ -25,7 +25,7 @@
   --color-danger: #e94e4e;
   --color-gradation: linear-gradient(
     90deg,
-    var(--color-secondary-purple-80) 0%,
+    #5732a1 0%,
     #5b038c 25%,
     #a0018b 50%,
     #ce018b 75%,
@@ -144,7 +144,22 @@
     }
   }
 }
-
+@layer components {
+  .dot {
+    @apply absolute top-0 w-[6px] h-[6px] rounded-full bg-[#7b2effff] animate-[blink_1s_infinite_both];
+  }
+}
+@keyframes blink {
+  0% {
+    opacity: 0.1;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.1;
+  }
+}
 [data-rsbs-scroll] {
   scrollbar-width: none;
 }
@@ -175,15 +190,6 @@
 .gradient-scroll-container > div {
   background: none !important;
   background-image: none !important;
-}
-.custom-header {
-  padding-bottom: 45px !important;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 1) 0%,
-    rgba(255, 255, 255, 1) 60%,
-    rgba(255, 255, 255, 0) 100%
-  );
 }
 /* 상단 그라데이션만 숨기기 */
 .gradient-scroll-container > div:first-child {
@@ -223,4 +229,34 @@
 .swiper-pagination-bullet-active {
   background-color: var(--color-primary-pink);
   width: 22px;
+}
+/* 채팅 페이지 헤더 */
+.custom-header {
+  padding-bottom: 45px !important;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 1) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+/* 로딩 스피너 관련 */
+.loader {
+  width: 25px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(farthest-side, rgb(123, 46, 255) 94%, #0000) top/4px 4px
+      no-repeat,
+    conic-gradient(
+      #0000 40%,
+      /* rgba(218, 139, 243, 0.867) 70%, */ rgb(123, 46, 255)
+    );
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 4px), #000 0);
+  animation: l13 0.65s infinite linear;
+}
+@keyframes l13 {
+  100% {
+    transform: rotate(1turn);
+  }
 }

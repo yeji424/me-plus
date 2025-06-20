@@ -1,3 +1,4 @@
+import React from 'react';
 import BotBubble from './BotBubble';
 import CarouselButtonGroup from './ChatButtonGroups/CarouselButtonGroup';
 import OttButtonGroup from './ChatButtonGroups/OttButtonGroup';
@@ -136,7 +137,7 @@ const BotBubbleFrame = ({
       <div className="flex gap-3 items-start">
         {/* 챗봇 아이콘 - 연속된 봇 메시지 중 첫 번째에만 표시 */}
         {showChatbotIcon ? (
-          <div className="flex-shrink-0 w-8 h-8 mt-1">
+          <div className="flex-shrink-0 w-8 h-8 ">
             <img
               src={ChatbotIcon}
               alt="챗봇"
@@ -165,4 +166,4 @@ const BotBubbleFrame = ({
   );
 };
 
-export default BotBubbleFrame;
+export default React.memo(BotBubbleFrame);

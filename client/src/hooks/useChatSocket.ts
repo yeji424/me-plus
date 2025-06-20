@@ -57,7 +57,8 @@ const getErrorMessage = (error: ServerError): string => {
 
 type Message =
   | { type: 'user'; text: string }
-  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall };
+  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall }
+  | { type: 'loading'; loadingType: 'searching' | 'waiting' | 'dbcalling' };
 
 export const useChatSocket = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -86,9 +87,25 @@ export const useChatSocket = () => {
       setMessages(converted);
     };
 
-    const handleCarouselButtons = (items: CarouselItem[]) => {
+    const handleLoading = (data: {
+      type: 'searching' | 'waiting' | 'dbcalling';
+    }) => {
       setMessages((prev) => [
         ...prev,
+        {
+          type: 'loading',
+          loadingType: data.type,
+        },
+      ]);
+    };
+
+    const handleLoadingEnd = () => {
+      setMessages((prev) => prev.filter((msg) => msg.type !== 'loading'));
+    };
+
+    const handleCarouselButtons = (items: CarouselItem[]) => {
+      setMessages((prev) => [
+        ...prev.filter((msg) => msg.type !== 'loading'),
         {
           type: 'bot',
           messageChunks: [''],
@@ -102,7 +119,7 @@ export const useChatSocket = () => {
 
     const handleOXCarouselButtons = (data: { options: string[] }) => {
       setMessages((prev) => [
-        ...prev,
+        ...prev.filter((msg) => msg.type !== 'loading'),
         {
           type: 'bot',
           messageChunks: [''],
@@ -119,7 +136,7 @@ export const useChatSocket = () => {
       options: string[];
     }) => {
       setMessages((prev) => [
-        ...prev,
+        ...prev.filter((msg) => msg.type !== 'loading'),
         {
           type: 'bot',
           messageChunks: [''],
@@ -133,7 +150,7 @@ export const useChatSocket = () => {
 
     const handlePlanLists = (plans: PlanData[]) => {
       setMessages((prev) => [
-        ...prev,
+        ...prev.filter((msg) => msg.type !== 'loading'),
         {
           type: 'bot',
           messageChunks: [''],
@@ -150,7 +167,7 @@ export const useChatSocket = () => {
       options: string[];
     }) => {
       setMessages((prev) => [
-        ...prev,
+        ...prev.filter((msg) => msg.type !== 'loading'),
         {
           type: 'bot',
           messageChunks: [''],
@@ -162,22 +179,42 @@ export const useChatSocket = () => {
       ]);
     };
 
+    const handleFirstCardList = () => {
+      setMessages((prev) => [
+        ...prev.filter((msg) => msg.type !== 'loading'),
+        {
+          type: 'bot',
+          messageChunks: [''],
+          functionCall: {
+            name: 'showFirstCardList',
+            args: {},
+          },
+        },
+      ]);
+    };
+
     socket.on('session-id', handleSessionId);
     socket.on('session-history', handleSessionHistory);
+    socket.on('loading', handleLoading);
+    socket.on('loading-end', handleLoadingEnd);
     socket.on('carousel-buttons', handleCarouselButtons);
     socket.on('ox-carousel-buttons', handleOXCarouselButtons);
     socket.on('ott-service-list', handleOTTServiceList);
     socket.on('plan-lists', handlePlanLists);
     socket.on('text-buttons', handleTextButtons);
+    socket.on('first-card-list', handleFirstCardList);
 
     return () => {
       socket.off('session-id', handleSessionId);
       socket.off('session-history', handleSessionHistory);
+      socket.off('loading', handleLoading);
+      socket.off('loading-end', handleLoadingEnd);
       socket.off('carousel-buttons', handleCarouselButtons);
       socket.off('ox-carousel-buttons', handleOXCarouselButtons);
       socket.off('ott-service-list', handleOTTServiceList);
       socket.off('plan-lists', handlePlanLists);
       socket.off('text-buttons', handleTextButtons);
+      socket.off('first-card-list', handleFirstCardList);
     };
   }, []);
 
