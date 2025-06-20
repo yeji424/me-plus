@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import Modal from '@/components/common/Modal';
 import { useNavigate } from 'react-router-dom';
 import { TestResult } from '@/data/TestResult';
 import { questions } from '@/data/Questions';
+import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
 import SelectButton from '@/components/testPage/SelectButton';
 import SelectButton3 from '@/components/testPage/SelectButton3';
@@ -148,6 +148,9 @@ const TestPage = () => {
                     );
                     navigate('/test-wait');
                   }}
+                  fullWidth
+                  variant="primary"
+                  size="large"
                 >
                   Me플러스 맞춤 추천 받기
                 </Button>
