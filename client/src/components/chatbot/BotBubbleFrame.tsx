@@ -1,3 +1,4 @@
+import React from 'react';
 import BotBubble from './BotBubble';
 import CarouselButtonGroup from './ChatButtonGroups/CarouselButtonGroup';
 import OttButtonGroup from './ChatButtonGroups/OttButtonGroup';
@@ -139,4 +140,4 @@ const BotBubbleFrame = ({
   );
 };
 
-export default BotBubbleFrame;
+export default React.memo(BotBubbleFrame);

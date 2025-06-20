@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Header from '@/components/common/Header';
 import NewChatIcon from '@/assets/icon/new_chat_icon.svg?react';
 import CallIcon from '@/assets/icon/call_icon.svg?react';
@@ -25,25 +25,18 @@ const ChatbotPage = () => {
   const handleButtonClick = (message: string) => {
     sendMessage(message);
   };
-  const bottomRef = useRef<HTMLDivElement | null>(null);
-  const prevMessageLengthRef = useRef(0);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const reversedMessages = useMemo(
+    () =>
+      messages
+        .map((msg, index) => ({ ...msg, tempKey: `${msg.type}-${index}` }))
+        .reverse(),
+    [messages],
+  );
   useEffect(() => {
-    if (!bottomRef.current) return;
-
-    const isNewMessageAdded = messages.length > prevMessageLengthRef.current;
-    prevMessageLengthRef.current = messages.length;
-
-    // 1) 메시지 추가되면 부드럽게 스크롤
-    bottomRef.current.scrollIntoView({
-      behavior: isNewMessageAdded ? 'smooth' : 'smooth',
-    });
-
-    // 2) 300ms 후에 무조건 딱 맨 아래로 스크롤(스크롤 위치 재조정)
-    const timeout = setTimeout(() => {
-      bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 1000);
-
-    return () => clearTimeout(timeout);
+    if (!containerRef.current) return;
+    const container = containerRef.current;
+    container.scrollTop = container.scrollHeight - container.clientHeight;
   }, [messages]);
 
   return (
@@ -64,23 +57,24 @@ const ChatbotPage = () => {
       <div className="gradient-scroll-container flex flex-col h-[100vh]">
         {/* 패딩으로 보이는 영역 조절 (= 스크롤 가능 영역) */}
         {/* 마진으로 안하고 패딩으로 한 이유 : 마진으로 하면 그라데이션 넣은 이유 사라짐 */}
-        <div className="relative flex-1 overflow-y-auto pt-[94px] pb-[60px]">
-          {/* 메시지 리스트 */}
-          <div className="space-y-2 max-w-[560px]  min-h-full px-1 -mx-1">
+        <div
+          ref={containerRef}
+          className="border-1 relative flex-1 overflow-y-auto mt-[94px] pb-[60px] flex flex-col-reverse"
+        >
+          <div className=" space-y-2 max-w-[560px] min-h-full flex flex-col-reverse">
             <div className="h-1" />
-            {messages.map((msg, idx) =>
+            {reversedMessages.map((msg) =>
               msg.type === 'user' ? (
-                <UserBubble key={idx} message={msg.text} />
+                <UserBubble key={msg.tempKey} message={msg.text} />
               ) : (
                 <BotBubbleFrame
-                  key={idx}
+                  key={msg.tempKey}
                   messageChunks={msg.messageChunks}
                   functionCall={msg.functionCall}
                   onButtonClick={handleButtonClick}
                 />
               ),
             )}
-            <div ref={bottomRef} />
           </div>
         </div>
       </div>
