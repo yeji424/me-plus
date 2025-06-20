@@ -1,9 +1,55 @@
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
+import axios from 'axios';
+import * as cheerio from 'cheerio';
 
 dotenv.config();
 
 export const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// 메타데이터 추출 함수
+const extractMetadata = async (url) => {
+  try {
+    const response = await axios.get(url, {
+      timeout: 10000,
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+      },
+      maxRedirects: 5,
+    });
+
+    const html = response.data;
+    const $ = cheerio.load(html);
+
+    const getMetaContent = (selector) => {
+      const element = $(selector);
+      return element.attr('content') || element.text() || null;
+    };
+
+    let imageUrl =
+      getMetaContent('meta[property="og:image"]') ||
+      getMetaContent('meta[name="twitter:image"]') ||
+      null;
+
+    // 상대 URL을 절대 URL로 변환
+    if (imageUrl && !imageUrl.startsWith('http')) {
+      const validUrl = new URL(url);
+      if (imageUrl.startsWith('//')) {
+        imageUrl = validUrl.protocol + imageUrl;
+      } else if (imageUrl.startsWith('/')) {
+        imageUrl = validUrl.origin + imageUrl;
+      } else {
+        imageUrl = validUrl.origin + '/' + imageUrl;
+      }
+    }
+
+    return imageUrl;
+  } catch (error) {
+    console.warn('메타데이터 추출 실패:', error.message);
+    return null;
+  }
+};
 
 export const streamChat = async (messages, socket, onDelta) => {
   try {
@@ -174,25 +220,35 @@ export const streamChat = async (messages, socket, onDelta) => {
         {
           type: 'function',
           function: {
-            name: 'requestTextButtons',
+            name: 'requestTextCard',
             description:
-              '유저에게 복잡한 문장형 응답 선택지를 세로 배열 버튼으로 제공합니다. 3개 이상의 선택지가 있고, 각 선택지가 완전한 문장이거나 상세한 설명일 때 사용합니다.',
+              '유저에게 특정 웹사이트나 링크로 안내할 때 사용합니다. URL의 미리보기 이미지와 함께 카드 형태로 보여줍니다. 유플러스 사이트나 추천하는 외부 링크를 안내할 때 사용합니다.',
             parameters: {
               type: 'object',
               properties: {
-                question: {
+                title: {
                   type: 'string',
-                  description: '화면에 보여줄 질문 또는 안내 텍스트',
+                  description: '카드에 표시될 제목',
                 },
-                options: {
-                  type: 'array',
-                  description: '선택 가능한 버튼 항목 리스트',
-                  items: {
-                    type: 'string',
-                  },
+                description: {
+                  type: 'string',
+                  description: '카드에 표시될 설명 텍스트',
+                },
+                url: {
+                  type: 'string',
+                  description: '안내할 링크 URL',
+                },
+                buttonText: {
+                  type: 'string',
+                  description:
+                    '버튼에 표시될 텍스트 (예: "자세히 보기", "사이트 방문하기")',
+                },
+                imageUrl: {
+                  type: 'string',
+                  description: '카드에 표시될 이미지 URL (선택사항)',
                 },
               },
-              required: ['question', 'options'],
+              required: ['title', 'description', 'url', 'buttonText'],
             },
           },
         },
@@ -436,20 +492,35 @@ export const streamChat = async (messages, socket, onDelta) => {
             break;
           }
 
-          case 'requestTextButtons': {
-            const { question, options } = args;
-            if (!question || !options) {
+          case 'requestTextCard': {
+            const { title, description, url, buttonText, imageUrl } = args;
+            if (!title || !description || !url || !buttonText) {
               socket.emit('loading-end');
               socket.emit('error', {
                 type: 'MISSING_FUNCTION_ARGS',
                 message:
-                  'requestTextButtons에 필요한 question 또는 options가 없습니다.',
+                  'requestTextCard에 필요한 title, description, url, buttonText가 없습니다.',
                 details: { functionName, args },
               });
               return;
             }
             socket.emit('loading-end');
-            socket.emit('text-buttons', { question, options });
+
+            // imageUrl이 없으면 URL에서 메타데이터 추출
+            let finalImageUrl = imageUrl;
+            if (!finalImageUrl) {
+              console.log('🔍 URL에서 메타데이터 추출 중:', url);
+              finalImageUrl = await extractMetadata(url);
+              console.log('📸 추출된 이미지 URL:', finalImageUrl);
+            }
+
+            socket.emit('text-card', {
+              title,
+              description,
+              url,
+              buttonText,
+              imageUrl: finalImageUrl,
+            });
             break;
           }
 
@@ -510,10 +581,7 @@ export const streamChat = async (messages, socket, onDelta) => {
           .trim();
 
         if (cleanedContent) {
-          socket.emit(
-            'stream',
-            cleanedContent.substring(responseRef.current.length),
-          );
+          socket.emit('stream', cleanedContent);
         }
       }
 

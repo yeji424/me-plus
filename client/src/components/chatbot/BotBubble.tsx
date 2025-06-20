@@ -1,4 +1,10 @@
-import { useEffect, useState, useRef, useLayoutEffect } from 'react';
+import {
+  useEffect,
+  useState,
+  useRef,
+  useLayoutEffect,
+  useCallback,
+} from 'react';
 import { useSpring, animated } from '@react-spring/web';
 import { parseMarkedTextToChars } from '@/utils/parseMarkedTextToChars';
 import MarkedText from './MarkedText';
@@ -13,24 +19,57 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
   const ghostRef = useRef<HTMLDivElement>(null);
   const measureTimeoutRef = useRef<number | null>(null);
 
+  const timersRef = useRef<number[]>([]);
+
   const springStyles = useSpring({
     width: boxSize.width,
     height: boxSize.height,
     config: { tension: 120, friction: 20 }, // 더 부드러운 애니메이션
   });
 
-  // 크기 측정 함수
-  const measureSize = () => {
-    if (ghostRef.current) {
-      const { offsetWidth, offsetHeight } = ghostRef.current;
-      setBoxSize((prev) => {
-        // 크기가 이전보다 작아지지 않도록 보장 (텍스트가 줄어들 때만 예외)
-        const newWidth = Math.max(offsetWidth, prev.width * 0.8);
-        const newHeight = Math.max(offsetHeight, prev.height * 0.8);
-        return { width: newWidth, height: newHeight };
-      });
-    }
-  };
+  // 다단계 크기 측정 함수
+  const measureSize = useCallback(() => {
+    if (!ghostRef.current) return;
+
+    const measure = () => {
+      if (ghostRef.current) {
+        const { offsetWidth, offsetHeight } = ghostRef.current;
+        const newSize = { width: offsetWidth, height: offsetHeight };
+
+        // 최소 크기 보장 (더 여유롭게)
+        const minWidth = 120;
+        const minHeight = 40;
+
+        const finalSize = {
+          width: Math.max(newSize.width, minWidth),
+          height: Math.max(newSize.height, minHeight),
+        };
+
+        // 크기가 실제로 변경된 경우에만 업데이트
+        setBoxSize((prevBoxSize) => {
+          if (
+            prevBoxSize.width !== finalSize.width ||
+            prevBoxSize.height !== finalSize.height
+          ) {
+            return finalSize;
+          }
+          return prevBoxSize;
+        });
+      }
+    };
+
+    // 타이머 정리
+    timersRef.current.forEach((timer) => clearTimeout(timer));
+    timersRef.current = [];
+
+    // 다단계 측정 (즉시, 50ms 후, 100ms 후)
+    measure(); // 즉시 측정
+
+    timersRef.current.push(
+      setTimeout(measure, 50), // 50ms 후 재측정
+      setTimeout(measure, 100), // 100ms 후 최종 측정
+    );
+  }, []); // 의존성 배열 비움
 
   // 여러 번 크기 측정을 시도하여 안정적인 크기 확보
   const scheduleMeasurement = () => {
@@ -56,6 +95,14 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
   useLayoutEffect(() => {
     scheduleMeasurement();
   }, [displayText]);
+  useLayoutEffect(() => {
+    measureSize();
+
+    // 컴포넌트 언마운트 시 타이머 정리
+    return () => {
+      timersRef.current.forEach((timer) => clearTimeout(timer));
+    };
+  }, [displayText, measureSize]);
 
   // 스트리밍 응답에 맞게 단순화
   useEffect(() => {
@@ -77,11 +124,11 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
 
   return (
     <>
-      {/* 숨겨진 텍스트로 크기 측정용 박스*/}
+      {/* 숨겨진 텍스트로 크기 측정용 박스 (패딩 추가로 여유공간 확보) */}
       <div
         ref={ghostRef}
         className="absolute invisible max-w-[309px] p-2 text-[14px] leading-5 whitespace-pre-wrap break-words"
-        style={{ minHeight: '24px' }} // 최소 높이 보장
+        style={{ minHeight: '24px', padding: '12px' }}
       >
         <MarkedText chars={chars} />
       </div>
