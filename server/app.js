@@ -12,6 +12,7 @@ import {
   getPopularPlanList,
   getUnlimitedDataPlanList,
 } from './controllers/planController.js';
+import { getUrlMetadata } from './controllers/metadataController.js';
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
 apiRouter.get('/chat/inputs', getInputExamples);
+apiRouter.get('/metadata', getUrlMetadata);
 apiRouter.get('/plans/:planId', getPlanDetail);
 apiRouter.get('/unlimited-plans', getUnlimitedDataPlanList);
 apiRouter.get('/ott-plans', getOTTPlanList);

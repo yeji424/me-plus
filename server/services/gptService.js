@@ -1,9 +1,55 @@
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
+import axios from 'axios';
+import * as cheerio from 'cheerio';
 
 dotenv.config();
 
 export const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// 메타데이터 추출 함수
+const extractMetadata = async (url) => {
+  try {
+    const response = await axios.get(url, {
+      timeout: 10000,
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+      },
+      maxRedirects: 5,
+    });
+
+    const html = response.data;
+    const $ = cheerio.load(html);
+
+    const getMetaContent = (selector) => {
+      const element = $(selector);
+      return element.attr('content') || element.text() || null;
+    };
+
+    let imageUrl =
+      getMetaContent('meta[property="og:image"]') ||
+      getMetaContent('meta[name="twitter:image"]') ||
+      null;
+
+    // 상대 URL을 절대 URL로 변환
+    if (imageUrl && !imageUrl.startsWith('http')) {
+      const validUrl = new URL(url);
+      if (imageUrl.startsWith('//')) {
+        imageUrl = validUrl.protocol + imageUrl;
+      } else if (imageUrl.startsWith('/')) {
+        imageUrl = validUrl.origin + imageUrl;
+      } else {
+        imageUrl = validUrl.origin + '/' + imageUrl;
+      }
+    }
+
+    return imageUrl;
+  } catch (error) {
+    console.warn('메타데이터 추출 실패:', error.message);
+    return null;
+  }
+};
 
 export const streamChat = async (messages, socket, onDelta) => {
   try {
@@ -364,12 +410,21 @@ export const streamChat = async (messages, socket, onDelta) => {
               });
               return;
             }
+
+            // imageUrl이 없으면 URL에서 메타데이터 추출
+            let finalImageUrl = imageUrl;
+            if (!finalImageUrl) {
+              console.log('🔍 URL에서 메타데이터 추출 중:', url);
+              finalImageUrl = await extractMetadata(url);
+              console.log('📸 추출된 이미지 URL:', finalImageUrl);
+            }
+
             socket.emit('text-card', {
               title,
               description,
               url,
               buttonText,
-              imageUrl,
+              imageUrl: finalImageUrl,
             });
             break;
           }

@@ -19,7 +19,10 @@ const ImageCard = ({
         <img
           src={imageUrl || NoImage}
           alt="preview"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-fill"
+          onError={(e) => {
+            e.currentTarget.src = NoImage;
+          }}
         />
       </div>
 
@@ -27,7 +30,7 @@ const ImageCard = ({
         <p className="leading-[18px] text-xs break-all">{text}</p>
         <button
           onClick={onButtonClick}
-          className="bg-background text-xs py-2 px-4 rounded-lg cursor-pointer"
+          className="bg-background text-xs py-2 px-4 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
         >
           {buttonText}
         </button>
