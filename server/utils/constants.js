@@ -66,3 +66,45 @@ export const InputRoleEnum = {
   SYSTEM: 'system',
   ASSISTANT: 'assistant',
 };
+
+export const GPTConfig = {
+  MODEL: 'gpt-4.1-mini-2025-04-14',
+  TIMEOUT_MS: 30000,
+  MAX_REDIRECTS: 5,
+  REQUEST_TIMEOUT: 10000,
+};
+
+export const LoadingType = {
+  SEARCHING: 'searching',
+  DB_CALLING: 'dbcalling',
+};
+
+export const ErrorType = {
+  REQUEST_TIMEOUT: 'REQUEST_TIMEOUT',
+  OPENAI_API_ERROR: 'OPENAI_API_ERROR',
+  NETWORK_ERROR: 'NETWORK_ERROR',
+  STREAM_ABORTED: 'STREAM_ABORTED',
+  FUNCTION_ARGS_PARSE_ERROR: 'FUNCTION_ARGS_PARSE_ERROR',
+  MISSING_FUNCTION_ARGS: 'MISSING_FUNCTION_ARGS',
+  UNKNOWN_FUNCTION: 'UNKNOWN_FUNCTION',
+  FUNCTION_EXECUTION_ERROR: 'FUNCTION_EXECUTION_ERROR',
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+};
+
+export const SocketEvent = {
+  STREAM: 'stream',
+  DONE: 'done',
+  LOADING: 'loading',
+  LOADING_END: 'loading-end',
+  ERROR: 'error',
+  OTT_SERVICE_LIST: 'ott-service-list',
+  OX_CAROUSEL_BUTTONS: 'ox-carousel-buttons',
+  CAROUSEL_BUTTONS: 'carousel-buttons',
+  PLAN_LISTS: 'plan-lists',
+  TEXT_CARD: 'text-card',
+  FIRST_CARD_LIST: 'first-card-list',
+};
+
+export const OTTServices = ['넷플릭스', '디즈니+', '티빙', '왓챠'];
+
+export const OXOptions = ['예', '아니오'];
