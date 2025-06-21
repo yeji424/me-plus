@@ -7,6 +7,7 @@ interface SelectButtonProps {
   selected: boolean;
   onClick: () => void;
   type: 'yes' | 'no';
+  disabled?: boolean;
 }
 
 const SelectButton: React.FC<SelectButtonProps> = ({
@@ -14,6 +15,7 @@ const SelectButton: React.FC<SelectButtonProps> = ({
   selected,
   onClick,
   type,
+  disabled,
 }) => {
   const baseClass =
     'w-[153px] h-[153px] flex flex-col items-center justify-center text-[16px] transition-all rounded-[20px]';
@@ -22,6 +24,9 @@ const SelectButton: React.FC<SelectButtonProps> = ({
   const iconColor = selected
     ? 'text-[var(--color-primary-pink)]'
     : 'text-gray-300';
+
+  const fadeClass =
+    !selected && disabled ? 'opacity-50 cursor-not-allowed' : '';
 
   const selectedStyle = selected
     ? {
@@ -39,9 +44,10 @@ const SelectButton: React.FC<SelectButtonProps> = ({
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       className={`${baseClass} ${textColor} ${
         selected ? '' : 'border border-gray300 bg-white'
-      }`}
+      } ${fadeClass}`}
       style={selectedStyle}
     >
       <IconComponent className={`w-[50px] h-[50px] mb-1 ${iconColor}`} />

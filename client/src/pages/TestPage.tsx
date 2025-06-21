@@ -122,12 +122,14 @@ const TestPage = () => {
                 selected={selected === 'yes'}
                 onClick={() => handleSelect('yes')}
                 type="yes"
+                disabled={isTransitioning}
               />
               <SelectButton
                 label="아니다"
                 selected={selected === 'no'}
                 onClick={() => handleSelect('no')}
                 type="no"
+                disabled={isTransitioning}
               />
             </div>
           ) : (
@@ -138,6 +140,7 @@ const TestPage = () => {
                   label={opt}
                   selected={selected === opt}
                   onClick={() => handleSelect(opt)}
+                  disabled={isTransitioning}
                 />
               ))}
             </div>
