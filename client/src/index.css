@@ -1,8 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import 'tailwindcss';
-@tailwind base;
-@tailwind utilities;
-@tailwind components;
+@import 'swiper/css';
+@import 'swiper/css/pagination';
 
 @theme {
   --color-primary-pink: #eb008b;
@@ -204,6 +203,32 @@
     transparent 0px,
     black 30px
   ) !important;
+}
+
+/* 서비스 가이드 스와이퍼 */
+.swiper-pagination {
+  z-index: -1;
+  top: 250px !important;
+  /* height: 640px; */
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  left: 50% !important;
+  transform: translateX(-50%);
+  aspect-ratio: 1 / 2;
+  bottom: auto !important;
+  max-width: 200px !important;
+  width: 63% !important;
+}
+.swiper-pagination-bullet {
+  border-radius: 100px;
+  transition-property: width;
+  transition-duration: 0.1s;
+  height: 4px;
+}
+.swiper-pagination-bullet-active {
+  background-color: var(--color-primary-pink);
+  width: 22px;
 }
 /* 채팅 페이지 헤더 */
 .custom-header {

@@ -10,6 +10,7 @@ interface LinkCardProps {
   variant?: 'default' | 'primary' | 'gradient' | 'shadow';
   size?: 'large' | 'medium';
   className?: string;
+  onClick?: () => void;
 }
 
 const LinkCard: React.FC<LinkCardProps> = ({
@@ -20,6 +21,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
   variant = 'default',
   size = 'large',
   className = '',
+  onClick,
 }) => {
   const getVariantStyles = (): {
     wrapper: string;
@@ -105,6 +107,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
       <Link
         to={to}
         className={`relative flex w-full h-full ${sizeStyles.minHeight} rounded-[17px] p-[1px] ${variantStyles.wrapper} ${className}`}
+        onClick={onClick}
       >
         <div
           className={`relative w-full rounded-[16px] ${variantStyles.container} ${sizeStyles.padding}`}

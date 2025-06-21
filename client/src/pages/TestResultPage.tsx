@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import type { PlanResult } from '@/components/types/TestResult';
-import TestResult from '@/data/TestResult';
+import { planResults } from '@/data/TestResult';
 
 import UsageBar from '@/components/testPage/UsageBar';
 import moonerFunImage from '../assets/image/mooner_fun.png';
@@ -42,17 +43,22 @@ const generateChatbotURL = (userProfile: UserProfile): string => {
 
 const TestResultPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const planId = location.state?.planId as string | undefined;
   const [plan, setPlan] = useState<PlanResult | null>(null);
 
   useEffect(() => {
-    const savedId = localStorage.getItem('recommendedPlanId');
-    if (savedId) {
-      const result = TestResult.find((p) => p.result.id === savedId);
-      if (result) {
-        setPlan(result.result);
+    if (planId) {
+      const matched = planResults.find((p) => p.id === planId);
+      if (matched) {
+        setPlan(matched);
       }
     }
-  }, []);
+  }, [planId]);
+
+  if (!planId) {
+    return <div>추천 정보가 없습니다. 테스트를 다시 시작해주세요.</div>;
+  }
 
   const handleBackClick = () => {
     navigate('/');
@@ -118,18 +124,12 @@ const TestResultPage = () => {
         {plan.name}
       </div>
 
-      <div className="mt-2 px-4 py-1 bg-gradation rounded-full text-[17px] text-white font-semibold inline-flex items-center gap-1">
-        <img src={plus} alt="더해서" className="w-[16px] h-[16px]" />
-        {plan.id === 'ott-plus' && '넷플릭스 / 왓챠 제휴 결합'}
-        {plan.id === 'music-plus' && '지니뮤직 제휴 결합'}
-        {plan.id === 'family' && 'U+ 투게더 결합'}
-        {plan.id === 'youth1-special' && '데이터 무제한 최대 1Mbps 속도'}
-        {plan.id === 'youth2-special' && '데이터 무제한 최대 5Mbps 속도'}
-        {plan.id === 'youth3-special' && '실버지킴이'}
-        {plan.id === 'max-data' && '데이터 무제한'}
-        {plan.id === 'max-high' && '데이터 무제한 최대 5Mbps 속도'}
-        {plan.id === 'max-data' && '데이터 무제한 최대 1Mbps 속도'}
-      </div>
+      {plan.tagLine && (
+        <div className="mt-2 px-4 py-1 bg-gradation rounded-full text-[17px] text-white font-semibold inline-flex items-center gap-1">
+          <img src={plus} alt="더해서" className="w-[16px] h-[16px]" />
+          {plan.tagLine}
+        </div>
+      )}
 
       <div className="relative w-full flex justify-center items-center mt-6">
         <img

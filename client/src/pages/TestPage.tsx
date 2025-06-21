@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import TestResult from '@/data/TestResult';
+import { rules } from '@/utils/rules';
+import { planResults } from '@/data/TestResult';
 import { questions } from '@/data/Questions';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
@@ -70,9 +71,9 @@ const TestPage = () => {
     (q) => selectedOptions[q.id] !== undefined,
   );
 
-  const getRecommendedPlan = (answers: { [key: number]: string }) => {
-    return TestResult.find((plan) => plan.condition(answers))!;
-  };
+  // const getRecommendedPlan = (answers: { [key: number]: string }) => {
+  //   return TestResult.find((plan) => plan.condition(answers))!;
+  // };
 
   return (
     <div className="h-screen flex flex-col">
@@ -121,12 +122,14 @@ const TestPage = () => {
                 selected={selected === 'yes'}
                 onClick={() => handleSelect('yes')}
                 type="yes"
+                disabled={isTransitioning}
               />
               <SelectButton
                 label="아니다"
                 selected={selected === 'no'}
                 onClick={() => handleSelect('no')}
                 type="no"
+                disabled={isTransitioning}
               />
             </div>
           ) : (
@@ -137,6 +140,7 @@ const TestPage = () => {
                   label={opt}
                   selected={selected === opt}
                   onClick={() => handleSelect(opt)}
+                  disabled={isTransitioning}
                 />
               ))}
             </div>
@@ -157,9 +161,18 @@ const TestPage = () => {
               <div className="w-full mt-10">
                 <Button
                   onClick={() => {
-                    const plan = getRecommendedPlan(selectedOptions);
-                    localStorage.setItem('recommendedPlanId', plan.result.id);
-                    navigate('/test-wait');
+                    const matchedRule = rules.find((rule) =>
+                      rule.condition(selectedOptions),
+                    );
+                    const plan = planResults.find(
+                      (p) => p.id === matchedRule?.resultId,
+                    );
+
+                    if (plan) {
+                      navigate('/test-wait', { state: { planId: plan.id } });
+                    } else {
+                      alert('조건에 맞는 요금제를 찾을 수 없어요.');
+                    }
                   }}
                   fullWidth
                   variant="primary"

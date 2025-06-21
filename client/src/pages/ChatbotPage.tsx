@@ -1,14 +1,16 @@
-
 import { useSearchParams } from 'react-router-dom';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import React from 'react';
 import Header from '@/components/common/Header';
 import NewChatIcon from '@/assets/icon/new_chat_icon.svg?react';
 import CallIcon from '@/assets/icon/call_icon.svg?react';
 import UserBubble from '@/components/chatbot/UserBubble';
 import InputBox from '@/components/chatbot/InputBox';
 import BotBubbleFrame from '@/components/chatbot/BotBubbleFrame';
+import LoadingBubble from '@/components/chatbot/LoadingBubble';
 import type { FunctionCall } from '@/components/chatbot/BotBubbleFrame';
 import { useChatSocket } from '@/hooks/useChatSocket';
+import ChatbotIcon from '@/assets/icon/meplus_icon.png';
 
 // 사용자 정보 타입 (TestResultPage와 동일)
 interface UserProfile {
@@ -29,7 +31,8 @@ interface UserProfile {
 
 type Message =
   | { type: 'user'; text: string }
-  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall };
+  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall }
+  | { type: 'loading'; loadingType: 'searching' | 'waiting' | 'dbcalling' };
 
 // URL 파라미터에서 사용자 정보 파싱 함수
 const parseUserProfileFromURL = (
@@ -75,6 +78,13 @@ const parseUserProfileFromURL = (
   }
 };
 
+// 컴포넌트들을 메모이제이션하여 불필요한 재렌더링 방지
+const MemoizedHeader = React.memo(Header);
+const MemoizedInputBox = React.memo(InputBox);
+const MemoizedUserBubble = React.memo(UserBubble);
+const MemoizedBotBubbleFrame = React.memo(BotBubbleFrame);
+const MemoizedLoadingBubble = React.memo(LoadingBubble);
+
 const ChatbotPage = () => {
   const [input, setInput] = useState('');
   const { messages, isStreaming, sendMessage, startNewChat } = useChatSocket();
@@ -82,8 +92,11 @@ const ChatbotPage = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [searchParams] = useSearchParams();
 
-  // 사용자 정보 확인: URL 파라미터에서만 읽음
-  const userProfile = parseUserProfileFromURL(searchParams);
+  // 사용자 정보 확인: URL 파라미터에서만 읽음 - 메모이제이션으로 최적화
+  const userProfile = useMemo(
+    () => parseUserProfileFromURL(searchParams),
+    [searchParams],
+  );
 
   // userProfile이 있으면 새 채팅 시작
   useEffect(() => {
@@ -136,22 +149,32 @@ const ChatbotPage = () => {
     }
   }, [isInitialized, userProfile]);
 
-  // 새 채팅 시작할 때만 초기 메시지 리셋
-  const handleNewChat = () => {
+  // 인라인 함수들을 useCallback으로 최적화
+  const handleInputChange = useCallback((value: string) => {
+    setInput(value);
+  }, []);
+
+  const handleNewChat = useCallback(() => {
     startNewChat();
     setInput('');
     setIsInitialized(false);
     setInitialMessages([]);
-  };
+  }, [startNewChat]);
 
-  const handleSendMessage = (text: string) => {
-    sendMessage(text);
-    setInput('');
-  };
+  const handleSendMessage = useCallback(
+    (text: string) => {
+      sendMessage(text);
+      setInput('');
+    },
+    [sendMessage],
+  );
 
-  const handleButtonClick = (message: string) => {
-    sendMessage(message);
-  };
+  const handleButtonClick = useCallback(
+    (message: string) => {
+      sendMessage(message);
+    },
+    [sendMessage],
+  );
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -165,30 +188,38 @@ const ChatbotPage = () => {
   const hasActiveFunctionCall =
     lastMessage?.type === 'bot' && lastMessage.functionCall;
   const isNewMessageAdded = allMessages.length > prevMessageLengthRef.current;
-  prevMessageLengthRef.current = allMessages.length;
-  
+
+  // 새 메시지가 추가되었을 때만 스크롤 조정
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !isNewMessageAdded) return;
     const container = containerRef.current;
     container.scrollTop = container.scrollHeight - container.clientHeight;
-  }, [allMessages]); 
+    prevMessageLengthRef.current = allMessages.length;
+  }, [allMessages, isNewMessageAdded]);
 
-    const reversedMessages = useMemo(
+  const reversedMessages = useMemo(
     () =>
       allMessages
         .map((msg, index) => ({ ...msg, tempKey: `${msg.type}-${index}` }))
         .reverse(),
     [allMessages],
   );
+
+  // Header 아이콘 버튼들도 메모이제이션
+  const iconButtons = useMemo(
+    () => [
+      { icon: <NewChatIcon />, onClick: handleNewChat },
+      { icon: <CallIcon />, onClick: () => {} },
+    ],
+    [handleNewChat],
+  );
+
   return (
     <>
       {/* 1. Header - Fixed */}
-      <Header
+      <MemoizedHeader
         title="요금제 추천 AI 챗봇 Me+"
-        iconButtons={[
-          { icon: <NewChatIcon />, onClick: handleNewChat },
-          { icon: <CallIcon />, onClick: () => {} },
-        ]}
+        iconButtons={iconButtons}
         isTransparent={true}
         className="custom-header"
       />
@@ -200,42 +231,60 @@ const ChatbotPage = () => {
         {/* 마진으로 안하고 패딩으로 한 이유 : 마진으로 하면 그라데이션 넣은 이유 사라짐 */}
         <div
           ref={containerRef}
-          className="border-1 relative flex-1 overflow-y-auto mt-[94px] pb-[60px] flex flex-col-reverse"
+          className="relative flex-1 overflow-y-auto mt-[50px] pb-[60px] flex flex-col-reverse"
         >
-          <div className=" space-y-2 max-w-[560px] min-h-full flex flex-col-reverse">
-            <div className="h-1" />
+          <div className="gap-5 max-w-[560px] min-h-full flex flex-col-reverse">
             {reversedMessages.map((msg, idx) => {
-              // 이전 메시지가 봇 메시지인지 확인
-              const prevMessage = idx > 0 ? allMessages[idx - 1] : null;
-              const isPreviousBot = prevMessage?.type === 'bot';
+              // 역순 배열에서 이전 메시지 확인 (역순이므로 다음 인덱스가 실제로는 이전 메시지)
+              const nextMessage =
+                idx < reversedMessages.length - 1
+                  ? reversedMessages[idx + 1]
+                  : null;
+              const isNextBot = nextMessage?.type === 'bot';
               const isCurrentBot = msg.type === 'bot';
 
-              // 연속된 봇 메시지 중 첫 번째인지 확인
-              const showChatbotIcon = isCurrentBot && !isPreviousBot;
+              // 연속된 봇 메시지 중 마지막인지 확인 (역순이므로 마지막이 실제로는 첫 번째)
+              const showChatbotIcon = isCurrentBot && !isNextBot;
 
-              return msg.type === 'user' ? (
-                <UserBubble key={idx} message={msg.text} />
-              ) : (
-                <BotBubbleFrame
-                  key={msg.tempKey}
-                  messageChunks={msg.messageChunks}
-                  functionCall={msg.functionCall}
-                  onButtonClick={handleButtonClick}
-                  showChatbotIcon={showChatbotIcon}
-                />
-              );
-            }
-            )}
+              if (msg.type === 'user') {
+                return (
+                  <MemoizedUserBubble key={msg.tempKey} message={msg.text} />
+                );
+              } else if (msg.type === 'loading') {
+                return (
+                  <div key={msg.tempKey} className="flex gap-3 items-start">
+                    <div className="flex-shrink-0 w-8 h-8">
+                      <img
+                        src={ChatbotIcon}
+                        alt="챗봇"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    <MemoizedLoadingBubble type={msg.loadingType} />
+                  </div>
+                );
+              } else {
+                return (
+                  <MemoizedBotBubbleFrame
+                    key={msg.tempKey}
+                    messageChunks={msg.messageChunks}
+                    functionCall={msg.functionCall}
+                    onButtonClick={handleButtonClick}
+                    showChatbotIcon={showChatbotIcon}
+                  />
+                );
+              }
+            })}
           </div>
         </div>
       </div>
       {/* 3. InputBox - Fixed */}
       <div className="fixed bottom-0 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] z-50">
         <div className="bg-background-80 h-[65px]  rounded-xl shadow-[0_-3px_15px_rgba(0,0,0,0.15)] border-t border-gray-100 py-3 px-5">
-          <InputBox
+          <MemoizedInputBox
             onSend={handleSendMessage}
             value={input}
-            onChange={(v) => setInput(v)}
+            onChange={handleInputChange}
             disabled={isStreaming}
             shouldAutoFocus={!hasActiveFunctionCall}
           />

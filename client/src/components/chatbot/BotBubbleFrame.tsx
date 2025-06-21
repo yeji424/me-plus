@@ -3,9 +3,9 @@ import BotBubble from './BotBubble';
 import CarouselButtonGroup from './ChatButtonGroups/CarouselButtonGroup';
 import OttButtonGroup from './ChatButtonGroups/OttButtonGroup';
 import OXButtonGroup from './ChatButtonGroups/OXButtonGroup';
-import TextButtonGroup from './ChatButtonGroups/TextButtonGroup';
 import ToggleCard from './ToggleCard';
 import FirstCardList from './FirstCardList';
+import ImageCard from './ImageCard';
 import { motion } from 'framer-motion';
 import ChatbotIcon from '@/assets/icon/meplus_icon.png';
 
@@ -15,10 +15,6 @@ export interface OXOption {
 }
 
 export interface CarouselItem {
-  id: string;
-  label: string;
-}
-export interface TextItem {
   id: string;
   label: string;
 }
@@ -43,23 +39,29 @@ export interface PlanData {
   premiumAddons: string | null;
   basicService: string;
 }
+
 export interface FunctionCall {
   name:
     | 'requestCarouselButtons'
     | 'requestOXCarouselButtons'
     | 'requestOTTServiceList'
-    | 'requestTextButtons'
+    | 'requestTextCard'
     | 'showPlanLists'
     | 'showFirstCardList';
   args?: {
     items?: CarouselItem[];
     options?: string[] | OXOption[];
-    textItems?: TextItem[];
     question?: string;
     plan?: PlanData;
     plans?: PlanData[];
+    title?: string;
+    description?: string;
+    url?: string;
+    buttonText?: string;
+    imageUrl?: string;
   };
 }
+
 export interface BotBubbleFrameProps {
   messageChunks: string[];
   functionCall?: FunctionCall;
@@ -102,18 +104,16 @@ const BotBubbleFrame = ({
         ) : null;
       case 'requestOTTServiceList':
         return <OttButtonGroup onButtonClick={onButtonClick} />;
-      case 'requestTextButtons':
-        return args?.textItems || args?.options ? (
-          <TextButtonGroup
-            options={
-              args.textItems ||
-              (args.options as string[])?.map((opt, idx) => ({
-                id: idx.toString(),
-                label: opt,
-              })) ||
-              []
-            }
-            onButtonClick={onButtonClick}
+      case 'requestTextCard':
+        return args?.title &&
+          args?.description &&
+          args?.url &&
+          args?.buttonText ? (
+          <ImageCard
+            imageUrl={args.imageUrl}
+            text={args.description}
+            buttonText={args.buttonText}
+            onButtonClick={() => window.open(args.url, '_blank')}
           />
         ) : null;
       case 'showPlanLists':
@@ -137,7 +137,7 @@ const BotBubbleFrame = ({
       <div className="flex gap-3 items-start">
         {/* 챗봇 아이콘 - 연속된 봇 메시지 중 첫 번째에만 표시 */}
         {showChatbotIcon ? (
-          <div className="flex-shrink-0 w-8 h-8 mt-1">
+          <div className="flex-shrink-0 w-8 h-8 ">
             <img
               src={ChatbotIcon}
               alt="챗봇"

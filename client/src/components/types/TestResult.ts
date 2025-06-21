@@ -9,4 +9,5 @@ export type PlanResult = {
   callUsage: number;
   messageUsage: number;
   price: number;
+  tagLine?: string;
 };
