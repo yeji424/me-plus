@@ -332,7 +332,7 @@ export const useChatSocket = () => {
       setIsStreaming(true);
       responseRef.current = '';
 
-      socket.emit('recommend-plan', payload);
+      socket.emit('chat', payload);
     },
     [sessionId],
   );
