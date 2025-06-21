@@ -68,9 +68,9 @@ export class GPTStreamProcessor {
 
     this.accumulatedContent += content;
 
-    // 텍스트에서 function call 패턴 감지
+    // 텍스트에서 function call 패턴 감지 (빈 괄호도 허용)
     const functionCallMatch = this.accumulatedContent.match(
-      /functions?\.(\w+)\s*\(\s*\{([\s\S]*?)\}\s*\)\s*$/,
+      /functions?\.(\w+)\s*\(\s*(\{[\s\S]*?\})?\s*\)\s*$/,
     );
 
     if (functionCallMatch) {
@@ -88,20 +88,24 @@ export class GPTStreamProcessor {
       this.startLoading(this.functionName);
 
       try {
-        this.functionArgsRaw = `{${functionCallMatch[2]}}`;
+        // 빈 괄호인 경우 빈 객체로 처리
+        this.functionArgsRaw = functionCallMatch[2] || '{}';
       } catch (e) {
         console.error('❌ Failed to parse function args from text:', e);
+        this.functionArgsRaw = '{}';
       }
 
       return true; // 스트리밍 종료
     }
 
-    // function call이 시작되는 패턴 감지
+    // function call이 시작되는 패턴 감지 (더 엄격하게)
     if (
+      this.accumulatedContent.match(/functions?\.[\w]*\(?$/) ||
       this.accumulatedContent.includes('functions.') ||
       this.accumulatedContent.includes('function.')
     ) {
       // function call이 완성되기를 기다리므로 전송하지 않음
+      console.log('🔍 Function call 패턴 감지, 완성 대기 중...');
       return false;
     }
 
