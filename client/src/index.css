@@ -149,6 +149,20 @@
     @apply absolute top-0 w-[6px] h-[6px] rounded-full bg-[#7b2effff] animate-[blink_1s_infinite_both];
   }
 }
+@keyframes tint {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.animate-tint {
+  animation: tint 0.6s ease-out forwards;
+}
 @keyframes blink {
   0% {
     opacity: 0.1;
