@@ -51,7 +51,12 @@ const extractMetadata = async (url) => {
   }
 };
 
-export const streamChat = async (messages, socket, onDelta) => {
+export const streamChat = async (
+  messages,
+  socket,
+  onDelta,
+  onFunctionCall = null,
+) => {
   try {
     // 타임아웃 설정 (30초)
     const timeoutMs = 30000;
@@ -471,6 +476,22 @@ export const streamChat = async (messages, socket, onDelta) => {
               });
               return;
             }
+
+            // 새로 추가: function call 정보 수집
+            const functionCallInfo = {
+              name: functionName,
+              args: { items },
+            };
+
+            // onFunctionCall 콜백이 있으면 호출 (안전하게)
+            if (onFunctionCall && typeof onFunctionCall === 'function') {
+              try {
+                onFunctionCall(functionCallInfo);
+              } catch (callbackError) {
+                console.error('❌ onFunctionCall error:', callbackError);
+              }
+            }
+
             socket.emit('loading-end');
             socket.emit('carousel-buttons', items);
             break;

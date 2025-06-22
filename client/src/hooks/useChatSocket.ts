@@ -57,7 +57,12 @@ const getErrorMessage = (error: ServerError): string => {
 
 type Message =
   | { type: 'user'; text: string }
-  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall }
+  | {
+      type: 'bot';
+      messageChunks: string[];
+      functionCall?: FunctionCall;
+      selectedData?: { selectedItem: CarouselItem; isSelected: boolean }; // 새로 추가
+    }
   | { type: 'loading'; loadingType: 'searching' | 'waiting' | 'dbcalling' };
 
 export const useChatSocket = () => {
@@ -72,12 +77,66 @@ export const useChatSocket = () => {
   }, []);
 
   const handleSessionHistory = useCallback(
-    (logs: { role: string; content: string }[]) => {
-      const converted: Message[] = logs.map((msg) =>
-        msg.role === 'user'
+    (
+      logs: { role: string; content: string; type?: string; data?: unknown }[],
+    ) => {
+      console.log('📋 Session history received:', logs); // 안전한 로그 추가
+
+      const converted: Message[] = logs.map((msg) => {
+        // 로그 추가 (각 메시지별로)
+        if (msg.type) {
+          console.log('🔍 Processing message with type:', msg.type, msg.data);
+        }
+
+        // 캐러셀 선택 등 특별한 타입 처리
+        if (
+          msg.type === 'carousel_select' ||
+          msg.type === 'ox_select' ||
+          msg.type === 'ott_select'
+        ) {
+          return { type: 'user', text: msg.content };
+        }
+
+        // 새로 추가: function_call 타입 처리
+        if (msg.type === 'function_call' && msg.role === 'assistant') {
+          console.log('🔧 Function call message detected:', msg.data);
+
+          // data에서 function call 정보 추출
+          const functionCallData = msg.data as {
+            name?: string;
+            args?: unknown;
+            selectedItem?: CarouselItem;
+            isSelected?: boolean;
+          };
+
+          if (functionCallData?.name && functionCallData?.args) {
+            const botMessage: Message = {
+              type: 'bot',
+              messageChunks: [msg.content],
+              functionCall: {
+                name: functionCallData.name as FunctionCall['name'],
+                args: functionCallData.args as FunctionCall['args'],
+              },
+            };
+
+            // 선택 데이터가 있으면 추가
+            if (functionCallData.selectedItem && functionCallData.isSelected) {
+              botMessage.selectedData = {
+                selectedItem: functionCallData.selectedItem,
+                isSelected: functionCallData.isSelected,
+              };
+              console.log('✅ Selected data loaded:', botMessage.selectedData);
+            }
+
+            return botMessage;
+          }
+        }
+
+        // 기본 처리
+        return msg.role === 'user'
           ? { type: 'user', text: msg.content }
-          : { type: 'bot', messageChunks: [msg.content] },
-      );
+          : { type: 'bot', messageChunks: [msg.content] };
+      });
       setMessages(converted);
     },
     [],
@@ -218,6 +277,31 @@ export const useChatSocket = () => {
     socket.on('text-card', handleTextCard);
     socket.on('first-card-list', handleFirstCardList);
 
+    // 새로 추가: 캐러셀 선택 상태 업데이트 완료 이벤트
+    socket.on(
+      'carousel-selection-updated',
+      ({ messageIndex, selectedItem, isSelected }) => {
+        console.log('✅ Carousel selection updated:', {
+          messageIndex,
+          selectedItem,
+          isSelected,
+        });
+
+        // UI 상태 업데이트
+        setMessages((prev) =>
+          prev.map((msg, idx) => {
+            if (idx === messageIndex && msg.type === 'bot') {
+              return {
+                ...msg,
+                selectedData: { selectedItem, isSelected },
+              };
+            }
+            return msg;
+          }),
+        );
+      },
+    );
+
     return () => {
       socket.off('session-id', handleSessionId);
       socket.off('session-history', handleSessionHistory);
@@ -229,6 +313,7 @@ export const useChatSocket = () => {
       socket.off('plan-lists', handlePlanLists);
       socket.off('text-card', handleTextCard);
       socket.off('first-card-list', handleFirstCardList);
+      socket.off('carousel-selection-updated');
     };
   }, [
     handleSessionId,
@@ -337,6 +422,45 @@ export const useChatSocket = () => {
     [sessionId],
   );
 
+  // 새로 추가: 캐러셀 선택 내역 전송 (기존 방식 - 사용 안 함)
+  const sendCarouselSelection = useCallback(
+    (
+      carouselData: CarouselItem[],
+      selectedItem: CarouselItem | null,
+      isSelected: boolean,
+    ) => {
+      if (!sessionId) return;
+
+      const payload = {
+        sessionId,
+        carouselData,
+        selectedItem,
+        isSelected,
+      };
+
+      console.log('📤 Sending carousel selection:', payload);
+      socket.emit('carousel-selection', payload);
+    },
+    [sessionId],
+  );
+
+  // 새로 추가: 캐러셀 선택 상태 업데이트 (새로운 방식)
+  const updateCarouselSelection = useCallback(
+    (messageIndex: number, selectedItem: CarouselItem) => {
+      if (!sessionId) return;
+
+      const payload = {
+        sessionId,
+        messageIndex,
+        selectedItem,
+      };
+
+      console.log('🔄 Updating carousel selection:', payload);
+      socket.emit('update-carousel-selection', payload);
+    },
+    [sessionId],
+  );
+
   // 새 채팅 시작
   const startNewChat = useCallback(() => {
     if (!sessionId) return;
@@ -350,6 +474,8 @@ export const useChatSocket = () => {
     isStreaming,
     sessionId,
     sendMessage,
+    sendCarouselSelection,
+    updateCarouselSelection, // 새로 추가
     startNewChat,
   };
 };

@@ -66,6 +66,13 @@ export interface BotBubbleFrameProps {
   messageChunks: string[];
   functionCall?: FunctionCall;
   onButtonClick?: (message: string) => void;
+  onCarouselSelect?: (
+    carouselData: CarouselItem[],
+    selectedItem: CarouselItem,
+    messageIndex?: number,
+  ) => void;
+  messageIndex?: number;
+  selectedData?: { selectedItem: CarouselItem; isSelected: boolean }; // 새로 추가
   showChatbotIcon?: boolean;
 }
 
@@ -73,6 +80,9 @@ const BotBubbleFrame = ({
   messageChunks,
   functionCall,
   onButtonClick,
+  onCarouselSelect,
+  messageIndex,
+  selectedData, // 새로 추가
   showChatbotIcon = true,
 }: BotBubbleFrameProps) => {
   const shouldShowMessage = !functionCall || messageChunks[0]?.trim() !== '';
@@ -86,6 +96,10 @@ const BotBubbleFrame = ({
           <CarouselButtonGroup
             options={args.items}
             onButtonClick={onButtonClick}
+            onCarouselSelect={(carouselData, selectedItem) =>
+              onCarouselSelect?.(carouselData, selectedItem, messageIndex)
+            }
+            selectedData={selectedData} // 새로 추가
           />
         ) : null;
       case 'requestOXCarouselButtons':
@@ -166,4 +180,4 @@ const BotBubbleFrame = ({
   );
 };
 
-export default React.memo(BotBubbleFrame);
+export default BotBubbleFrame;

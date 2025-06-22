@@ -1,6 +1,10 @@
 import { Server } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
-import { handlePlanRecommend } from '../controllers/planSocketController.js';
+import {
+  handlePlanRecommend,
+  handleCarouselSelection,
+  handleUpdateCarouselSelection,
+} from '../controllers/planSocketController.js';
 import { ChatSession } from '../models/ChatSession.js';
 import {
   emitRecommendReasonByGuide,
@@ -34,6 +38,16 @@ export const setupSocket = (server) => {
     // 기본 대화
     socket.on('recommend-plan', (userInput) => {
       handlePlanRecommend(socket, userInput);
+    });
+
+    // 새로 추가: 캐러셀 선택 내역 저장
+    socket.on('carousel-selection', (selectionData) => {
+      handleCarouselSelection(socket, selectionData);
+    });
+
+    // 새로 추가: 캐러셀 선택 상태 업데이트
+    socket.on('update-carousel-selection', (updateData) => {
+      handleUpdateCarouselSelection(socket, updateData);
     });
 
     /** 가이드 별 적절한 요금제를 추천 */

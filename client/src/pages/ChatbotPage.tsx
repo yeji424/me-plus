@@ -8,7 +8,10 @@ import UserBubble from '@/components/chatbot/UserBubble';
 import InputBox from '@/components/chatbot/InputBox';
 import BotBubbleFrame from '@/components/chatbot/BotBubbleFrame';
 import LoadingBubble from '@/components/chatbot/LoadingBubble';
-import type { FunctionCall } from '@/components/chatbot/BotBubbleFrame';
+import type {
+  FunctionCall,
+  CarouselItem,
+} from '@/components/chatbot/BotBubbleFrame';
 import { useChatSocket } from '@/hooks/useChatSocket';
 import ChatbotIcon from '@/assets/icon/meplus_icon.png';
 
@@ -31,7 +34,12 @@ interface UserProfile {
 
 type Message =
   | { type: 'user'; text: string }
-  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall }
+  | {
+      type: 'bot';
+      messageChunks: string[];
+      functionCall?: FunctionCall;
+      selectedData?: { selectedItem: CarouselItem; isSelected: boolean };
+    }
   | { type: 'loading'; loadingType: 'searching' | 'waiting' | 'dbcalling' };
 
 // URL 파라미터에서 사용자 정보 파싱 함수
@@ -87,7 +95,13 @@ const MemoizedLoadingBubble = React.memo(LoadingBubble);
 
 const ChatbotPage = () => {
   const [input, setInput] = useState('');
-  const { messages, isStreaming, sendMessage, startNewChat } = useChatSocket();
+  const {
+    messages,
+    isStreaming,
+    sendMessage,
+    updateCarouselSelection,
+    startNewChat,
+  } = useChatSocket();
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const [searchParams] = useSearchParams();
@@ -183,6 +197,48 @@ const ChatbotPage = () => {
     () => [...initialMessages, ...messages],
     [initialMessages, messages],
   );
+
+  // 새로 추가: 캐러셀 선택 처리 (업데이트 방식)
+  const handleCarouselSelect = useCallback(
+    (
+      carouselData: CarouselItem[],
+      selectedItem: CarouselItem,
+      displayIndex?: number, // 화면에 표시된 인덱스
+    ) => {
+      console.log('🎯 캐러셀 선택:', {
+        carouselData,
+        selectedItem,
+        displayIndex,
+      });
+
+      // 실제 function_call 메시지의 인덱스를 찾기 (messages 배열에서만)
+      const actualIndex = messages.findIndex((msg) => {
+        return (
+          msg.type === 'bot' &&
+          msg.functionCall?.name === 'requestCarouselButtons' &&
+          JSON.stringify(msg.functionCall.args?.items) ===
+            JSON.stringify(carouselData)
+        );
+      });
+
+      console.log(
+        '🔍 실제 function_call 메시지 인덱스 (messages 배열):',
+        actualIndex,
+      );
+      console.log('🔍 전체 messages 배열 길이:', messages.length);
+      console.log('🔍 전체 allMessages 배열 길이:', allMessages.length);
+
+      if (actualIndex !== -1) {
+        updateCarouselSelection(actualIndex, selectedItem);
+      } else {
+        console.warn(
+          '⚠️ function_call 메시지를 찾을 수 없어서 업데이트를 건너뜁니다.',
+        );
+      }
+    },
+    [updateCarouselSelection, messages, allMessages],
+  );
+
   const prevMessageLengthRef = useRef(allMessages.length);
   const lastMessage = allMessages[allMessages.length - 1];
   const hasActiveFunctionCall =
@@ -270,6 +326,9 @@ const ChatbotPage = () => {
                     messageChunks={msg.messageChunks}
                     functionCall={msg.functionCall}
                     onButtonClick={handleButtonClick}
+                    onCarouselSelect={handleCarouselSelect}
+                    messageIndex={allMessages.length - 1 - idx} // 역순 배열에서 실제 인덱스 계산
+                    selectedData={msg.selectedData} // 새로 추가
                     showChatbotIcon={showChatbotIcon}
                   />
                 );
