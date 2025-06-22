@@ -160,6 +160,7 @@ export class GPTStreamProcessor {
 
       this.socket.emit(SocketEvent.DONE);
     }
+    this.socket.emit(SocketEvent.DONE);
   }
 
   /**
