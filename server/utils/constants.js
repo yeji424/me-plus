@@ -68,7 +68,7 @@ export const InputRoleEnum = {
 };
 
 export const GPTConfig = {
-  MODEL: 'gpt-4.1-mini-2025-04-14',
+  MODEL: 'gpt-4.1',
   TIMEOUT_MS: 30000,
   MAX_REDIRECTS: 5,
   REQUEST_TIMEOUT: 10000,
