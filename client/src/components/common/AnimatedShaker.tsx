@@ -13,7 +13,7 @@ const AnimatedShaker: React.FC<AnimatedShakerProps> = ({
   idleTime = 3000,
 }) => {
   const controls = useAnimation();
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [isIdle, setIsIdle] = useState(false);
 
   // 인터랙션 발생 시 타이머 초기화
