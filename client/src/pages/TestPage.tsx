@@ -188,9 +188,9 @@ const TestPage = () => {
                     }
                   }}
                   fullWidth
-                  variant="primary"
                   size="large"
-                  className="shadow-[0_4px_4px_rgba(0,0,0,0.25)] rounded-[12px]"
+                  variant="custom"
+                  className="bg-secondary-purple-60 text-white text-[14px] px-4 py-[10px] rounded-[10px] font-medium w-full"
                 >
                   Me플러스 맞춤 추천 받기
                 </Button>
