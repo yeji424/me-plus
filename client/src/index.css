@@ -1,68 +1,283 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import 'tailwindcss';
+@import 'swiper/css';
+@import 'swiper/css/pagination';
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+@theme {
+  --color-primary-pink: #eb008b;
+  --color-primary-pink-40: #f5bbde;
+  --color-primary-pink-60: #f460b9;
+  --color-primary-pink-80: #d2018c;
+  --color-secondary-purple: #9469fe;
+  --color-secondary-purple-40: #dfe4fd;
+  --color-secondary-purple-60: #6b27e7;
+  --color-secondary-purple-80: #5732a1;
+  --color-background: #f6f7fc;
+  --color-background-40: #ffffff;
+  --color-background-80: #f4f4f4;
+  --color-gray700: #1e1e1e;
+  --color-gray600: #3a3a3a;
+  --color-gray500: #717379;
+  --color-gray400: #9a9da4;
+  --color-gray300: #a5a8af;
+  --color-gray200: #d5d7df;
+  --color-gray100: #fcfcfc;
+  --color-danger: #e94e4e;
+  --color-gradation: linear-gradient(
+    90deg,
+    #5732a1 0%,
+    #5b038c 25%,
+    #a0018b 50%,
+    #ce018b 75%,
+    #eb008b 100%
+  );
+  --color-gradation-20: linear-gradient(
+    90deg,
+    rgba(87, 50, 161, 0.1) 0%,
+    rgba(91, 3, 140, 0.1) 25%,
+    rgba(160, 1, 139, 0.1) 50%,
+    rgba(206, 1, 139, 0.1) 75%,
+    rgba(235, 0, 139, 0.1) 100%
+  );
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  --color-gradation-70: linear-gradient(
+    90deg,
+    rgba(87, 50, 161, 0.7) 0%,
+    rgba(91, 3, 140, 0.7) 25%,
+    rgba(160, 1, 139, 0.7) 50%,
+    rgba(206, 1, 139, 0.7) 75%,
+    rgba(235, 0, 139, 0.7) 100%
+  );
+  --color-gradation-background: linear-gradient(#dfe4fd 0%, #ffffff 100%);
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  --shadow-basic: 0 0 20px rgba(0, 0, 0, 0.1);
+  --shadow-small: 0 0 15px rgba(0, 0, 0, 0.07);
 }
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
+@layer base {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    @apply tracking-tighter;
+    line-height: 1.5;
+    color-scheme: light dark;
+    background-color: var(--color-background);
+    color: var(--color-gray-700);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    word-break: keep-all;
   }
-  a:hover {
-    color: #747bff;
+  html {
+    /* 스크롤바 숨기기 */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
   }
-  button {
-    background-color: #f9f9f9;
+  html::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+  }
+  html,
+  body {
+    background-color: var(--color-gray300);
+    @apply flex items-start justify-center relative w-full;
+  }
+  body {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+  }
+  body::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+  }
+  #root {
+    @apply overflow-x-hidden overflow-y-auto relative max-w-[600px] w-full min-h-screen;
+    @apply pr-[20px] pb-[0px] pl-[20px];
+    box-shadow: var(--shadow-basic);
+    background-color: var(--color-background);
+    /* 스크롤바 숨기기 */
+  }
+  #root::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+  }
+  main {
+    @apply flex-1;
+  }
+}
+
+.text-gradation {
+  background: var(--color-gradation);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+.bg-gradation {
+  background-image: var(--color-gradation);
+}
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+.user-bubble {
+  background: linear-gradient(
+      180deg,
+      #5732a1 0%,
+      #5b038c 25%,
+      #a0018b 50%,
+      #ce018b 75%,
+      #eb008b 100%
+    )
+    no-repeat center;
+  background-attachment: fixed;
+}
+
+/* 테일윈드 사용한 유틸리티 클래스(재사용 가능한 class) 여기 넣으면 됩니다! */
+@layer utilities {
+  .icon-button {
+    @apply cursor-pointer stroke-gray-500 hover:text-secondary-purple-60 transition-colors;
+  }
+  .fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s ease-in-out forwards;
+  }
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+}
+@layer components {
+  .dot {
+    @apply absolute top-0 w-[6px] h-[6px] rounded-full bg-[#7b2effff] animate-[blink_1s_infinite_both];
+  }
+}
+@keyframes tint {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+.animate-tint {
+  animation: tint 0.6s ease-out forwards;
+}
+@keyframes blink {
+  0% {
+    opacity: 0.1;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.1;
+  }
+}
+[data-rsbs-scroll] {
+  scrollbar-width: none;
+}
+[data-rsbs-header] {
+  height: 45px !important; /* 예: 높이를 늘리기 */
+  cursor: pointer !important;
+}
+[data-rsbs-header]::before {
+  background-color: var(--color-secondary-purple-80) !important;
+  width: 44px !important;
+  height: 4px !important;
+  border-radius: 9999px !important;
+  margin: 2px auto !important;
+  content: '' !important;
+}
+[data-rsbs-overlay],
+[data-rsbs-backdrop] {
+  z-index: 100 !important;
+}
+/* GradientScroll 스크롤바 숨기기 */
+.gradient-scroll-container ::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+}
+.gradient-scroll-container * {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+/* GradientScroll 상단 그라데이션 숨기기 - 여러 방법 시도 */
+.gradient-scroll-container > div::before,
+.gradient-scroll-container > div::after {
+  display: none !important;
+}
+
+.gradient-scroll-container > div {
+  background: none !important;
+  background-image: none !important;
+}
+/* 상단 그라데이션만 숨기기 */
+.gradient-scroll-container > div:first-child {
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0px,
+    black 30px
+  ) !important;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0px,
+    black 30px
+  ) !important;
+}
+
+/* 서비스 가이드 스와이퍼 */
+.swiper-pagination {
+  z-index: -1;
+  top: 250px !important;
+  /* height: 640px; */
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  left: 50% !important;
+  transform: translateX(-50%);
+  aspect-ratio: 1 / 2;
+  bottom: auto !important;
+  max-width: 200px !important;
+  width: 63% !important;
+}
+.swiper-pagination-bullet {
+  border-radius: 100px;
+  transition-property: width;
+  transition-duration: 0.1s;
+  height: 4px;
+}
+.swiper-pagination-bullet-active {
+  background-color: var(--color-primary-pink);
+  width: 22px;
+}
+/* 채팅 페이지 헤더 */
+.custom-header {
+  padding-bottom: 45px !important;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 1) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+/* 로딩 스피너 관련 */
+.loader {
+  width: 25px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(farthest-side, rgb(123, 46, 255) 94%, #0000) top/4px 4px
+      no-repeat,
+    conic-gradient(
+      #0000 40%,
+      /* rgba(218, 139, 243, 0.867) 70%, */ rgb(123, 46, 255)
+    );
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - 4px), #000 0);
+  animation: l13 0.65s infinite linear;
+}
+@keyframes l13 {
+  100% {
+    transform: rotate(1turn);
   }
 }

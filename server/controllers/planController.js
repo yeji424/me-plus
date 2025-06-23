@@ -5,7 +5,9 @@ import {
   getFamilyBundlePlans,
   getOTTBundlePlans,
   getPlans,
+  getPopularPlans,
   getUnlimitedDataPlans,
+  getPlanExploreDataList,
 } from '../services/gptFuncDefinitions.js';
 import { AddonType, BenefitType } from '../utils/constants.js';
 
@@ -45,6 +47,16 @@ export const getPlanDetail = async (req, res) => {
       },
     };
 
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};
+
+/** 요금 탐색 목록 조회 (테스트용: GPT랑 상관 없음)  */
+export const getPlanExploreList = async (req, res) => {
+  try {
+    const data = await getPlanExploreDataList();
     return res.status(200).json(data);
   } catch (error) {
     return res.sendStatus(500);
@@ -95,6 +107,16 @@ export const getBundlePlanList = async (req, res) => {
 export const getPlanList = async (req, res) => {
   try {
     const data = await getPlans();
+    return res.status(200).json(data);
+  } catch (error) {
+    return res.sendStatus(500);
+  }
+};
+
+/** 인기 요금제 목록 조회 */
+export const getPopularPlanList = async (req, res) => {
+  try {
+    const data = await getPopularPlans();
     return res.status(200).json(data);
   } catch (error) {
     return res.sendStatus(500);

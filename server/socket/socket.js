@@ -1,7 +1,6 @@
 import { Server } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { handlePlanRecommend } from '../controllers/planSocketController.js';
-import { ChatSession } from '../models/ChatSession.js';
 import {
   emitRecommendReasonByGuide,
   getPlanIds,
@@ -16,25 +15,32 @@ export const setupSocket = (server) => {
   io.on('connection', (socket) => {
     console.log('🧑‍💻 User connected:', socket.id);
 
-    // 세션 초기화 및 불러오기
+    // 세션 초기화 (로컬스토리지 사용으로 MongoDB 세션 불러오기 제거)
     socket.on('init-session', async (sessionIdFromClient) => {
-      let sessionId = sessionIdFromClient;
-      let session = await ChatSession.findOne({ sessionId });
-
-      // 없으면 새로 생성
-      if (!session) {
-        sessionId = uuidv4();
-        session = await ChatSession.create({ sessionId, messages: [] });
-      }
+      // 간단히 세션 ID만 생성/반환하고 빈 히스토리 반환
+      const sessionId = sessionIdFromClient || uuidv4();
 
       socket.emit('session-id', sessionId);
-      socket.emit('session-history', session.messages);
+      socket.emit('session-history', []); // 빈 배열 - 로컬스토리지에서 불러옴
     });
 
     // 기본 대화
     socket.on('recommend-plan', (userInput) => {
       handlePlanRecommend(socket, userInput);
     });
+
+    // 제거: 로컬스토리지로 마이그레이션으로 인해 MongoDB 저장 불필요
+    // socket.on('carousel-selection', (selectionData) => {
+    //   handleCarouselSelection(socket, selectionData);
+    // });
+
+    // socket.on('update-carousel-selection', (updateData) => {
+    //   handleUpdateCarouselSelection(socket, updateData);
+    // });
+
+    // socket.on('update-ott-selection', (updateData) => {
+    //   handleUpdateOttSelection(socket, updateData);
+    // });
 
     /** 가이드 별 적절한 요금제를 추천 */
     socket.on('recommend-plan-by-guide', async (message) => {
@@ -66,11 +72,10 @@ export const setupSocket = (server) => {
       console.log('❌ User disconnected:', socket.id);
     });
 
-    // 새채팅
+    // 새채팅 (로컬스토리지 사용으로 MongoDB 삭제 불필요)
     socket.on('reset-session', async ({ sessionId }) => {
-      await ChatSession.deleteOne({ sessionId });
+      // MongoDB 작업 제거 - 로컬스토리지에서 관리
       const newId = uuidv4();
-      await ChatSession.create({ sessionId: newId, messages: [] });
       socket.emit('session-id', newId);
       socket.emit('session-history', []);
     });

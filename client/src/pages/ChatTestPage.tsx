@@ -1,3 +1,5 @@
+import TypingDots from '@/components/chatbot/TypingDots';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 
@@ -174,7 +176,11 @@ const PlanChatTester = () => {
 
   return (
     <div style={{ padding: '1rem' }}>
-      <h2>요금제 추천 AI 챗봇</h2>
+      <div>
+        <LoadingSpinner />
+        <TypingDots />
+      </div>
+      <div className="h-50" /> <h2>요금제 추천 AI 챗봇</h2>
       <button
         onClick={handleNewChat}
         disabled={isStreaming}
