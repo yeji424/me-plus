@@ -2,7 +2,7 @@ interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'custom';
   size?: 'small' | 'medium' | 'large';
   fullWidth?: boolean;
   className?: string;
@@ -25,6 +25,8 @@ const Button: React.FC<ButtonProps> = ({
         return 'bg-secondary-purple-80 text-white hover:bg-secondary-purple-90';
       case 'secondary':
         return 'bg-secondary-purple-40 text-gray700 hover:bg-secondary-purple-50';
+      case 'custom':
+        return '';
       default:
         return 'bg-secondary-purple-80 text-white hover:bg-secondary-purple-90';
     }
