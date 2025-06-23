@@ -347,9 +347,9 @@ const ChatbotPage = () => {
         {/* 마진으로 안하고 패딩으로 한 이유 : 마진으로 하면 그라데이션 넣은 이유 사라짐 */}
         <div
           ref={containerRef}
-          className="relative flex-1 overflow-y-auto mt-[50px] pb-[60px] flex flex-col-reverse"
+          className="relative flex-1 overflow-y-auto pb-[60px] flex flex-col-reverse"
         >
-          <div className="gap-5 max-w-[560px] min-h-full flex flex-col-reverse">
+          <div className="gap-2 max-w-[560px] min-h-full flex flex-col-reverse">
             {reversedMessages.map((msg, idx) => {
               // 역순 배열에서 이전 메시지 확인 (역순이므로 다음 인덱스가 실제로는 이전 메시지)
               const nextMessage =
@@ -438,7 +438,6 @@ const ChatbotPage = () => {
           새로 시작하기
         </Button>
       </Modal>
-      즉,
     </>
   );
 };
