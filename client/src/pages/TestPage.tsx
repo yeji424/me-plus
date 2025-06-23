@@ -199,30 +199,33 @@ const TestPage = () => {
           </div>
         </div>
       </div>
-      {showBackModal && (
-        <Modal
-          isOpen={showBackModal}
-          onClose={() => setShowBackModal(false)}
-          modalTitle="맞춤형 요금제 찾기를 그만두시겠어요?"
-          modalDesc="홈으로 이동하면 현재 진행 중인 테스트는 초기화됩니다."
+      <Modal
+        isOpen={showBackModal}
+        onClose={() => setShowBackModal(false)}
+        modalTitle="맞춤형 요금제 찾기를 그만두시겠어요?"
+        modalDesc="홈으로 이동하면 현재 진행 중인 테스트는 초기화됩니다."
+      >
+        <Button
+          variant="secondary"
+          size="medium"
+          fullWidth
+          onClick={() => setShowBackModal(false)}
         >
-          <button
-            onClick={() => setShowBackModal(false)}
-            className="bg-secondary-purple-40 text-gray700 text-[14px] px-4 py-[10px] rounded-[10px] font-medium w-full"
-          >
-            계속할래요
-          </button>
-          <button
-            onClick={() => {
-              navigate('/');
-              setShowBackModal(false);
-            }}
-            className="bg-secondary-purple-60 text-white text-[14px] px-4 py-[10px] rounded-[10px] font-medium w-full"
-          >
-            그만둘래요
-          </button>
-        </Modal>
-      )}
+          계속할래요
+        </Button>
+
+        <Button
+          variant="primary"
+          size="medium"
+          fullWidth
+          onClick={() => {
+            navigate('/');
+            setShowBackModal(false);
+          }}
+        >
+          그만둘래요
+        </Button>
+      </Modal>
     </div>
   );
 };
