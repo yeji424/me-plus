@@ -5,12 +5,14 @@ import { useNavigate } from 'react-router-dom';
 interface AnimatedCardWrapperProps {
   className?: string;
   children: React.ReactNode;
-  to: string;
+  to?: string;
+  onClick?: () => void;
 }
 const AnimatedCardWrapper: React.FC<AnimatedCardWrapperProps> = ({
   className = '',
   children,
   to,
+  onClick,
 }) => {
   const controls = useAnimation();
   const navigate = useNavigate();
@@ -31,9 +33,14 @@ const AnimatedCardWrapper: React.FC<AnimatedCardWrapperProps> = ({
   };
 
   const handleTap = () => {
-    setTimeout(() => {
-      navigate(to);
-    }, 400);
+    if (onClick) {
+      onClick();
+    }
+    if (to) {
+      setTimeout(() => {
+        navigate(to);
+      }, 400);
+    }
   };
 
   return (

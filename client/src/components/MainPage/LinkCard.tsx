@@ -103,6 +103,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
     <AnimatedWrapper
       className={`w-full h-full ${sizeStyles.minHeight} `}
       to={to}
+      onClick={onClick}
     >
       <Link
         to={to}
