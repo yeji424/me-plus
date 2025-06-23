@@ -11,6 +11,7 @@ import {
   getPlanList,
   getPopularPlanList,
   getUnlimitedDataPlanList,
+  getPlanExploreList,
 } from './controllers/planController.js';
 import { getUrlMetadata } from './controllers/metadataController.js';
 
@@ -43,5 +44,6 @@ apiRouter.get('/affordable-plans', getAffordablePlanList);
 apiRouter.get('/bundle-plans', getBundlePlanList);
 apiRouter.get('/popular-plans', getPopularPlanList);
 apiRouter.get('/plans', getPlanList);
+apiRouter.get('/plan/explore', getPlanExploreList);
 
 export default app;
