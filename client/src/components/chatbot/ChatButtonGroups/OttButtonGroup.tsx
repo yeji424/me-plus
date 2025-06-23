@@ -55,20 +55,10 @@ const OttButtonGroup = ({
   }, [selectedData]);
 
   const handleButtonClick = (label: string) => {
-    // 이미 선택된 서비스인지 확인
-    const isAlreadySelected = selectedServices.includes(label);
+    // 이미 선택이 완료된 상태면 더 이상 선택 불가
+    if (selectedServices.length > 0) return;
 
-    let newSelectedServices: string[];
-    if (isAlreadySelected) {
-      // 이미 선택된 경우 제거
-      newSelectedServices = selectedServices.filter(
-        (service) => service !== label,
-      );
-    } else {
-      // 새로 선택하는 경우 추가
-      newSelectedServices = [...selectedServices, label];
-    }
-
+    const newSelectedServices = [label];
     setSelectedServices(newSelectedServices);
     onButtonClick?.(label);
     onOttSelect?.(newSelectedServices);
@@ -82,7 +72,10 @@ const OttButtonGroup = ({
             key={service.id}
             label={service.label}
             icon={<img src={service.icon} alt={service.label} />}
-            disabled={selectedServices.includes(service.label)} // 선택된 서비스는 비활성화로 표시
+            disabled={
+              selectedServices.length > 0 &&
+              !selectedServices.includes(service.label)
+            } // 다른 서비스가 선택되면 나머지는 비활성화
             onClick={() => handleButtonClick(service.label)}
           />
         ))}
