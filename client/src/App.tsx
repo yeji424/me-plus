@@ -14,6 +14,7 @@ import ComparePage from './pages/ComparePage';
 import TestResultPage from './pages/TestResultPage';
 import MainPage from './pages/MainPage';
 import Footer from './components/common/Footer';
+import ServiceGuidePage from './pages/ServiceGuidePage';
 
 const MainLayout = () => {
   return (
@@ -40,6 +41,7 @@ function App() {
           <Route path="test-wait" element={<TestWaitingPage />} />
           <Route path="test-result" element={<TestResultPage />} />
           <Route path="compare" element={<ComparePage />} />
+          <Route path="service-guide" element={<ServiceGuidePage />} />
           <Route path="/chat-test" element={<ChatTestPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
