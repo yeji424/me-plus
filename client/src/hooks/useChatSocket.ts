@@ -81,15 +81,8 @@ export const useChatSocket = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [useLocalStorage, setUseLocalStorage] = useState(() => {
-    // 페이지 로드 시 로컬스토리지 설정 복원
-    try {
-      const stored = localStorage.getItem('me-plus-use-local-storage');
-      return stored === 'true';
-    } catch {
-      return false;
-    }
-  });
+  // 항상 로컬스토리지 사용
+  const useLocalStorage = true;
   const responseRef = useRef('');
 
   // 로컬스토리지에 메시지 저장하는 함수
@@ -582,6 +575,30 @@ export const useChatSocket = () => {
     [],
   );
 
+  // 로컬 상태에서만 OX 선택 상태 업데이트 (서버에 보내지 않음)
+  const updateOxSelection = useCallback(
+    (messageIndex: number, selectedOption: string) => {
+      console.log('🔘 로컬에서 OX 선택 상태 업데이트:', {
+        messageIndex,
+        selectedOption,
+      });
+
+      // 로컬 상태만 업데이트
+      setMessages((prev) =>
+        prev.map((msg, idx) => {
+          if (idx === messageIndex && msg.type === 'bot') {
+            return {
+              ...msg,
+              selectedData: { selectedOption, isSelected: true },
+            };
+          }
+          return msg;
+        }),
+      );
+    },
+    [],
+  );
+
   // 메시지가 변경될 때마다 로컬스토리지에 저장
   useEffect(() => {
     if (useLocalStorage && messages.length > 0) {
@@ -589,27 +606,7 @@ export const useChatSocket = () => {
     }
   }, [messages, useLocalStorage, saveMessagesToLocal]);
 
-  // 로컬스토리지 사용 토글
-  const toggleLocalStorage = useCallback(() => {
-    setUseLocalStorage((prev) => {
-      const newValue = !prev;
-      console.log(`💾 로컬스토리지 사용: ${newValue ? 'ON' : 'OFF'}`);
-
-      // 설정을 로컬스토리지에 저장
-      try {
-        localStorage.setItem('me-plus-use-local-storage', newValue.toString());
-      } catch (error) {
-        console.error('❌ 로컬스토리지 설정 저장 실패:', error);
-      }
-
-      if (newValue && sessionId) {
-        // 로컬스토리지를 켤 때 현재 메시지들 저장
-        saveMessagesToLocal(messages);
-      }
-
-      return newValue;
-    });
-  }, [sessionId, messages, saveMessagesToLocal]);
+  // 제거: 항상 로컬스토리지 사용으로 토글 불필요
 
   // 새 채팅 시작
   const startNewChat = useCallback(() => {
@@ -623,11 +620,10 @@ export const useChatSocket = () => {
     messages,
     isStreaming,
     sessionId,
-    useLocalStorage,
-    toggleLocalStorage,
     sendMessage,
     updateCarouselSelection,
     updateOttSelection,
+    updateOxSelection,
     startNewChat,
   };
 };

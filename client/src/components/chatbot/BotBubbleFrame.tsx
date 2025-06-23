@@ -71,13 +71,15 @@ export interface BotBubbleFrameProps {
     selectedItem: CarouselItem,
     messageIndex?: number,
   ) => void;
-  onOttSelect?: (selectedServices: string[], messageIndex?: number) => void; // 새로 추가
+  onOttSelect?: (selectedServices: string[], messageIndex?: number) => void;
+  onOxSelect?: (selectedOption: string, messageIndex?: number) => void;
   messageIndex?: number;
   selectedData?: {
     selectedItem?: CarouselItem;
     selectedServices?: string[];
+    selectedOption?: string; // OX 버튼 선택된 옵션 (label)
     isSelected: boolean;
-  }; // OTT Service 지원을 위해 확장
+  }; // 모든 버튼 그룹 지원을 위해 확장
   showChatbotIcon?: boolean;
 }
 
@@ -86,7 +88,8 @@ const BotBubbleFrame = ({
   functionCall,
   onButtonClick,
   onCarouselSelect,
-  onOttSelect, // 새로 추가
+  onOttSelect,
+  onOxSelect,
   messageIndex,
   selectedData,
   showChatbotIcon = true,
@@ -120,6 +123,17 @@ const BotBubbleFrame = ({
                 : (args.options as OXOption[])
             }
             onButtonClick={onButtonClick}
+            onOxSelect={(selectedOption) =>
+              onOxSelect?.(selectedOption, messageIndex)
+            }
+            selectedData={
+              selectedData?.selectedOption
+                ? {
+                    selectedOption: selectedData.selectedOption,
+                    isSelected: selectedData.isSelected,
+                  }
+                : undefined
+            }
           />
         ) : null;
       case 'requestOTTServiceList':

@@ -12,6 +12,7 @@ export interface StoredMessage {
   selectedData?: {
     selectedItem?: CarouselItem;
     selectedServices?: string[];
+    selectedOption?: string; // OX 버튼 선택된 옵션
     isSelected: boolean;
   };
   loadingType?: 'searching' | 'waiting' | 'dbcalling';
