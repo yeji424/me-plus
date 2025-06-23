@@ -51,7 +51,12 @@ const extractMetadata = async (url) => {
   }
 };
 
-export const streamChat = async (messages, socket, onDelta) => {
+export const streamChat = async (
+  messages,
+  socket,
+  onDelta,
+  onFunctionCall = null,
+) => {
   try {
     // 타임아웃 설정 (30초)
     const timeoutMs = 30000;
@@ -60,7 +65,7 @@ export const streamChat = async (messages, socket, onDelta) => {
     });
 
     const streamPromise = openai.chat.completions.create({
-      model: 'gpt-4.1-mini-2025-04-14',
+      model: 'gpt-4.1',
       messages,
       stream: true,
       tools: [
@@ -444,6 +449,21 @@ export const streamChat = async (messages, socket, onDelta) => {
 
         switch (functionName) {
           case 'requestOTTServiceList': {
+            // 새로 추가: function call 정보 수집
+            const functionCallInfo = {
+              name: functionName,
+              args: args || {},
+            };
+
+            // onFunctionCall 콜백이 있으면 호출 (안전하게)
+            if (onFunctionCall && typeof onFunctionCall === 'function') {
+              try {
+                onFunctionCall(functionCallInfo);
+              } catch (callbackError) {
+                console.error('❌ onFunctionCall error:', callbackError);
+              }
+            }
+
             socket.emit('loading-end');
             socket.emit('ott-service-list', {
               question: '어떤 OTT 서비스를 함께 사용 중이신가요?',
@@ -453,6 +473,21 @@ export const streamChat = async (messages, socket, onDelta) => {
           }
 
           case 'requestOXCarouselButtons': {
+            // 새로 추가: function call 정보 수집
+            const functionCallInfo = {
+              name: functionName,
+              args: args || {},
+            };
+
+            // onFunctionCall 콜백이 있으면 호출 (안전하게)
+            if (onFunctionCall && typeof onFunctionCall === 'function') {
+              try {
+                onFunctionCall(functionCallInfo);
+              } catch (callbackError) {
+                console.error('❌ onFunctionCall error:', callbackError);
+              }
+            }
+
             socket.emit('loading-end');
             socket.emit('ox-carousel-buttons', {
               options: ['예', '아니오'],
@@ -471,6 +506,22 @@ export const streamChat = async (messages, socket, onDelta) => {
               });
               return;
             }
+
+            // 새로 추가: function call 정보 수집
+            const functionCallInfo = {
+              name: functionName,
+              args: { items },
+            };
+
+            // onFunctionCall 콜백이 있으면 호출 (안전하게)
+            if (onFunctionCall && typeof onFunctionCall === 'function') {
+              try {
+                onFunctionCall(functionCallInfo);
+              } catch (callbackError) {
+                console.error('❌ onFunctionCall error:', callbackError);
+              }
+            }
+
             socket.emit('loading-end');
             socket.emit('carousel-buttons', items);
             break;
@@ -487,6 +538,22 @@ export const streamChat = async (messages, socket, onDelta) => {
               });
               return;
             }
+
+            // 새로 추가: function call 정보 수집
+            const functionCallInfo = {
+              name: functionName,
+              args: { plans },
+            };
+
+            // onFunctionCall 콜백이 있으면 호출 (안전하게)
+            if (onFunctionCall && typeof onFunctionCall === 'function') {
+              try {
+                onFunctionCall(functionCallInfo);
+              } catch (callbackError) {
+                console.error('❌ onFunctionCall error:', callbackError);
+              }
+            }
+
             socket.emit('loading-end');
             socket.emit('plan-lists', plans);
             break;
@@ -504,6 +571,22 @@ export const streamChat = async (messages, socket, onDelta) => {
               });
               return;
             }
+
+            // 새로 추가: function call 정보 수집
+            const functionCallInfo = {
+              name: functionName,
+              args: { title, description, url, buttonText, imageUrl },
+            };
+
+            // onFunctionCall 콜백이 있으면 호출 (안전하게)
+            if (onFunctionCall && typeof onFunctionCall === 'function') {
+              try {
+                onFunctionCall(functionCallInfo);
+              } catch (callbackError) {
+                console.error('❌ onFunctionCall error:', callbackError);
+              }
+            }
+
             socket.emit('loading-end');
 
             // imageUrl이 없으면 URL에서 메타데이터 추출
@@ -525,6 +608,21 @@ export const streamChat = async (messages, socket, onDelta) => {
           }
 
           case 'showFirstCardList': {
+            // 새로 추가: function call 정보 수집
+            const functionCallInfo = {
+              name: functionName,
+              args: args || {},
+            };
+
+            // onFunctionCall 콜백이 있으면 호출 (안전하게)
+            if (onFunctionCall && typeof onFunctionCall === 'function') {
+              try {
+                onFunctionCall(functionCallInfo);
+              } catch (callbackError) {
+                console.error('❌ onFunctionCall error:', callbackError);
+              }
+            }
+
             socket.emit('loading-end');
             socket.emit('first-card-list');
             break;

@@ -12,7 +12,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const percentage = Math.min((currentStep / totalSteps) * 100, 100);
 
   return (
-    <div className="w-full px-6 mt-6">
+    <div className="w-full mt-6">
       <div className="flex justify-center text-[16px] text-secondary-purple-80 font-semibold mb-2">
         <span>{`${currentStep} / ${totalSteps}`}</span>
       </div>

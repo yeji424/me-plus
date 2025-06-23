@@ -9,6 +9,7 @@ import moonerFunImage from '../assets/image/mooner_fun.png';
 import Header from '@/components/common/Header';
 import confetti from '../assets/image/confetti.png';
 import plus from '@/assets/icon/plus.png';
+import TestWaitingPage from './TestWaitingPage';
 
 // 사용자 정보 타입 정의
 interface UserProfile {
@@ -109,15 +110,18 @@ const TestResultPage = () => {
     navigate(chatbotURL);
   };
 
+  //여기까지 현훈님 작성코드
+
   if (!plan) {
-    return <div>로딩 중...</div>; // 또는 로딩 UI
+    return <TestWaitingPage />;
   }
 
   return (
-    <div className="h-screen flex flex-col items-center text-center px-4">
+    <div className="h-screen flex flex-col items-center text-center">
       <Header
         title="나에게 잘 어울리는 요금제는?"
         onBackClick={handleBackClick}
+        isTransparent={true}
       />
 
       <div className="mt-4 text-[21.5px] font-bold text-secondary-purple-80">
@@ -160,15 +164,18 @@ const TestResultPage = () => {
         월 {plan.price?.toLocaleString()}원
       </div>
 
-      <div className="flex gap-4 mt-6 w-full max-w-md">
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md px-4 pb-6 z-50 flex gap-4">
         <button
           onClick={handleChatbotClick}
-          className="w-1/2 rounded-xl bg-secondary-purple-40 text-gray600 text-sm font-semibold py-3"
+          className="w-1/2 rounded-xl bg-secondary-purple-40 text-gray600 text-sm font-semibold py-3 shadow-[0_4px_4px_rgba(0,0,0,0.25)]"
         >
           챗봇 상담하기
         </button>
 
-        <button className="w-1/2 rounded-xl bg-secondary-purple-80 text-white text-[14px] font-semibold py-3">
+        <button
+          onClick={() => window.open(plan.link, '_blank')}
+          className="w-1/2 rounded-xl bg-secondary-purple-60 text-white text-[14px] font-semibold py-3 shadow-[0_4px_4px_rgba(0,0,0,0.25)]"
+        >
           요금제 바꾸러가기
         </button>
       </div>

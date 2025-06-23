@@ -5,6 +5,14 @@ import type {
   FunctionCall,
   PlanData,
 } from '@/components/chatbot/BotBubbleFrame';
+import {
+  getSession,
+  saveSession,
+  convertToStoredMessage,
+  convertFromStoredMessage,
+  type ChatSession,
+  type StoredMessage,
+} from '@/utils/chatStorage';
 
 // 서버 에러 타입 정의
 export interface ServerError {
@@ -57,30 +65,178 @@ const getErrorMessage = (error: ServerError): string => {
 
 type Message =
   | { type: 'user'; text: string }
-  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall }
+  | {
+      type: 'bot';
+      messageChunks: string[];
+      functionCall?: FunctionCall;
+      selectedData?: {
+        selectedItem?: CarouselItem;
+        selectedServices?: string[];
+        isSelected: boolean;
+      }; // OTT Service 지원을 위해 확장
+    }
   | { type: 'loading'; loadingType: 'searching' | 'waiting' | 'dbcalling' };
 
 export const useChatSocket = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(true); // 초기 로딩 상태 추가
+  // 항상 로컬스토리지 사용
+  const useLocalStorage = true;
   const responseRef = useRef('');
 
-  const handleSessionId = useCallback((id: string) => {
-    setSessionId(id);
-    localStorage.setItem('sessionId', id);
-  }, []);
+  // 로컬스토리지에 메시지 저장하는 함수
+  const saveMessagesToLocal = useCallback(
+    (messagesArray: Message[]) => {
+      if (!useLocalStorage || !sessionId) return;
+
+      try {
+        const storedMessages: StoredMessage[] = messagesArray.map((msg) =>
+          convertToStoredMessage(msg as Omit<StoredMessage, 'timestamp'>),
+        );
+
+        const chatSession: ChatSession = {
+          sessionId,
+          messages: storedMessages,
+          lastUpdated: Date.now(),
+        };
+
+        saveSession(chatSession);
+        console.log('💾 Messages saved to localStorage:', messagesArray.length);
+      } catch (error) {
+        console.error('❌ Failed to save messages to localStorage:', error);
+      }
+    },
+    [useLocalStorage, sessionId],
+  );
+
+  // 로컬스토리지에서 메시지 불러오는 함수
+  const loadMessagesFromLocal = useCallback(
+    (sessionIdToLoad: string): Message[] => {
+      if (!useLocalStorage) return [];
+
+      try {
+        const session = getSession(sessionIdToLoad);
+        if (!session) return [];
+
+        const messages: Message[] = session.messages.map(
+          (msg) => convertFromStoredMessage(msg) as Message,
+        );
+
+        console.log('📂 Messages loaded from localStorage:', messages.length);
+        return messages;
+      } catch (error) {
+        console.error('❌ Failed to load messages from localStorage:', error);
+        return [];
+      }
+    },
+    [useLocalStorage],
+  );
+
+  const handleSessionId = useCallback(
+    (id: string) => {
+      setSessionId(id);
+      localStorage.setItem('sessionId', id);
+
+      // 로컬스토리지 사용 시 기존 세션 불러오기
+      if (useLocalStorage) {
+        const localMessages = loadMessagesFromLocal(id);
+        if (localMessages.length > 0) {
+          setMessages(localMessages);
+          console.log(
+            '📂 로컬스토리지에서 세션 히스토리 불러옴:',
+            localMessages.length,
+          );
+        } else {
+          console.log('📭 로컬스토리지에 저장된 히스토리 없음');
+        }
+      }
+
+      // 로딩 완료
+      setIsInitialLoading(false);
+    },
+    [useLocalStorage, loadMessagesFromLocal],
+  );
 
   const handleSessionHistory = useCallback(
-    (logs: { role: string; content: string }[]) => {
-      const converted: Message[] = logs.map((msg) =>
-        msg.role === 'user'
+    (
+      logs: { role: string; content: string; type?: string; data?: unknown }[],
+    ) => {
+      console.log('📋 Session history received from server:', logs);
+
+      // 로컬스토리지 사용 시에는 서버 히스토리 무시
+      if (useLocalStorage) {
+        console.log('💾 로컬스토리지 사용 중이므로 서버 히스토리 무시');
+        return;
+      }
+
+      // 서버 히스토리가 비어있으면 처리하지 않음
+      if (!logs || logs.length === 0) {
+        console.log('📭 서버 히스토리가 비어있음');
+        return;
+      }
+
+      const converted: Message[] = logs.map((msg) => {
+        // 로그 추가 (각 메시지별로)
+        if (msg.type) {
+          console.log('🔍 Processing message with type:', msg.type, msg.data);
+        }
+
+        // 캐러셀 선택 등 특별한 타입 처리
+        if (
+          msg.type === 'carousel_select' ||
+          msg.type === 'ox_select' ||
+          msg.type === 'ott_select'
+        ) {
+          return { type: 'user', text: msg.content };
+        }
+
+        // 새로 추가: function_call 타입 처리
+        if (msg.type === 'function_call' && msg.role === 'assistant') {
+          console.log('🔧 Function call message detected:', msg.data);
+
+          // data에서 function call 정보 추출
+          const functionCallData = msg.data as {
+            name?: string;
+            args?: unknown;
+            selectedItem?: CarouselItem;
+            selectedServices?: string[];
+            isSelected?: boolean;
+          };
+
+          if (functionCallData?.name && functionCallData?.args) {
+            const botMessage: Message = {
+              type: 'bot',
+              messageChunks: [msg.content],
+              functionCall: {
+                name: functionCallData.name as FunctionCall['name'],
+                args: functionCallData.args as FunctionCall['args'],
+              },
+            };
+
+            // 선택 데이터가 있으면 추가 (OTT와 캐러셀 모두 지원)
+            if (functionCallData.isSelected) {
+              botMessage.selectedData = {
+                selectedItem: functionCallData.selectedItem,
+                selectedServices: functionCallData.selectedServices,
+                isSelected: functionCallData.isSelected,
+              };
+              console.log('✅ Selected data loaded:', botMessage.selectedData);
+            }
+
+            return botMessage;
+          }
+        }
+
+        // 기본 처리
+        return msg.role === 'user'
           ? { type: 'user', text: msg.content }
-          : { type: 'bot', messageChunks: [msg.content] },
-      );
+          : { type: 'bot', messageChunks: [msg.content] };
+      });
       setMessages(converted);
     },
-    [],
+    [useLocalStorage],
   );
 
   const handleLoading = useCallback(
@@ -218,6 +374,31 @@ export const useChatSocket = () => {
     socket.on('text-card', handleTextCard);
     socket.on('first-card-list', handleFirstCardList);
 
+    // 제거: 서버에서 더 이상 이벤트를 보내지 않음 (로컬스토리지 사용)
+    // socket.on('carousel-selection-updated', ({ messageIndex, selectedItem, isSelected }) => {
+    //   console.log('✅ Carousel selection updated:', { messageIndex, selectedItem, isSelected });
+    //   setMessages((prev) =>
+    //     prev.map((msg, idx) => {
+    //       if (idx === messageIndex && msg.type === 'bot') {
+    //         return { ...msg, selectedData: { selectedItem, isSelected } };
+    //       }
+    //       return msg;
+    //     }),
+    //   );
+    // });
+
+    // socket.on('ott-selection-updated', ({ messageIndex, selectedServices, isSelected }) => {
+    //   console.log('✅ OTT selection updated:', { messageIndex, selectedServices, isSelected });
+    //   setMessages((prev) =>
+    //     prev.map((msg, idx) => {
+    //       if (idx === messageIndex && msg.type === 'bot') {
+    //         return { ...msg, selectedData: { selectedServices, isSelected } };
+    //       }
+    //       return msg;
+    //     }),
+    //   );
+    // });
+
     return () => {
       socket.off('session-id', handleSessionId);
       socket.off('session-history', handleSessionHistory);
@@ -229,6 +410,8 @@ export const useChatSocket = () => {
       socket.off('plan-lists', handlePlanLists);
       socket.off('text-card', handleTextCard);
       socket.off('first-card-list', handleFirstCardList);
+      // socket.off('carousel-selection-updated'); // 제거: 더 이상 사용 안 함
+      // socket.off('ott-selection-updated'); // 제거: 더 이상 사용 안 함
     };
   }, [
     handleSessionId,
@@ -238,6 +421,8 @@ export const useChatSocket = () => {
     handleOTTServiceList,
     handlePlanLists,
     handleTextCard,
+    handleLoading,
+    handleLoadingEnd,
   ]);
 
   // 스트리밍 응답 처리
@@ -337,6 +522,98 @@ export const useChatSocket = () => {
     [sessionId],
   );
 
+  // 제거: 서버에 더 이상 선택 상태를 보내지 않음 (로컬스토리지 사용)
+  // const sendCarouselSelection = useCallback((carouselData, selectedItem, isSelected) => {
+  //   if (!sessionId) return;
+  //   const payload = { sessionId, carouselData, selectedItem, isSelected };
+  //   console.log('📤 Sending carousel selection:', payload);
+  //   socket.emit('carousel-selection', payload);
+  // }, [sessionId]);
+
+  // 로컬 상태에서만 선택 상태 업데이트 (서버에 보내지 않음)
+  const updateCarouselSelection = useCallback(
+    (messageIndex: number, selectedItem: CarouselItem) => {
+      console.log('🔄 로컬에서 캐러셀 선택 상태 업데이트:', {
+        messageIndex,
+        selectedItem,
+      });
+
+      // 로컬 상태만 업데이트
+      setMessages((prev) =>
+        prev.map((msg, idx) => {
+          if (idx === messageIndex && msg.type === 'bot') {
+            return {
+              ...msg,
+              selectedData: { selectedItem, isSelected: true },
+            };
+          }
+          return msg;
+        }),
+      );
+    },
+    [],
+  );
+
+  // 로컬 상태에서만 OTT 선택 상태 업데이트 (서버에 보내지 않음)
+  const updateOttSelection = useCallback(
+    (messageIndex: number, selectedServices: string[]) => {
+      console.log('🎬 로컬에서 OTT 선택 상태 업데이트:', {
+        messageIndex,
+        selectedServices,
+      });
+
+      // 로컬 상태만 업데이트
+      setMessages((prev) =>
+        prev.map((msg, idx) => {
+          if (idx === messageIndex && msg.type === 'bot') {
+            return {
+              ...msg,
+              selectedData: {
+                selectedServices,
+                isSelected: selectedServices.length > 0,
+              },
+            };
+          }
+          return msg;
+        }),
+      );
+    },
+    [],
+  );
+
+  // 로컬 상태에서만 OX 선택 상태 업데이트 (서버에 보내지 않음)
+  const updateOxSelection = useCallback(
+    (messageIndex: number, selectedOption: string) => {
+      console.log('🔘 로컬에서 OX 선택 상태 업데이트:', {
+        messageIndex,
+        selectedOption,
+      });
+
+      // 로컬 상태만 업데이트
+      setMessages((prev) =>
+        prev.map((msg, idx) => {
+          if (idx === messageIndex && msg.type === 'bot') {
+            return {
+              ...msg,
+              selectedData: { selectedOption, isSelected: true },
+            };
+          }
+          return msg;
+        }),
+      );
+    },
+    [],
+  );
+
+  // 메시지가 변경될 때마다 로컬스토리지에 저장
+  useEffect(() => {
+    if (useLocalStorage && messages.length > 0) {
+      saveMessagesToLocal(messages);
+    }
+  }, [messages, useLocalStorage, saveMessagesToLocal]);
+
+  // 제거: 항상 로컬스토리지 사용으로 토글 불필요
+
   // 새 채팅 시작
   const startNewChat = useCallback(() => {
     if (!sessionId) return;
@@ -349,7 +626,11 @@ export const useChatSocket = () => {
     messages,
     isStreaming,
     sessionId,
+    isInitialLoading,
     sendMessage,
+    updateCarouselSelection,
+    updateOttSelection,
+    updateOxSelection,
     startNewChat,
   };
 };

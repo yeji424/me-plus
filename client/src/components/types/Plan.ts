@@ -14,8 +14,8 @@ export interface Plan {
   premiumDiscountAmount?: number;
   ageGroup?: string;
   detailUrl?: string;
-  bundleBenefit?: string;
+  bundleBenefit?: string | null;
   mediaAddons?: string | null;
   premiumAddons?: string | null;
-  basicService?: string;
+  basicService?: string | null;
 }
