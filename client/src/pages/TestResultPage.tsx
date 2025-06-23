@@ -129,7 +129,7 @@ const TestResultPage = () => {
       <Header
         title="나에게 잘 어울리는 요금제는?"
         onBackClick={handleBackClick}
-        isSpecialColor={true}
+        // isSpecialColor={true}
       />
 
       <div className="mt-4 text-[21.5px] font-bold text-secondary-purple-80">
