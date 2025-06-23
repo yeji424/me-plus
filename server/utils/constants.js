@@ -53,3 +53,16 @@ export const AddonTypeMapping = {
   PREMIUM: '프리미엄',
   MEDIA: '미디어',
 };
+
+export const conditionByPlanGuide = {
+  '고용량 데이터': '데이터가 많은 요금제를 추천해줘.',
+  'OTT 애청자': 'OTT 서비스를 제공하는 요금제를 추천해줘.',
+  '경제형 사용자': '가성비 좋은 요금제를 추천해줘.',
+  '가족 결합형': '가족 결합 혜택이 있는 요금제를 추천해줘.',
+};
+
+export const InputRoleEnum = {
+  USER: 'user',
+  SYSTEM: 'system',
+  ASSISTANT: 'assistant',
+};

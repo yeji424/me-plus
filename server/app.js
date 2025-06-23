@@ -2,14 +2,25 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express from 'express';
 import mongoose from 'mongoose';
-import { getPlanDetail } from './controllers/planController.js';
+import { getInputExamples } from './controllers/chatController.js';
+import {
+  getAffordablePlanList,
+  getBundlePlanList,
+  getOTTPlanList,
+  getPlanDetail,
+  getPlanList,
+  getPopularPlanList,
+  getUnlimitedDataPlanList,
+  getPlanExploreList,
+} from './controllers/planController.js';
+import { getUrlMetadata } from './controllers/metadataController.js';
 
 dotenv.config();
 
 const app = express();
 app.use(
   cors({
-    origin: ['http://localhost:5174'],
+    origin: ['http://localhost:5174', 'http://localhost:5173'],
     credentials: true,
   }),
 );
@@ -21,12 +32,18 @@ mongoose
   .then(() => console.log('✅ MongoDB connected'))
   .catch(console.error);
 
-// changeSchema();
-
-// Routers
 const apiRouter = express.Router();
 app.use('/api', apiRouter);
 
+apiRouter.get('/chat/inputs', getInputExamples);
+apiRouter.get('/metadata', getUrlMetadata);
 apiRouter.get('/plans/:planId', getPlanDetail);
+apiRouter.get('/unlimited-plans', getUnlimitedDataPlanList);
+apiRouter.get('/ott-plans', getOTTPlanList);
+apiRouter.get('/affordable-plans', getAffordablePlanList);
+apiRouter.get('/bundle-plans', getBundlePlanList);
+apiRouter.get('/popular-plans', getPopularPlanList);
+apiRouter.get('/plans', getPlanList);
+apiRouter.get('/plan/explore', getPlanExploreList);
 
 export default app;

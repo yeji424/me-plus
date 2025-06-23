@@ -16,23 +16,24 @@ export const planSchema = new Schema(
     category: { type: String, required: true },
     name: { type: String, required: true },
     description: String,
-    monthlyFee: { type: Number, default: 0 },
-    detailUrl: String,
     isPopular: { type: Boolean, default: false },
     dataGb: { type: Number, default: 0 },
     sharedDataGb: { type: Number, default: 0 },
     voiceMinutes: { type: Number, default: 0 },
+    addonVoiceMinutes: { type: Number, default: 0 },
     smsCount: { type: Number, default: 0 },
-    bundleBenefit: {
-      type: {
-        _id: { type: mongoose.Schema.Types.ObjectId, required: true },
-        name: { type: String, required: true },
-        description: String,
-      },
-    },
+    monthlyFee: { type: Number, default: 0 },
     optionalDiscountAmount: { type: Number, default: 0 },
     premiumDiscountAmount: { type: Number, default: 0 },
     ageGroup: { type: String, required: true },
+    detailUrl: String,
+    bundleBenefit: {
+      type: String, // 객체 또는 문자열 모두 지원
+      default: null,
+    },
+    mediaAddons: { type: String, default: null },
+    premiumAddons: { type: String, default: null },
+    basicService: String,
   },
   { collection: 'plans', timestamps: true },
 );

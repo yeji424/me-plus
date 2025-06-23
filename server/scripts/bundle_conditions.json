@@ -1,0 +1,72 @@
+[
+  {
+    "_id": "1",
+    "bundleBenefit": "U+ 투게더 결합",
+    "count": 1,
+    "discountAmount": 0,
+    "type": "MOBILE"
+  },
+  {
+    "_id": "2",
+    "bundleBenefit": "U+ 투게더 결합",
+    "count": 2,
+    "discountAmount": 10000,
+    "type": "MOBILE"
+  },
+  {
+    "_id": "3",
+    "bundleBenefit": "U+ 투게더 결합",
+    "count": 3,
+    "discountAmount": 14000,
+    "type": "MOBILE"
+  },
+  {
+    "_id": "4",
+    "bundleBenefit": "U+ 투게더 결합",
+    "count": 4,
+    "discountAmount": 20000,
+    "type": "MOBILE"
+  },
+  {
+    "_id": "5",
+    "bundleBenefit": "U+ 투게더 결합",
+    "count": 5,
+    "discountAmount": 20000,
+    "type": "MOBILE"
+  },
+  {
+    "_id": "6",
+    "bundleBenefit": "U+ 투게더 결합",
+    "count": 1,
+    "discountAmount": 11000,
+    "type": "INTERNET"
+  },
+  {
+    "_id": "7",
+    "bundleBenefit": "U+ 투게더 결합",
+    "count": 2,
+    "discountAmount": 5500,
+    "type": "INTERNET"
+  },
+  {
+    "_id": "8",
+    "bundleBenefit": "U+ 투게더 결합",
+    "count": 3,
+    "discountAmount": 2750,
+    "type": "INTERNET"
+  },
+  {
+    "_id": "9",
+    "bundleBenefit": "U+투게더 청소년 할인",
+    "count": 1,
+    "discountAmount": 10000,
+    "type": "MOBILE"
+  },
+  {
+    "_id": "10",
+    "bundleBenefit": "5G 시그니처 가족할인",
+    "count": 1,
+    "discountAmount": 33000,
+    "type": "MOBILE"
+  }
+]
