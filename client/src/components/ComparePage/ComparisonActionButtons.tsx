@@ -1,3 +1,5 @@
+import Button from '../common/Button';
+
 interface ComparisonActionButtonsProps {
   leftButtonText?: string;
   rightButtonText?: string;
@@ -19,23 +21,25 @@ const ComparisonActionButtons: React.FC<ComparisonActionButtonsProps> = ({
       <div className="flex w-full">
         <div className="flex-[2] relative flex flex-col items-center gap-1 justify-center rounded-[10px]">
           {leftButtonText && (
-            <button
+            <Button
               onClick={onLeftClick}
               className="text-xs text-background-40 font-semibold bg-primary-pink w-full h-[38px] flex items-center justify-center rounded-[10px] cursor-pointer shadow-basic"
+              variant="custom"
             >
               {leftButtonText}
-            </button>
+            </Button>
           )}
         </div>
         <div className="flex-[1] text-sm flex items-center justify-center" />
         <div className="flex-[2] relative flex flex-col items-center gap-1 justify-center rounded-[10px]">
           {rightButtonText && (
-            <button
+            <Button
               onClick={onRightClick}
               className="text-xs text-background-40 font-semibold bg-primary-pink w-full h-[38px] flex items-center justify-center rounded-[10px] cursor-pointer shadow-basic"
+              variant="custom"
             >
               {rightButtonText}
-            </button>
+            </Button>
           )}
         </div>
       </div>
