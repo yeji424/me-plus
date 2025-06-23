@@ -1233,11 +1233,7 @@ const ComparePage: React.FC = () => {
 
   return (
     <>
-      <Header
-        title="요금제 비교하기"
-        isTransparent={true}
-        onBackClick={() => openModal()}
-      />
+      <Header title="요금제 비교하기" onBackClick={() => openModal()} />
       {isModalOpen && (
         <Modal
           isOpen={isModalOpen}

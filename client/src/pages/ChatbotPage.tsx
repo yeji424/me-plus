@@ -338,11 +338,9 @@ const ChatbotPage = () => {
       <MemoizedHeader
         title="요금제 추천 AI 챗봇 Me+"
         iconButtons={iconButtons}
-        isTransparent={true}
-        className="custom-header"
       />
       {/* 원래 삭제해도 되는데 같이 넣으니까 더 자연스러워서 넣음 */}
-      <div className="pointer-events-none fixed top-13 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-[40px] z-30 bg-gradient-to-b from-[#ffffff] to-transparent" />
+      {/* <div className="pointer-events-none fixed top-13 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-[40px] z-30 bg-gradient-to-b from-[#ffffff] to-transparent" /> */}
       {/* 2. ChatArea - Flex */}
       <div className="gradient-scroll-container flex flex-col h-[100vh]">
         {/* 패딩으로 보이는 영역 조절 (= 스크롤 가능 영역) */}
