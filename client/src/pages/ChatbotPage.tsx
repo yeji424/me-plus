@@ -98,8 +98,11 @@ const ChatbotPage = () => {
   const {
     messages,
     isStreaming,
+    useLocalStorage,
+    toggleLocalStorage,
     sendMessage,
     updateCarouselSelection,
+    updateOttSelection,
     startNewChat,
   } = useChatSocket();
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
@@ -239,6 +242,30 @@ const ChatbotPage = () => {
     [updateCarouselSelection, messages, allMessages],
   );
 
+  // 새로 추가: OTT 선택 처리
+  const handleOttSelect = useCallback(
+    (selectedServices: string[], displayIndex?: number) => {
+      console.log('🎬 OTT 선택:', { selectedServices, displayIndex });
+
+      // 실제 function_call 메시지의 인덱스를 찾기 (messages 배열에서만)
+      const actualIndex = messages.findIndex((msg) => {
+        return (
+          msg.type === 'bot' &&
+          msg.functionCall?.name === 'requestOTTServiceList'
+        );
+      });
+
+      console.log('🔍 실제 OTT function_call 메시지 인덱스:', actualIndex);
+
+      if (actualIndex !== -1) {
+        updateOttSelection(actualIndex, selectedServices);
+      } else {
+        console.warn('⚠️ OTT function_call 메시지를 찾을 수 없습니다.');
+      }
+    },
+    [updateOttSelection, messages],
+  );
+
   const prevMessageLengthRef = useRef(allMessages.length);
   const lastMessage = allMessages[allMessages.length - 1];
   const hasActiveFunctionCall =
@@ -265,9 +292,23 @@ const ChatbotPage = () => {
   const iconButtons = useMemo(
     () => [
       { icon: <NewChatIcon />, onClick: handleNewChat },
+      {
+        icon: (
+          <div
+            className={`px-2 py-1 rounded-md text-xs font-medium transition-colors ${
+              useLocalStorage
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-600'
+            }`}
+          >
+            💾 {useLocalStorage ? 'ON' : 'OFF'}
+          </div>
+        ),
+        onClick: toggleLocalStorage,
+      },
       { icon: <CallIcon />, onClick: () => {} },
     ],
-    [handleNewChat],
+    [handleNewChat, useLocalStorage, toggleLocalStorage],
   );
 
   return (
@@ -327,8 +368,9 @@ const ChatbotPage = () => {
                     functionCall={msg.functionCall}
                     onButtonClick={handleButtonClick}
                     onCarouselSelect={handleCarouselSelect}
+                    onOttSelect={handleOttSelect} // 새로 추가
                     messageIndex={allMessages.length - 1 - idx} // 역순 배열에서 실제 인덱스 계산
-                    selectedData={msg.selectedData} // 새로 추가
+                    selectedData={msg.selectedData}
                     showChatbotIcon={showChatbotIcon}
                   />
                 );

@@ -10,7 +10,11 @@ interface CarouselButtonGroupProps {
     carouselData: CarouselItem[],
     selectedItem: CarouselItem,
   ) => void;
-  selectedData?: { selectedItem: CarouselItem; isSelected: boolean }; // 새로 추가
+  selectedData?: {
+    selectedItem?: CarouselItem;
+    selectedServices?: string[];
+    isSelected: boolean;
+  }; // 새로 추가
 }
 
 const CarouselButtonGroup = ({
@@ -20,7 +24,9 @@ const CarouselButtonGroup = ({
   selectedData, // 새로 추가
 }: CarouselButtonGroupProps) => {
   const [clickedButton, setClickedButton] = useState<string | null>(
-    selectedData?.isSelected ? selectedData.selectedItem.label : null,
+    selectedData?.isSelected && selectedData.selectedItem
+      ? selectedData.selectedItem.label
+      : null,
   );
 
   const handleButtonClick = (option: CarouselItem) => {

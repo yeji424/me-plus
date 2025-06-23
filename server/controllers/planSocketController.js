@@ -1,5 +1,3 @@
-import { getPlansWithCache } from '../cache/planCache.js';
-import { ChatSession } from '../models/ChatSession.js';
 import { streamChat } from '../services/gptService.js';
 import { buildPromptMessages } from '../utils/promptBuilder.js';
 
@@ -91,35 +89,14 @@ export const handlePlanRecommend = async (socket, { sessionId, message }) => {
       return;
     }
 
-    let session;
-    try {
-      session = await ChatSession.findOne({ sessionId });
-
-      if (!session) {
-        session = await ChatSession.create({ sessionId, messages: [] });
-        console.log('✅ New session created:', sessionId);
-      }
-    } catch (dbError) {
-      console.error('❌ Database error:', dbError);
-      socket.emit('error', {
-        type: 'DATABASE_ERROR',
-        message: '세션 데이터 처리 중 오류가 발생했습니다.',
-        details: {
-          sessionId,
-          error: dbError.message,
-        },
-      });
-      return;
-    }
-
-    // const plans = await getPlansWithCache();
+    // MongoDB 세션 관리 제거 - 로컬스토리지에서 관리
+    // 기본 메시지 형태로 프롬프트 생성 (히스토리 없이)
     const plans = '';
-    const newUserMsg = { role: 'user', content: message };
-    const fullMessages = [...session.messages, newUserMsg];
+    const basicMessages = [{ role: 'user', content: message }];
 
     let messages;
     try {
-      messages = buildPromptMessages(plans, fullMessages);
+      messages = buildPromptMessages(plans, basicMessages);
     } catch (promptError) {
       console.error('❌ Prompt building error:', promptError);
       socket.emit('error', {
@@ -134,7 +111,6 @@ export const handlePlanRecommend = async (socket, { sessionId, message }) => {
     }
 
     let assistantReply = '';
-    let functionCallInfo = null; // 새로 추가: function call 정보 저장
 
     // GPT 스트리밍 호출
     try {
@@ -145,51 +121,20 @@ export const handlePlanRecommend = async (socket, { sessionId, message }) => {
           assistantReply += chunk;
         },
         (funcInfo) => {
-          // 새로 추가: function call 정보 수집
           functionCallInfo = funcInfo;
           console.log('🔧 Function call detected:', funcInfo);
         },
       );
     } catch (gptError) {
       console.error('❌ GPT streaming error:', gptError);
-      // streamChat에서 이미 error를 emit하므로 여기서는 로그만
       return;
     }
 
-    // 세션 저장
-    try {
-      session.messages.push(newUserMsg);
-
-      // assistant 메시지 저장 (function call 정보 포함)
-      const assistantMessage = {
-        role: 'assistant',
-        content: assistantReply,
-        type: functionCallInfo ? 'function_call' : 'text', // 새로 추가
-        data: functionCallInfo ? functionCallInfo : null, // 새로 추가
-      };
-
-      session.messages.push(assistantMessage);
-      session.markModified('messages');
-      await session.save();
-      console.log('✅ Session saved successfully:', sessionId);
-
-      // 로그 추가 (안전하게)
-      if (functionCallInfo) {
-        console.log('🔧 Function call saved to DB:', functionCallInfo);
-      }
-    } catch (saveError) {
-      console.error('❌ Session save error:', saveError);
-      socket.emit('error', {
-        type: 'SESSION_SAVE_ERROR',
-        message:
-          '대화 저장 중 오류가 발생했습니다. 대화는 계속 가능하지만 기록이 저장되지 않을 수 있습니다.',
-        details: {
-          sessionId,
-          error: saveError.message,
-        },
-      });
-      // 저장 실패해도 대화는 계속 진행
-    }
+    // MongoDB 저장 제거 - 로컬스토리지에서 관리
+    console.log(
+      '✅ Message processed successfully (saved to localStorage):',
+      sessionId,
+    );
   } catch (error) {
     console.error('❌ handlePlanRecommend error:', error);
     socket.emit('error', {
@@ -197,7 +142,7 @@ export const handlePlanRecommend = async (socket, { sessionId, message }) => {
       message: '요청 처리 중 예상치 못한 오류가 발생했습니다.',
       details: {
         sessionId,
-        message: message?.substring(0, 100), // 메시지는 100자만 로그
+        message: message?.substring(0, 100),
         error: error.message,
       },
     });

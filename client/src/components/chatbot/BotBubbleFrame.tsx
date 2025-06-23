@@ -71,8 +71,13 @@ export interface BotBubbleFrameProps {
     selectedItem: CarouselItem,
     messageIndex?: number,
   ) => void;
+  onOttSelect?: (selectedServices: string[], messageIndex?: number) => void; // 새로 추가
   messageIndex?: number;
-  selectedData?: { selectedItem: CarouselItem; isSelected: boolean }; // 새로 추가
+  selectedData?: {
+    selectedItem?: CarouselItem;
+    selectedServices?: string[];
+    isSelected: boolean;
+  }; // OTT Service 지원을 위해 확장
   showChatbotIcon?: boolean;
 }
 
@@ -81,8 +86,9 @@ const BotBubbleFrame = ({
   functionCall,
   onButtonClick,
   onCarouselSelect,
+  onOttSelect, // 새로 추가
   messageIndex,
-  selectedData, // 새로 추가
+  selectedData,
   showChatbotIcon = true,
 }: BotBubbleFrameProps) => {
   const shouldShowMessage = !functionCall || messageChunks[0]?.trim() !== '';
@@ -117,7 +123,28 @@ const BotBubbleFrame = ({
           />
         ) : null;
       case 'requestOTTServiceList':
-        return <OttButtonGroup onButtonClick={onButtonClick} />;
+        // 디버깅 로그 추가
+        console.log(
+          '🎬 BotBubbleFrame rendering OTT with selectedData:',
+          selectedData,
+        );
+
+        return (
+          <OttButtonGroup
+            onButtonClick={onButtonClick}
+            onOttSelect={(selectedServices) =>
+              onOttSelect?.(selectedServices, messageIndex)
+            }
+            selectedData={
+              selectedData?.selectedServices
+                ? {
+                    selectedServices: selectedData.selectedServices,
+                    isSelected: selectedData.isSelected,
+                  }
+                : undefined
+            }
+          />
+        );
       case 'requestTextCard':
         return args?.title &&
           args?.description &&
