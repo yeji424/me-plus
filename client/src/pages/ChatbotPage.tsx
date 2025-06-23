@@ -351,7 +351,7 @@ const ChatbotPage = () => {
           ref={containerRef}
           className="relative flex-1 overflow-y-auto mt-[50px] pb-[60px] flex flex-col-reverse"
         >
-          <div className="gap-5 max-w-[560px] min-h-full flex flex-col-reverse">
+          <div className="gap-2 max-w-[560px] min-h-full flex flex-col-reverse">
             {reversedMessages.map((msg, idx) => {
               // 역순 배열에서 이전 메시지 확인 (역순이므로 다음 인덱스가 실제로는 이전 메시지)
               const nextMessage =

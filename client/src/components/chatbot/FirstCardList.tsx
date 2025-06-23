@@ -52,7 +52,7 @@ const CardItem = ({
   onButtonClick: (message: string) => void;
 }) => {
   return (
-    <div className="w-[180px] shrink-0 flex flex-col items-center gap-[18px] p-[10px] rounded-[12px] bg-gradation-background shadow-small">
+    <div className="w-[160px] sm:w-[180px] shrink-0 flex flex-col items-center gap-[18px] p-[10px] rounded-[12px] bg-gradation-background shadow-small">
       <img
         src={item.image}
         alt={item.title}
@@ -92,8 +92,8 @@ const FirstCardList = ({
   };
 
   return (
-    <div className="mx-1 w-full max-w-[450px]">
-      <DraggableScroll className="flex flex-nowrap gap-[6px] hide-scrollbar overflow-visible">
+    <div className="w-full max-w-[85.5vw]">
+      <DraggableScroll className="flex flex-nowrap gap-[6px] mx-2 my-2 pr-4">
         {cardData.map((item) => (
           <CardItem
             key={item.id}
