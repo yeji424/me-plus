@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import type { PlanResult } from '@/components/types/TestResult';
-import { planResults } from '@/data/TestResult';
-
+// import { planResults } from '@/data/TestResult';
+import { getAllPlans } from '@/api/testPlan';
 import UsageBar from '@/components/testPage/UsageBar';
 import moonerFunImage from '../assets/image/mooner_fun.png';
 import Header from '@/components/common/Header';
@@ -49,12 +49,20 @@ const TestResultPage = () => {
   const [plan, setPlan] = useState<PlanResult | null>(null);
 
   useEffect(() => {
-    if (planId) {
-      const matched = planResults.find((p) => p.id === planId);
-      if (matched) {
-        setPlan(matched);
+    const fetchPlan = async () => {
+      if (!planId || typeof planId !== 'string') return;
+
+      try {
+        const res = await getAllPlans();
+        const matched = res.planResults.find((p) => p.id === planId);
+        if (matched) setPlan(matched);
+        else console.warn('해당 ID에 맞는 요금제가 없습니다.');
+      } catch (err) {
+        console.error('요금제 조회 실패:', err);
       }
-    }
+    };
+
+    fetchPlan();
   }, [planId]);
 
   if (!planId) {

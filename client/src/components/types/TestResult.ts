@@ -1,6 +1,7 @@
 export type Answer = string;
 
 export type PlanResult = {
+  _id: string;
   id: string;
   name: string;
   description: string;
@@ -11,4 +12,5 @@ export type PlanResult = {
   price: number;
   tagLine?: string;
   link: string;
+  isActive: boolean;
 };
