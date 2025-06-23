@@ -56,7 +56,7 @@ const AnimatedCardWrapper: React.FC<AnimatedCardWrapperProps> = ({
         handleTap();
         handleTapEnd();
       }}
-      className={`relative rounded-[17px] p-[1px] overflow-hidden cursor-pointer ${className}`}
+      className={`relative w-full inline-flex rounded-[17px] p-[1px] overflow-hidden cursor-pointer ${className}`}
     >
       <motion.div
         style={{ transformOrigin: 'center' }}
@@ -64,7 +64,7 @@ const AnimatedCardWrapper: React.FC<AnimatedCardWrapperProps> = ({
         initial={{ scaleX: 0, opacity: 0 }}
         animate={controls}
       />
-      <div className="relative z-10 rounded-[16px]">{children}</div>
+      <div className="relative z-10 w-full">{children}</div>
     </motion.div>
   );
 };

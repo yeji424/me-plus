@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import BackIcon from '@/assets/icon/back_icon.svg?react';
+import BackIcon from '@/assets/icon/header_back_icon.svg?react';
 import TintedWrapper from './TintedWrapper';
 
 interface HeaderProps {

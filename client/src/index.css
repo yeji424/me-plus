@@ -177,15 +177,22 @@
 [data-rsbs-scroll] {
   scrollbar-width: none;
 }
-[data-rsbs-header]:before {
+[data-rsbs-header] {
+  height: 45px !important; /* 예: 높이를 늘리기 */
+  cursor: pointer !important;
+}
+[data-rsbs-header]::before {
   background-color: var(--color-secondary-purple-80) !important;
   width: 44px !important;
+  height: 4px !important;
+  border-radius: 9999px !important;
+  margin: 2px auto !important;
+  content: '' !important;
 }
 [data-rsbs-overlay],
 [data-rsbs-backdrop] {
   z-index: 100 !important;
 }
-
 /* GradientScroll 스크롤바 숨기기 */
 .gradient-scroll-container ::-webkit-scrollbar {
   display: none !important; /* Chrome, Safari, Opera */

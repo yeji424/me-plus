@@ -170,6 +170,9 @@ const ChatbotPage = () => {
     }
   }, [isInitialized, userProfile]);
 
+  const handleClose = () => {
+    setShowBackModal(false);
+  };
   // 인라인 함수들을 useCallback으로 최적화
   const handleInputChange = useCallback((value: string) => {
     setInput(value);
@@ -410,35 +413,34 @@ const ChatbotPage = () => {
           />
         </div>
       </div>
-      {showBackModal && (
-        <Modal
-          isOpen={showBackModal}
-          onClose={() => setShowBackModal(false)}
-          modalTitle="챗봇 상담을 새로 시작하시겠어요?"
-          modalDesc="새로 상담을 시작할 경우, 이전에 진행한 상담은 모두 초기화됩니다."
+      <Modal
+        isOpen={showBackModal}
+        onClose={() => setShowBackModal(false)}
+        modalTitle="챗봇 상담을 새로 시작하시겠어요?"
+        modalDesc="새로 상담을 시작할 경우, 이전에 진행한 상담은 모두 초기화됩니다."
+      >
+        <Button
+          variant="secondary"
+          size="medium"
+          fullWidth
+          onClick={handleClose}
         >
-          <Button
-            variant="secondary"
-            size="medium"
-            fullWidth
-            onClick={() => setShowBackModal(false)}
-          >
-            닫기
-          </Button>
+          닫기
+        </Button>
 
-          <Button
-            variant="primary"
-            size="medium"
-            fullWidth
-            onClick={() => {
-              handleNewChat();
-              setShowBackModal(false);
-            }}
-          >
-            새로 시작하기
-          </Button>
-        </Modal>
-      )}
+        <Button
+          variant="primary"
+          size="medium"
+          fullWidth
+          onClick={() => {
+            handleNewChat();
+            handleClose();
+          }}
+        >
+          새로 시작하기
+        </Button>
+      </Modal>
+      즉,
     </>
   );
 };
