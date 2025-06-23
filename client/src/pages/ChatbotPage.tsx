@@ -14,6 +14,8 @@ import type {
 } from '@/components/chatbot/BotBubbleFrame';
 import { useChatSocket } from '@/hooks/useChatSocket';
 import ChatbotIcon from '@/assets/icon/meplus_icon.png';
+import Modal from '@/components/common/Modal';
+import Button from '@/components/common/Button';
 
 // 사용자 정보 타입 (TestResultPage와 동일)
 interface UserProfile {
@@ -107,6 +109,7 @@ const ChatbotPage = () => {
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const [searchParams] = useSearchParams();
+  const [showBackModal, setShowBackModal] = useState(false);
 
   // 사용자 정보 확인: URL 파라미터에서만 읽음 - 메모이제이션으로 최적화
   const userProfile = useMemo(
@@ -314,12 +317,11 @@ const ChatbotPage = () => {
   // Header 아이콘 버튼들도 메모이제이션
   const iconButtons = useMemo(
     () => [
-      { icon: <NewChatIcon />, onClick: handleNewChat },
+      { icon: <NewChatIcon />, onClick: () => setShowBackModal(true) },
       { icon: <CallIcon />, onClick: () => {} },
     ],
     [handleNewChat],
   );
-
   return (
     <>
       {/* 1. Header - Fixed */}
@@ -401,6 +403,35 @@ const ChatbotPage = () => {
           />
         </div>
       </div>
+      {showBackModal && (
+        <Modal
+          isOpen={showBackModal}
+          onClose={() => setShowBackModal(false)}
+          modalTitle="챗봇 상담을 새로 시작하시겠어요?"
+          modalDesc="새로 상담을 시작할 경우, 이전에 진행한 상담은 모두 초기화됩니다."
+        >
+          <Button
+            variant="secondary"
+            size="medium"
+            fullWidth
+            onClick={() => setShowBackModal(false)}
+          >
+            닫기
+          </Button>
+
+          <Button
+            variant="primary"
+            size="medium"
+            fullWidth
+            onClick={() => {
+              handleNewChat();
+              setShowBackModal(false);
+            }}
+          >
+            새로 시작하기
+          </Button>
+        </Modal>
+      )}
     </>
   );
 };

@@ -9,6 +9,7 @@ export const usePlanFilter = (
   activePriceIndex: number,
 ) => {
   return useMemo(() => {
+    if (!plans) return [];
     return plans.filter((plan) => {
       const networkTypeFromTitle = plan.category;
       const matchNetwork =

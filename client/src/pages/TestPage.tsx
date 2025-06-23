@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import TestResult from '@/data/TestResult';
+import { rules } from '@/utils/rules';
+import { planResults } from '@/data/TestResult';
 import { questions } from '@/data/Questions';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
@@ -14,6 +15,7 @@ import tips from '../assets/icon/tips.png';
 import next from '../assets/icon/next_icon.svg';
 import back from '../assets/icon/back_icon.svg';
 import { useRef } from 'react';
+import type { PlanResult } from '@/components/types/TestResult';
 
 const TestPage = () => {
   const navigate = useNavigate();
@@ -70,15 +72,16 @@ const TestPage = () => {
     (q) => selectedOptions[q.id] !== undefined,
   );
 
-  const getRecommendedPlan = (answers: { [key: number]: string }) => {
-    return TestResult.find((plan) => plan.condition(answers))!;
-  };
+  // const getRecommendedPlan = (answers: { [key: number]: string }) => {
+  //   return TestResult.find((plan) => plan.condition(answers))!;
+  // };
 
   return (
     <div className="h-screen flex flex-col">
       <Header
         title="나에게 잘 어울리는 요금제는?"
         onBackClick={handleBackClick}
+        isTransparent={true}
       />
 
       <ProgressBar
@@ -86,7 +89,7 @@ const TestPage = () => {
         totalSteps={questions.length}
       />
 
-      <div className="flex flex-col items-center justify-between flex-1 px-4 py-6">
+      <div className="flex flex-col items-center justify-between flex-1 py-6">
         <div className="flex flex-col items-center gap-4 w-full">
           <img src={moonerSrc} alt="무너" className="w-[140px]" />
 
@@ -121,12 +124,14 @@ const TestPage = () => {
                 selected={selected === 'yes'}
                 onClick={() => handleSelect('yes')}
                 type="yes"
+                disabled={isTransitioning}
               />
               <SelectButton
                 label="아니다"
                 selected={selected === 'no'}
                 onClick={() => handleSelect('no')}
                 type="no"
+                disabled={isTransitioning}
               />
             </div>
           ) : (
@@ -137,6 +142,7 @@ const TestPage = () => {
                   label={opt}
                   selected={selected === opt}
                   onClick={() => handleSelect(opt)}
+                  disabled={isTransitioning}
                 />
               ))}
             </div>
@@ -154,16 +160,37 @@ const TestPage = () => {
               {currentQuestion.tip.rest}
             </p>{' '}
             {allAnswered && (
-              <div className="w-full mt-10">
+              <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md px-4 pb-6 z-50">
                 <Button
                   onClick={() => {
-                    const plan = getRecommendedPlan(selectedOptions);
-                    localStorage.setItem('recommendedPlanId', plan.result.id);
-                    navigate('/test-wait');
+                    const matchedRules = rules.filter((rule) =>
+                      rule.condition(selectedOptions),
+                    );
+
+                    const matchedPlans = matchedRules
+                      .map((rule) =>
+                        planResults.find((p) => p.id === rule.resultId),
+                      )
+                      .filter((p): p is PlanResult => !!p);
+
+                    const sortedPlans = matchedPlans.sort(
+                      (a, b) => a.priority - b.priority,
+                    );
+
+                    const bestPlan = sortedPlans[0];
+
+                    if (bestPlan) {
+                      navigate('/test-wait', {
+                        state: { planId: bestPlan.id },
+                      });
+                    } else {
+                      alert('조건에 맞는 요금제를 찾을 수 없어요.');
+                    }
                   }}
                   fullWidth
-                  variant="primary"
                   size="large"
+                  variant="custom"
+                  className="bg-secondary-purple-60 text-white text-[14px] px-4 py-[10px] rounded-[10px] font-medium w-full"
                 >
                   Me플러스 맞춤 추천 받기
                 </Button>
