@@ -22,7 +22,7 @@ const Button: React.FC<ButtonProps> = ({
   const getVariantStyles = (): string => {
     switch (variant) {
       case 'primary':
-        return 'bg-secondary-purple-80 text-white hover:bg-secondary-purple-90';
+        return 'bg-secondary-purple-60 text-white hover:bg-secondary-purple-90';
       case 'secondary':
         return 'bg-secondary-purple-40 text-gray700 hover:bg-secondary-purple-50';
       case 'custom':
