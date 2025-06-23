@@ -81,6 +81,7 @@ export const useChatSocket = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [isInitialLoading, setIsInitialLoading] = useState(true); // 초기 로딩 상태 추가
   // 항상 로컬스토리지 사용
   const useLocalStorage = true;
   const responseRef = useRef('');
@@ -151,6 +152,9 @@ export const useChatSocket = () => {
           console.log('📭 로컬스토리지에 저장된 히스토리 없음');
         }
       }
+
+      // 로딩 완료
+      setIsInitialLoading(false);
     },
     [useLocalStorage, loadMessagesFromLocal],
   );
@@ -620,6 +624,7 @@ export const useChatSocket = () => {
     messages,
     isStreaming,
     sessionId,
+    isInitialLoading,
     sendMessage,
     updateCarouselSelection,
     updateOttSelection,

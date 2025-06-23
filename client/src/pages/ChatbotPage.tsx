@@ -16,6 +16,7 @@ import { useChatSocket } from '@/hooks/useChatSocket';
 import ChatbotIcon from '@/assets/icon/meplus_icon.png';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // 사용자 정보 타입 (TestResultPage와 동일)
 interface UserProfile {
@@ -100,6 +101,7 @@ const ChatbotPage = () => {
   const {
     messages,
     isStreaming,
+    isInitialLoading,
     sendMessage,
     updateCarouselSelection,
     updateOttSelection,
@@ -322,6 +324,11 @@ const ChatbotPage = () => {
     ],
     [handleNewChat],
   );
+  // 초기 로딩 중일 때는 로딩 스피너만 표시
+  if (isInitialLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <>
       {/* 1. Header - Fixed */}
