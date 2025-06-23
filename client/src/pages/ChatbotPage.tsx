@@ -440,7 +440,6 @@ const ChatbotPage = () => {
           새로 시작하기
         </Button>
       </Modal>
-      즉,
     </>
   );
 };
