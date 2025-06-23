@@ -6,14 +6,10 @@ import AnimatedShaker from '@/components/common/AnimatedShaker';
 import compareIcon from '@/assets/icon/compare_icon.png';
 import chatbotIcon from '@/assets/icon/chatbot_icon.png';
 import testIcon from '@/assets/icon/test_icon.png';
-import ServiceGuide from '@/components/ServiceGuide/ServiceGuide';
-import { useState } from 'react';
 
 const MainPage: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
-    <div className="relative" style={{ top: '-25px' }}>
+    <div className="" style={{ top: '-25px' }}>
       {/* 제목 */}
       <FadeInUpDiv custom={0} className="mb-[37px]">
         <h2 className="text-2xl font-semibold">
@@ -84,7 +80,7 @@ const MainPage: React.FC = () => {
             </div>
             <div className="flex-[1]">
               <LinkCard
-                to=""
+                to="/service-guide"
                 title={
                   <>
                     서비스
@@ -94,13 +90,11 @@ const MainPage: React.FC = () => {
                 }
                 variant="shadow"
                 size="medium"
-                onClick={() => setIsOpen(true)}
               />
             </div>
           </div>
         </FadeInUpDiv>
       </div>
-      {isOpen && <ServiceGuide onClose={() => setIsOpen(false)} />}
     </div>
   );
 };
