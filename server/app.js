@@ -18,9 +18,14 @@ import { getUrlMetadata } from './controllers/metadataController.js';
 dotenv.config();
 
 const app = express();
+// CORS 허용 도메인을 환경변수에서 가져오기
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map((origin) => origin.trim())
+  : ['http://localhost:5173', 'http://localhost:5174']; // 기본값
+
 app.use(
   cors({
-    origin: ['http://localhost:5174', 'http://localhost:5173'],
+    origin: allowedOrigins,
     credentials: true,
   }),
 );

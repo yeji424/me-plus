@@ -18,7 +18,7 @@ const PlanDetailInfo: React.FC<PlanDetailInfoProps> = ({
   const formattedSmsCount =
     plan.smsCount === -1 ? '무제한' : `${plan.smsCount}건`;
   return (
-    <div className="bg-background rounded-b-[7px] p-3 text-[13px] flex flex-col gap-2">
+    <div className="bg-background rounded-b-[7px] p-3 text-[13px] flex flex-col gap-[10px]">
       <div className="flex gap-[5px]">
         <p className="min-w-[90px] text-secondary-purple-80">전화</p>
         <p className="w-full">{formattedVoiceMinutes}</p>
@@ -44,14 +44,15 @@ const PlanDetailInfo: React.FC<PlanDetailInfoProps> = ({
         <p className="w-full">{plan.mediaAddons ? plan.mediaAddons : ' - '}</p>
       </div>
 
-      <div className="h-[43px] mt-2">
+      <div className="mt-">
         <Button
+          className="rounded-[12px] flex items-center justify-center"
           fullWidth
           variant="primary"
           onClick={onClick}
           disabled={disabled}
         >
-          선택하기
+          <span>선택하기</span>
         </Button>
       </div>
     </div>

@@ -81,7 +81,6 @@ const TestPage = () => {
       <Header
         title="나에게 잘 어울리는 요금제는?"
         onBackClick={handleBackClick}
-        isTransparent={true}
       />
 
       <ProgressBar

@@ -16,6 +16,7 @@ import { getAllPlans } from '@/api/plan';
 import 'react-spring-bottom-sheet/dist/style.css';
 import { BottomSheet } from 'react-spring-bottom-sheet';
 import LoadingBubble from '@/components/chatbot/LoadingBubble';
+import FadeInUpDiv from '@/components/common/FadeInUpDiv';
 
 // 컴포넌트 외부로 이동하여 재생성 방지
 const localFallbackPlans: Plan[] = [
@@ -1233,11 +1234,7 @@ const ComparePage: React.FC = () => {
 
   return (
     <>
-      <Header
-        title="요금제 비교하기"
-        isTransparent={true}
-        onBackClick={() => openModal()}
-      />
+      <Header title="요금제 비교하기" onBackClick={() => openModal()} />
       {isModalOpen && (
         <Modal
           isOpen={isModalOpen}
@@ -1258,29 +1255,38 @@ const ComparePage: React.FC = () => {
           </Button>
         </Modal>
       )}
-      <h1 className="font-semibold text-2xl text-center mt-[20px]">
-        비교하고 싶은
-        <br />
-        요금제를 선택해 주세요
-      </h1>
+      <FadeInUpDiv custom={0}>
+        <h1 className="font-semibold text-2xl text-center mt-[20px]">
+          비교하고 싶은
+          <br />
+          요금제를 선택해 주세요
+        </h1>
+      </FadeInUpDiv>
 
-      <PlanSelectionCard
-        selectedLeft={selectedLeft}
-        selectedRight={selectedRight}
-        onSelectSlot={openSheetForSlot}
-        onClearSlot={handleClearSlot}
-      />
-      {selectedLeft || selectedRight ? (
-        <ComparisonResult
+      <FadeInUpDiv custom={1}>
+        <PlanSelectionCard
           selectedLeft={selectedLeft}
           selectedRight={selectedRight}
+          onSelectSlot={openSheetForSlot}
+          onClearSlot={handleClearSlot}
         />
-      ) : (
-        <div className="flex flex-col justify-center items-center text-center text-gray500 mt-[120px]">
-          <p className="text-lg">비교할 요금제가 없습니다</p>
-          <p className="text-xl">버튼을 눌러 요금제를 선택해주세요!</p>
-        </div>
-      )}
+      </FadeInUpDiv>
+
+      <FadeInUpDiv custom={2}>
+        {selectedLeft || selectedRight ? (
+          <ComparisonResult
+            selectedLeft={selectedLeft}
+            selectedRight={selectedRight}
+          />
+        ) : (
+          <div className="flex flex-col gap-2 justify-center items-center text-center text-gray500 mt-[120px]">
+            <p className="text-lg">비교할 요금제가 없습니다</p>
+            <p className="text-xl text-primary-pink-60">
+              버튼을 눌러 요금제를 선택해주세요!
+            </p>
+          </div>
+        )}
+      </FadeInUpDiv>
       <BottomSheet
         className="fixed left-1/2 top-0 bottom-0 -translate-x-1/2 w-full max-w-[600px] flex justify-center items-center z-50"
         open={open}
@@ -1301,19 +1307,25 @@ const ComparePage: React.FC = () => {
               <LoadingBubble type="dbcalling" />
             </div>
           )}
-          <div className="flex flex-col gap-[15px] select-none mb-3">
-            {filteredPlans.map((plan) => (
-              <PlanListItem
+          <div className="flex flex-col gap-2 select-none mb-3">
+            {filteredPlans.map((plan, i) => (
+              <FadeInUpDiv
                 key={plan._id}
-                plan={plan}
-                isOpen={openDropdowns[plan._id] || false}
-                isDisabled={
-                  selectedLeft?._id === plan._id ||
-                  selectedRight?._id === plan._id
-                }
-                onToggle={() => toggleDropdown(plan._id)}
-                onSelect={() => handleSelectPlan(plan)}
-              />
+                custom={i}
+                delayUnit={0.07}
+                duration={0.3}
+              >
+                <PlanListItem
+                  plan={plan}
+                  isOpen={openDropdowns[plan._id] || false}
+                  isDisabled={
+                    selectedLeft?._id === plan._id ||
+                    selectedRight?._id === plan._id
+                  }
+                  onToggle={() => toggleDropdown(plan._id)}
+                  onSelect={() => handleSelectPlan(plan)}
+                />
+              </FadeInUpDiv>
             ))}
           </div>
         </div>
