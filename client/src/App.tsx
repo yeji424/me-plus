@@ -20,7 +20,7 @@ const MainLayout = () => {
   return (
     <>
       <div className=" min-h-screen flex flex-col">
-        <main className="flex-grow mt-[55px]">
+        <main className="flex-grow mt-[50px]">
           <Outlet />
         </main>
         <Footer />
