@@ -121,7 +121,6 @@ export const handlePlanRecommend = async (socket, { sessionId, message }) => {
           assistantReply += chunk;
         },
         (funcInfo) => {
-          functionCallInfo = funcInfo;
           console.log('🔧 Function call detected:', funcInfo);
         },
       );

@@ -682,9 +682,8 @@ export const streamChat = async (
           socket.emit('stream', cleanedContent);
         }
       }
-
-      socket.emit('done');
     }
+    socket.emit('done');
   } catch (error) {
     console.error('❌ GPT Service Error:', error);
 
