@@ -72,7 +72,7 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
   }, []); // 의존성 배열 비움
 
   // 여러 번 크기 측정을 시도하여 안정적인 크기 확보
-  const scheduleMeasurement = () => {
+  const scheduleMeasurement = useCallback(() => {
     // 기존 타이머 클리어
     if (measureTimeoutRef.current !== null) {
       clearTimeout(measureTimeoutRef.current);
@@ -90,11 +90,11 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
         measureSize();
       }, 100);
     }, 50);
-  };
+  }, [measureSize]);
 
   useLayoutEffect(() => {
     scheduleMeasurement();
-  }, [displayText]);
+  }, [displayText, scheduleMeasurement]);
   useLayoutEffect(() => {
     measureSize();
 

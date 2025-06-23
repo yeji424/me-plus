@@ -1,4 +1,3 @@
-import React from 'react';
 import BotBubble from './BotBubble';
 import CarouselButtonGroup from './ChatButtonGroups/CarouselButtonGroup';
 import OttButtonGroup from './ChatButtonGroups/OttButtonGroup';

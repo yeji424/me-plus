@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 
 interface AnimatedShakerProps {
@@ -17,13 +17,13 @@ const AnimatedShaker: React.FC<AnimatedShakerProps> = ({
   const [isIdle, setIsIdle] = useState(false);
 
   // 인터랙션 발생 시 타이머 초기화
-  const resetTimer = () => {
+  const resetTimer = useCallback(() => {
     setIsIdle(false);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
       setIsIdle(true);
     }, idleTime);
-  };
+  }, [idleTime]);
 
   useEffect(() => {
     resetTimer();
@@ -40,7 +40,7 @@ const AnimatedShaker: React.FC<AnimatedShakerProps> = ({
         window.removeEventListener(event, resetTimer);
       });
     };
-  }, [idleTime]);
+  }, [idleTime, resetTimer]);
 
   useEffect(() => {
     if (isIdle) {

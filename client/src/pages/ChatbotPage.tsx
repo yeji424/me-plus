@@ -322,7 +322,7 @@ const ChatbotPage = () => {
       { icon: <NewChatIcon />, onClick: () => setShowBackModal(true) },
       { icon: <CallIcon />, onClick: () => {} },
     ],
-    [handleNewChat],
+    [], // setShowBackModal은 setState 함수로 안정적이므로 의존성 불필요
   );
   // 초기 로딩 중일 때는 로딩 스피너만 표시
   if (isInitialLoading) {

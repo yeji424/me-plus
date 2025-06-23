@@ -421,6 +421,8 @@ export const useChatSocket = () => {
     handleOTTServiceList,
     handlePlanLists,
     handleTextCard,
+    handleLoading,
+    handleLoadingEnd,
   ]);
 
   // 스트리밍 응답 처리
