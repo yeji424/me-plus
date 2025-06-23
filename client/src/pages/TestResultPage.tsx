@@ -9,6 +9,7 @@ import moonerFunImage from '../assets/image/mooner_fun.png';
 import Header from '@/components/common/Header';
 import confetti from '../assets/image/confetti.png';
 import plus from '@/assets/icon/plus.png';
+import TestWaitingPage from './TestWaitingPage';
 
 // 사용자 정보 타입 정의
 interface UserProfile {
@@ -109,15 +110,18 @@ const TestResultPage = () => {
     navigate(chatbotURL);
   };
 
+  //여기까지 현훈님 작성코드
+
   if (!plan) {
-    return <div>로딩 중...</div>; // 또는 로딩 UI
+    return <TestWaitingPage />;
   }
 
   return (
-    <div className="h-screen flex flex-col items-center text-center px-4">
+    <div className="h-screen flex flex-col items-center text-center">
       <Header
         title="나에게 잘 어울리는 요금제는?"
         onBackClick={handleBackClick}
+        isTransparent={true}
       />
 
       <div className="mt-4 text-[21.5px] font-bold text-secondary-purple-80">
@@ -168,7 +172,10 @@ const TestResultPage = () => {
           챗봇 상담하기
         </button>
 
-        <button className="w-1/2 rounded-xl bg-secondary-purple-80 text-white text-[14px] font-semibold py-3">
+        <button
+          onClick={() => window.open(plan.link, '_blank')}
+          className="w-1/2 rounded-xl bg-secondary-purple-80 text-white text-[14px] font-semibold py-3"
+        >
           요금제 바꾸러가기
         </button>
       </div>
