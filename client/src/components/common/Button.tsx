@@ -1,3 +1,5 @@
+import AnimatedCardWrapper from './AnimatedWrapper';
+
 interface ButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
@@ -79,11 +81,12 @@ const Button: React.FC<ButtonProps> = ({
   const sizeStyles = getSizeStyles();
 
   return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`
+    <AnimatedCardWrapper onClick={onClick}>
+      <button
+        type={type}
+        onClick={onClick}
+        disabled={disabled}
+        className={`
         ${sizeStyles.padding} 
         ${sizeStyles.fontSize} 
         ${sizeStyles.height} 
@@ -99,9 +102,10 @@ const Button: React.FC<ButtonProps> = ({
         }
         ${className}
       `}
-    >
-      {children}
-    </button>
+      >
+        {children}
+      </button>
+    </AnimatedCardWrapper>
   );
 };
 

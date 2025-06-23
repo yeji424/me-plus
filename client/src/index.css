@@ -177,15 +177,22 @@
 [data-rsbs-scroll] {
   scrollbar-width: none;
 }
-[data-rsbs-header]:before {
+[data-rsbs-header] {
+  height: 45px !important; /* 예: 높이를 늘리기 */
+  cursor: pointer !important;
+}
+[data-rsbs-header]::before {
   background-color: var(--color-secondary-purple-80) !important;
   width: 44px !important;
+  height: 4px !important;
+  border-radius: 9999px !important;
+  margin: 2px auto !important;
+  content: '' !important;
 }
 [data-rsbs-overlay],
 [data-rsbs-backdrop] {
   z-index: 100 !important;
 }
-
 /* GradientScroll 스크롤바 숨기기 */
 .gradient-scroll-container ::-webkit-scrollbar {
   display: none !important; /* Chrome, Safari, Opera */
@@ -222,8 +229,7 @@
 /* 서비스 가이드 스와이퍼 */
 .swiper-pagination {
   z-index: -1;
-  top: 250px !important;
-  /* height: 640px; */
+  top: 185px !important;
   display: flex;
   justify-content: center;
   align-items: end;
@@ -231,8 +237,9 @@
   transform: translateX(-50%);
   aspect-ratio: 1 / 2;
   bottom: auto !important;
-  max-width: 200px !important;
-  width: 63% !important;
+  max-height: 500px;
+  height: 55%;
+  width: 35% !important;
 }
 .swiper-pagination-bullet {
   border-radius: 100px;
