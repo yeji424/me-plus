@@ -57,7 +57,7 @@ const InputBox = ({
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="AI챗봇에게 물어보고 싶은 내용을 질문하세요."
-        className="flex-grow h-10 bg-white rounded-full focus:outline-none text-gray-700 placeholder-gray-400 text-sm px-5"
+        className="flex-grow h-10 w-full bg-white rounded-full focus:outline-none text-gray-700 placeholder-gray-400 text-sm px-5"
         disabled={disabled}
         autoFocus={shouldAutoFocus}
       />
@@ -65,7 +65,7 @@ const InputBox = ({
         type="button"
         onClick={handleSubmit}
         disabled={disabled}
-        className={`ml-3 rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200 ${
+        className={`ml-3 rounded-full w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
           disabled
             ? 'bg-gray-300 cursor-not-allowed'
             : 'bg-secondary-purple-80 hover:bg-secondary-purple-60 active:scale-95'
