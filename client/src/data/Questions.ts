@@ -55,7 +55,7 @@ export const questions: Question[] = [
     type: 'binary',
     tip: {
       highlight: '그렇다',
-      rest: '를 선택했을 경우, 음악 구독 결합 혜택이 좋을 것 같아요!',
+      rest: '를 선택했을 경우, 음악 구독 결합 혜택이 제공되는게 좋을 것 같아요!',
     },
   },
   {
@@ -65,7 +65,7 @@ export const questions: Question[] = [
     type: 'binary',
     tip: {
       highlight: '그렇다',
-      rest: '를 선택했을 경우, OTT 구독 결합 혜택이 좋을 것 같아요!',
+      rest: '를 선택했을 경우, OTT 구독 결합 혜택이 제공되는게 좋을 것 같아요!',
     },
   },
   {

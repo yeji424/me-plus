@@ -10,4 +10,5 @@ export type PlanResult = {
   messageUsage: number;
   price: number;
   tagLine?: string;
+  link: string;
 };
