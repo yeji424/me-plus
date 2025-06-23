@@ -1282,6 +1282,7 @@ const ComparePage: React.FC = () => {
         </div>
       )}
       <BottomSheet
+        className="fixed left-1/2 top-0 bottom-0 -translate-x-1/2 w-full max-w-[600px] flex justify-center items-center z-50"
         open={open}
         onDismiss={() => setOpen(false)}
         snapPoints={({ maxHeight }) => [maxHeight / 1.25]}
@@ -1300,7 +1301,7 @@ const ComparePage: React.FC = () => {
               <LoadingBubble type="dbcalling" />
             </div>
           )}
-          <div className="flex flex-col gap-[15px] select-none pt-[190px] mb-3">
+          <div className="flex flex-col gap-[15px] select-none mb-3">
             {filteredPlans.map((plan) => (
               <PlanListItem
                 key={plan._id}
