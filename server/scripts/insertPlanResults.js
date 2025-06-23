@@ -1,6 +1,11 @@
-import type { PlanResult } from '@/components/types/TestResult';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import { PlanResult } from '../models/PlanResult.js';
 
-export const planResults: PlanResult[] = [
+// .env 파일 로드
+dotenv.config();
+
+const planResultsData = [
   //음악
   {
     id: 'music-plus',
@@ -129,4 +134,54 @@ export const planResults: PlanResult[] = [
   },
 ];
 
-export default planResults;
+async function insertPlanResults() {
+  try {
+    // MongoDB 연결
+    console.log('🔗 MongoDB 연결 중...');
+    await mongoose.connect(process.env.MONGO_URI, { dbName: 'meplus' });
+    console.log('✅ MongoDB 연결 성공!');
+
+    // 기존 데이터 확인
+    const existingPlanResults = await PlanResult.countDocuments();
+    console.log(`📊 기존 PlanResult 수: ${existingPlanResults}개`);
+
+    // 기존 데이터 삭제
+    if (existingPlanResults > 0) {
+      console.log('🗑️ 기존 PlanResult 데이터를 삭제합니다...');
+      await PlanResult.deleteMany({});
+      console.log('✅ 기존 데이터 삭제 완료!');
+    }
+
+    // 새 데이터 삽입
+    console.log('📥 새로운 PlanResult 데이터를 삽입합니다...');
+    const insertedData = await PlanResult.insertMany(planResultsData);
+    console.log(`✅ ${insertedData.length}개의 PlanResult 데이터 삽입 완료!`);
+
+    console.log('\n📋 삽입된 데이터:');
+    insertedData.forEach((item, index) => {
+      console.log(
+        `${index + 1}. ${item.name} (ID: ${item.id}, Priority: ${item.priority}, 가격: ${item.price.toLocaleString()}원)`,
+      );
+    });
+  } catch (error) {
+    console.error('❌ PlanResult 데이터 삽입 중 오류:', error);
+  } finally {
+    // MongoDB 연결 종료
+    await mongoose.disconnect();
+    console.log('\n🔌 MongoDB 연결이 종료되었습니다.');
+    process.exit(0);
+  }
+}
+
+// 스크립트 실행
+console.log(
+  '🚀 PlanResult(테스트 결과 기반 추천 요금제) 데이터 삽입 스크립트 시작!',
+);
+console.log('📁 .env 파일에서 MONGO_URI를 로드합니다...');
+
+if (!process.env.MONGO_URI) {
+  console.error('❌ .env 파일에 MONGO_URI가 설정되지 않았습니다!');
+  process.exit(1);
+}
+
+insertPlanResults();

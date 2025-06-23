@@ -8,9 +8,15 @@ import UserBubble from '@/components/chatbot/UserBubble';
 import InputBox from '@/components/chatbot/InputBox';
 import BotBubbleFrame from '@/components/chatbot/BotBubbleFrame';
 import LoadingBubble from '@/components/chatbot/LoadingBubble';
-import type { FunctionCall } from '@/components/chatbot/BotBubbleFrame';
+import type {
+  FunctionCall,
+  CarouselItem,
+} from '@/components/chatbot/BotBubbleFrame';
 import { useChatSocket } from '@/hooks/useChatSocket';
 import ChatbotIcon from '@/assets/icon/meplus_icon.png';
+import Modal from '@/components/common/Modal';
+import Button from '@/components/common/Button';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
 
 // 사용자 정보 타입 (TestResultPage와 동일)
 interface UserProfile {
@@ -31,7 +37,12 @@ interface UserProfile {
 
 type Message =
   | { type: 'user'; text: string }
-  | { type: 'bot'; messageChunks: string[]; functionCall?: FunctionCall }
+  | {
+      type: 'bot';
+      messageChunks: string[];
+      functionCall?: FunctionCall;
+      selectedData?: { selectedItem: CarouselItem; isSelected: boolean };
+    }
   | { type: 'loading'; loadingType: 'searching' | 'waiting' | 'dbcalling' };
 
 // URL 파라미터에서 사용자 정보 파싱 함수
@@ -87,10 +98,20 @@ const MemoizedLoadingBubble = React.memo(LoadingBubble);
 
 const ChatbotPage = () => {
   const [input, setInput] = useState('');
-  const { messages, isStreaming, sendMessage, startNewChat } = useChatSocket();
+  const {
+    messages,
+    isStreaming,
+    isInitialLoading,
+    sendMessage,
+    updateCarouselSelection,
+    updateOttSelection,
+    updateOxSelection,
+    startNewChat,
+  } = useChatSocket();
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const [searchParams] = useSearchParams();
+  const [showBackModal, setShowBackModal] = useState(false);
 
   // 사용자 정보 확인: URL 파라미터에서만 읽음 - 메모이제이션으로 최적화
   const userProfile = useMemo(
@@ -183,6 +204,96 @@ const ChatbotPage = () => {
     () => [...initialMessages, ...messages],
     [initialMessages, messages],
   );
+
+  // 새로 추가: 캐러셀 선택 처리 (업데이트 방식)
+  const handleCarouselSelect = useCallback(
+    (
+      carouselData: CarouselItem[],
+      selectedItem: CarouselItem,
+      displayIndex?: number, // 화면에 표시된 인덱스
+    ) => {
+      console.log('🎯 캐러셀 선택:', {
+        carouselData,
+        selectedItem,
+        displayIndex,
+      });
+
+      // 실제 function_call 메시지의 인덱스를 찾기 (messages 배열에서만)
+      const actualIndex = messages.findIndex((msg) => {
+        return (
+          msg.type === 'bot' &&
+          msg.functionCall?.name === 'requestCarouselButtons' &&
+          JSON.stringify(msg.functionCall.args?.items) ===
+            JSON.stringify(carouselData)
+        );
+      });
+
+      console.log(
+        '🔍 실제 function_call 메시지 인덱스 (messages 배열):',
+        actualIndex,
+      );
+      console.log('🔍 전체 messages 배열 길이:', messages.length);
+      console.log('🔍 전체 allMessages 배열 길이:', allMessages.length);
+
+      if (actualIndex !== -1) {
+        updateCarouselSelection(actualIndex, selectedItem);
+      } else {
+        console.warn(
+          '⚠️ function_call 메시지를 찾을 수 없어서 업데이트를 건너뜁니다.',
+        );
+      }
+    },
+    [updateCarouselSelection, messages, allMessages],
+  );
+
+  // 새로 추가: OTT 선택 처리
+  const handleOttSelect = useCallback(
+    (selectedServices: string[], displayIndex?: number) => {
+      console.log('🎬 OTT 선택:', { selectedServices, displayIndex });
+
+      // 실제 function_call 메시지의 인덱스를 찾기 (messages 배열에서만)
+      const actualIndex = messages.findIndex((msg) => {
+        return (
+          msg.type === 'bot' &&
+          msg.functionCall?.name === 'requestOTTServiceList'
+        );
+      });
+
+      console.log('🔍 실제 OTT function_call 메시지 인덱스:', actualIndex);
+
+      if (actualIndex !== -1) {
+        updateOttSelection(actualIndex, selectedServices);
+      } else {
+        console.warn('⚠️ OTT function_call 메시지를 찾을 수 없습니다.');
+      }
+    },
+    [updateOttSelection, messages],
+  );
+
+  // 새로 추가: OX 선택 처리
+  const handleOxSelect = useCallback(
+    (selectedOption: string, displayIndex?: number) => {
+      console.log('🔘 OX 선택:', { selectedOption, displayIndex });
+
+      // 실제 function_call 메시지의 인덱스를 찾기 (messages 배열에서만)
+      const actualIndex = messages.findIndex((msg) => {
+        return (
+          msg.type === 'bot' &&
+          msg.functionCall?.name === 'requestOXCarouselButtons'
+        );
+      });
+
+      console.log('🔍 실제 OX function_call 메시지 인덱스:', actualIndex);
+
+      if (actualIndex !== -1) {
+        updateOxSelection(actualIndex, selectedOption);
+      } else {
+        console.warn('⚠️ OX function_call 메시지를 찾을 수 없습니다.');
+      }
+    },
+    [updateOxSelection, messages],
+  );
+
   const prevMessageLengthRef = useRef(allMessages.length);
   const lastMessage = allMessages[allMessages.length - 1];
   const hasActiveFunctionCall =
@@ -208,11 +319,15 @@ const ChatbotPage = () => {
   // Header 아이콘 버튼들도 메모이제이션
   const iconButtons = useMemo(
     () => [
-      { icon: <NewChatIcon />, onClick: handleNewChat },
+      { icon: <NewChatIcon />, onClick: () => setShowBackModal(true) },
       { icon: <CallIcon />, onClick: () => {} },
     ],
-    [handleNewChat],
+    [], // setShowBackModal은 setState 함수로 안정적이므로 의존성 불필요
   );
+  // 초기 로딩 중일 때는 로딩 스피너만 표시
+  if (isInitialLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
@@ -270,6 +385,11 @@ const ChatbotPage = () => {
                     messageChunks={msg.messageChunks}
                     functionCall={msg.functionCall}
                     onButtonClick={handleButtonClick}
+                    onCarouselSelect={handleCarouselSelect}
+                    onOttSelect={handleOttSelect}
+                    onOxSelect={handleOxSelect}
+                    messageIndex={allMessages.length - 1 - idx} // 역순 배열에서 실제 인덱스 계산
+                    selectedData={msg.selectedData}
                     showChatbotIcon={showChatbotIcon}
                   />
                 );
@@ -290,6 +410,35 @@ const ChatbotPage = () => {
           />
         </div>
       </div>
+      {showBackModal && (
+        <Modal
+          isOpen={showBackModal}
+          onClose={() => setShowBackModal(false)}
+          modalTitle="챗봇 상담을 새로 시작하시겠어요?"
+          modalDesc="새로 상담을 시작할 경우, 이전에 진행한 상담은 모두 초기화됩니다."
+        >
+          <Button
+            variant="secondary"
+            size="medium"
+            fullWidth
+            onClick={() => setShowBackModal(false)}
+          >
+            닫기
+          </Button>
+
+          <Button
+            variant="primary"
+            size="medium"
+            fullWidth
+            onClick={() => {
+              handleNewChat();
+              setShowBackModal(false);
+            }}
+          >
+            새로 시작하기
+          </Button>
+        </Modal>
+      )}
     </>
   );
 };

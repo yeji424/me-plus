@@ -17,9 +17,9 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
   const [displayText, setDisplayText] = useState('');
   const [boxSize, setBoxSize] = useState({ width: 0, height: 0 });
   const ghostRef = useRef<HTMLDivElement>(null);
-  const measureTimeoutRef = useRef<number | null>(null);
+  const measureTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const timersRef = useRef<number[]>([]);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const springStyles = useSpring({
     width: boxSize.width,
@@ -72,9 +72,9 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
   }, []); // 의존성 배열 비움
 
   // 여러 번 크기 측정을 시도하여 안정적인 크기 확보
-  const scheduleMeasurement = () => {
+  const scheduleMeasurement = useCallback(() => {
     // 기존 타이머 클리어
-    if (measureTimeoutRef.current) {
+    if (measureTimeoutRef.current !== null) {
       clearTimeout(measureTimeoutRef.current);
     }
 
@@ -90,11 +90,11 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
         measureSize();
       }, 100);
     }, 50);
-  };
+  }, [measureSize]);
 
   useLayoutEffect(() => {
     scheduleMeasurement();
-  }, [displayText]);
+  }, [displayText, scheduleMeasurement]);
   useLayoutEffect(() => {
     measureSize();
 

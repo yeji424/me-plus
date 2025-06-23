@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ChatButton from '../ChatButton';
 import NetflixIcon from '@/assets/icon/netflix.png';
 import TvingIcon from '@/assets/icon/tving.png';
@@ -21,16 +21,47 @@ const OTT_SERVICES: OttService[] = [
 
 interface OttButtonGroupProps {
   onButtonClick?: (message: string) => void;
+  onOttSelect?: (selectedServices: string[]) => void; // 새로 추가
+  selectedData?: { selectedServices: string[]; isSelected: boolean }; // 새로 추가
 }
 
-const OttButtonGroup = ({ onButtonClick }: OttButtonGroupProps) => {
-  const [clickedButton, setClickedButton] = useState<string | null>(null);
+const OttButtonGroup = ({
+  onButtonClick,
+  onOttSelect,
+  selectedData,
+}: OttButtonGroupProps) => {
+  // 디버깅 로그 추가
+  console.log('🎬 OttButtonGroup rendered with selectedData:', selectedData);
+
+  const [selectedServices, setSelectedServices] = useState<string[]>(
+    selectedData?.isSelected ? selectedData.selectedServices : [],
+  );
+
+  // 디버깅 로그 추가
+  console.log('🎬 OttButtonGroup selectedServices state:', selectedServices);
+
+  // selectedData가 변경될 때마다 state 업데이트
+  useEffect(() => {
+    if (selectedData?.isSelected && selectedData.selectedServices) {
+      console.log(
+        '🔄 Updating selectedServices from props:',
+        selectedData.selectedServices,
+      );
+      setSelectedServices(selectedData.selectedServices);
+    } else {
+      console.log('🔄 Resetting selectedServices (no selection data)');
+      setSelectedServices([]);
+    }
+  }, [selectedData]);
 
   const handleButtonClick = (label: string) => {
-    if (clickedButton) return;
+    // 이미 선택이 완료된 상태면 더 이상 선택 불가
+    if (selectedServices.length > 0) return;
 
-    setClickedButton(label);
+    const newSelectedServices = [label];
+    setSelectedServices(newSelectedServices);
     onButtonClick?.(label);
+    onOttSelect?.(newSelectedServices);
   };
 
   return (
@@ -41,7 +72,10 @@ const OttButtonGroup = ({ onButtonClick }: OttButtonGroupProps) => {
             key={service.id}
             label={service.label}
             icon={<img src={service.icon} alt={service.label} />}
-            disabled={clickedButton !== null && clickedButton !== service.label}
+            disabled={
+              selectedServices.length > 0 &&
+              !selectedServices.includes(service.label)
+            } // 다른 서비스가 선택되면 나머지는 비활성화
             onClick={() => handleButtonClick(service.label)}
           />
         ))}

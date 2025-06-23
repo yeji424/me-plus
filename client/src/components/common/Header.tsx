@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BackIcon from '@/assets/icon/back_icon.svg?react';
+import TintedWrapper from './TintedWrapper';
 
 interface HeaderProps {
   title: string;
@@ -31,22 +32,26 @@ const Header = ({
   return (
     <>
       <header
-        className={`fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] px-5 pt-5 pb-3 flex items-center justify-between z-50 ${
+        className={`fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] px-3 pt-3 pb-3 flex items-center justify-between z-50 ${
           isTransparent ? 'bg-transparent' : 'bg-white'
         } ${className}`}
       >
-        <BackIcon onClick={backPage} className="icon-button" />
+        <TintedWrapper>
+          <BackIcon onClick={backPage} className="icon-button" />
+        </TintedWrapper>
         {title && (
           <p className=" absolute left-1/2 -translate-x-1/2 text-base text-gray700">
             {title}
           </p>
         )}
         {iconButtons && (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {iconButtons.map((btn, index) => (
-              <button key={index} onClick={btn.onClick} className="icon-button">
-                {btn.icon}
-              </button>
+              <TintedWrapper key={index}>
+                <button onClick={btn.onClick} className="icon-button">
+                  {btn.icon}
+                </button>
+              </TintedWrapper>
             ))}
           </div>
         )}

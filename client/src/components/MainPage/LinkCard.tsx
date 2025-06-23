@@ -1,9 +1,11 @@
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import AnimatedWrapper from '@/components/common/AnimatedWrapper';
 
 interface LinkCardProps {
   to: string;
-  title: string;
-  description?: string;
+  title: string | ReactNode;
+  description?: string | ReactNode;
   icon?: string;
   variant?: 'default' | 'primary' | 'gradient' | 'shadow';
   size?: 'large' | 'medium';
@@ -39,7 +41,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
         return {
           wrapper: 'bg-gradation',
           container: 'bg-background-40',
-          title: 'text-gradation',
+          title: 'text-gradation ',
           description: 'text-secondary-purple-80',
         };
       case 'shadow':
@@ -64,16 +66,16 @@ const LinkCard: React.FC<LinkCardProps> = ({
     padding: string;
     titleSize: string;
     descriptionSize: string;
-    maxWidth: string;
+    // maxWidth: string;
   } => {
     switch (size) {
       case 'large':
         return {
           minHeight: 'min-h-[190px]',
-          padding: 'py-[33px] px-[18px]',
+          padding: 'py-[28px] px-5',
           titleSize: 'text-2xl',
           descriptionSize: 'text-[13px]',
-          maxWidth: 'max-w-[250px]',
+          // maxWidth: 'max-w-[250px]',
         };
       case 'medium':
         return {
@@ -81,7 +83,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
           padding: 'py-5 px-4',
           titleSize: 'text-[21px]',
           descriptionSize: 'text-xs',
-          maxWidth: 'max-w-[110px]',
+          // maxWidth: 'max-w-[110px]',
         };
       default:
         return {
@@ -89,7 +91,7 @@ const LinkCard: React.FC<LinkCardProps> = ({
           padding: 'py-[33px] px-[18px]',
           titleSize: 'text-2xl',
           descriptionSize: 'text-[13px]',
-          maxWidth: 'max-w-[250px]',
+          // maxWidth: 'max-w-[250px]',
         };
     }
   };
@@ -98,44 +100,46 @@ const LinkCard: React.FC<LinkCardProps> = ({
   const sizeStyles = getSizeStyles();
 
   return (
-    <Link
+    <AnimatedWrapper
+      className={`w-full h-full ${sizeStyles.minHeight} `}
       to={to}
-      className={`flex w-full h-full ${sizeStyles.minHeight} rounded-[17px] p-[1px] ${variantStyles.wrapper} ${className}`}
       onClick={onClick}
     >
-      <div
-        className={`flex ${sizeStyles.padding} w-full rounded-[16px] justify-between ${variantStyles.container}`}
+      <Link
+        to={to}
+        className={`relative flex w-full h-full ${sizeStyles.minHeight} rounded-[17px] p-[1px] ${variantStyles.wrapper} ${className}`}
+        onClick={onClick}
       >
         <div
-          className={`flex flex-col gap-[17px] w-full flex-[2] ${sizeStyles.maxWidth}`}
+          className={`relative w-full rounded-[16px] ${variantStyles.container} ${sizeStyles.padding}`}
         >
-          <h1
-            className={`${sizeStyles.titleSize} font-semibold w-fit whitespace-pre-line ${variantStyles.title}`}
-          >
-            {title}
-          </h1>
-          {description && (
-            <p
-              className={`${sizeStyles.descriptionSize} whitespace-pre-line ${variantStyles.description}`}
-            >
-              {description}
-            </p>
-          )}
-        </div>
-
-        {icon && (
-          <div className="relative w-full h-full flex-[1]">
+          {/* 텍스트 */}
+          <div>
+            <div className={`flex flex-col gap-[17px] `}>
+              <h1
+                className={`inline-block w-fit ${sizeStyles.titleSize} font-semibold whitespace-pre-line ${variantStyles.title}`}
+              >
+                {title}
+              </h1>
+              {description && (
+                <p
+                  className={`w-[70%] font-normal ${sizeStyles.descriptionSize} whitespace-pre-line ${variantStyles.description}`}
+                >
+                  {description}
+                </p>
+              )}
+            </div>
+          </div>
+          {icon && (
             <img
               src={icon}
-              alt="카드 이미지"
-              className={`absolute right-0 ${
-                size === 'medium' ? 'top-1/2 -translate-y-1/2' : 'bottom-0'
-              }`}
+              alt="카드 아이콘"
+              className={`absolute ${'bottom-[28px]'} right-5 ${size === 'medium' ? 'w-[53px]' : 'w-[102px]'}`}
             />
-          </div>
-        )}
-      </div>
-    </Link>
+          )}
+        </div>
+      </Link>
+    </AnimatedWrapper>
   );
 };
 

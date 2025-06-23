@@ -1,4 +1,3 @@
-import React from 'react';
 import BotBubble from './BotBubble';
 import CarouselButtonGroup from './ChatButtonGroups/CarouselButtonGroup';
 import OttButtonGroup from './ChatButtonGroups/OttButtonGroup';
@@ -66,6 +65,20 @@ export interface BotBubbleFrameProps {
   messageChunks: string[];
   functionCall?: FunctionCall;
   onButtonClick?: (message: string) => void;
+  onCarouselSelect?: (
+    carouselData: CarouselItem[],
+    selectedItem: CarouselItem,
+    messageIndex?: number,
+  ) => void;
+  onOttSelect?: (selectedServices: string[], messageIndex?: number) => void;
+  onOxSelect?: (selectedOption: string, messageIndex?: number) => void;
+  messageIndex?: number;
+  selectedData?: {
+    selectedItem?: CarouselItem;
+    selectedServices?: string[];
+    selectedOption?: string; // OX 버튼 선택된 옵션 (label)
+    isSelected: boolean;
+  }; // 모든 버튼 그룹 지원을 위해 확장
   showChatbotIcon?: boolean;
 }
 
@@ -73,6 +86,11 @@ const BotBubbleFrame = ({
   messageChunks,
   functionCall,
   onButtonClick,
+  onCarouselSelect,
+  onOttSelect,
+  onOxSelect,
+  messageIndex,
+  selectedData,
   showChatbotIcon = true,
 }: BotBubbleFrameProps) => {
   const shouldShowMessage = !functionCall || messageChunks[0]?.trim() !== '';
@@ -86,6 +104,10 @@ const BotBubbleFrame = ({
           <CarouselButtonGroup
             options={args.items}
             onButtonClick={onButtonClick}
+            onCarouselSelect={(carouselData, selectedItem) =>
+              onCarouselSelect?.(carouselData, selectedItem, messageIndex)
+            }
+            selectedData={selectedData} // 새로 추가
           />
         ) : null;
       case 'requestOXCarouselButtons':
@@ -100,10 +122,42 @@ const BotBubbleFrame = ({
                 : (args.options as OXOption[])
             }
             onButtonClick={onButtonClick}
+            onOxSelect={(selectedOption) =>
+              onOxSelect?.(selectedOption, messageIndex)
+            }
+            selectedData={
+              selectedData?.selectedOption
+                ? {
+                    selectedOption: selectedData.selectedOption,
+                    isSelected: selectedData.isSelected,
+                  }
+                : undefined
+            }
           />
         ) : null;
       case 'requestOTTServiceList':
-        return <OttButtonGroup onButtonClick={onButtonClick} />;
+        // 디버깅 로그 추가
+        console.log(
+          '🎬 BotBubbleFrame rendering OTT with selectedData:',
+          selectedData,
+        );
+
+        return (
+          <OttButtonGroup
+            onButtonClick={onButtonClick}
+            onOttSelect={(selectedServices) =>
+              onOttSelect?.(selectedServices, messageIndex)
+            }
+            selectedData={
+              selectedData?.selectedServices
+                ? {
+                    selectedServices: selectedData.selectedServices,
+                    isSelected: selectedData.isSelected,
+                  }
+                : undefined
+            }
+          />
+        );
       case 'requestTextCard':
         return args?.title &&
           args?.description &&
@@ -166,4 +220,4 @@ const BotBubbleFrame = ({
   );
 };
 
-export default React.memo(BotBubbleFrame);
+export default BotBubbleFrame;
