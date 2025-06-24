@@ -93,15 +93,15 @@ const TestPage = () => {
         <div className="flex flex-col items-center gap-4 w-full">
           <img src={moonerSrc} alt="무너" className="w-[140px]" />
 
-          <div className="relative w-full px-4">
-            <p className="text-center text-gray800 text-[20px] font-semibold">
+          <div className="relative w-full flex justify-center">
+            <p className="text-center text-gray800 text-[20px] font-semibold w-[calc(100%-64px)]">
               {currentQuestion.text}
             </p>
 
             <button
               onClick={handleBack}
               disabled={currentIndex === 0 || isTransitioning}
-              className="absolute left-0 top-1/2 -translate-y-1/2"
+              className="absolute left-0 top-1/2 -translate-y-1/2 p-3 cursor-pointer"
             >
               <img src={back} alt="이전질문" className="w-[8px] h-[16px]" />
             </button>
@@ -111,7 +111,7 @@ const TestPage = () => {
               disabled={
                 currentIndex === questions.length - 1 || isTransitioning
               }
-              className="absolute right-0 top-1/2 -translate-y-1/2"
+              className="absolute right-0 top-1/2 -translate-y-1/2 p-3 cursor-pointer"
             >
               <img src={next} alt="다음질문" className="w-[8px] h-[16px]" />
             </button>
