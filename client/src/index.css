@@ -90,7 +90,7 @@
   }
   #root {
     @apply overflow-x-hidden overflow-y-auto relative max-w-[600px] w-full min-h-screen;
-    @apply pr-[20px] pb-[0px] pl-[20px];
+    @apply p-[0px];
     box-shadow: var(--shadow-basic);
     background-color: var(--color-background);
     /* 스크롤바 숨기기 */

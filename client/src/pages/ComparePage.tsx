@@ -1233,7 +1233,7 @@ const ComparePage: React.FC = () => {
   }, []); // localFallbackPlans는 컴포넌트 외부에서 정의된 상수이므로 의존성 불필요
 
   return (
-    <>
+    <div className="px-5">
       <Header title="요금제 비교하기" onBackClick={() => openModal()} />
       {isModalOpen && (
         <Modal
@@ -1330,7 +1330,7 @@ const ComparePage: React.FC = () => {
           </div>
         </div>
       </BottomSheet>
-    </>
+    </div>
   );
 };
 

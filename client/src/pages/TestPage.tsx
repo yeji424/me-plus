@@ -245,7 +245,7 @@ const TestPage = () => {
   );
 
   return (
-    <div className="flex flex-col">
+    <div className="px-5 flex flex-col">
       <Header
         title="나에게 잘 어울리는 요금제는?"
         onBackClick={handleBackClick}
