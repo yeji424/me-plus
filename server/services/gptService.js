@@ -235,7 +235,6 @@ ${executedFunctions}
   ];
 
   console.log('🔄 Generating follow-up question with mini model');
-  console.log('📝 Executed functions:', executedFunctions);
 
   // 역질문 전용 streamChat 호출 (FOLLOWUP_TOOLS 사용)
   await streamChatForFollowUp(followUpMessages, socket, GPTConfig.MODEL_MINI);
