@@ -72,6 +72,7 @@ export interface BotBubbleFrameProps {
   ) => void;
   onOttSelect?: (selectedServices: string[], messageIndex?: number) => void;
   onOxSelect?: (selectedOption: string, messageIndex?: number) => void;
+  onToggleCardClick?: (cardElement: HTMLDivElement) => void;
   messageIndex?: number;
   selectedData?: {
     selectedItem?: CarouselItem;
@@ -89,6 +90,7 @@ const BotBubbleFrame = ({
   onCarouselSelect,
   onOttSelect,
   onOxSelect,
+  onToggleCardClick,
   messageIndex,
   selectedData,
   showChatbotIcon = true,
@@ -174,7 +176,11 @@ const BotBubbleFrame = ({
         return args?.plans ? (
           <div className="space-y-3">
             {args.plans.map((plan, index) => (
-              <ToggleCard key={plan._id || index} plan={plan} />
+              <ToggleCard
+                key={plan._id || index}
+                plan={plan}
+                onToggleClick={onToggleCardClick}
+              />
             ))}
           </div>
         ) : null;

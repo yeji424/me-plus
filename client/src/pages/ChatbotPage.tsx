@@ -313,6 +313,25 @@ const ChatbotPage = () => {
     });
   }, []);
 
+  // ToggleCard 위치로 스크롤하는 함수
+  const scrollToToggleCard = useCallback((cardElement: HTMLDivElement) => {
+    if (!containerRef.current) return;
+
+    // 카드의 위치 정보 가져오기
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const cardRect = cardElement.getBoundingClientRect();
+
+    // flex-col-reverse 때문에 계산이 복잡함
+    // 카드가 뷰포트 상단에 오도록 스크롤 위치 계산
+    const scrollTop = containerRef.current.scrollTop;
+    const targetScrollTop = scrollTop + (cardRect.top - containerRect.top) - 50;
+
+    containerRef.current.scrollTo({
+      top: targetScrollTop,
+      behavior: 'smooth',
+    });
+  }, []);
+
   // 새 메시지가 추가되었을 때 스크롤 조정
   useEffect(() => {
     if (!isNewMessageAdded) return;
@@ -426,6 +445,7 @@ const ChatbotPage = () => {
                     onCarouselSelect={handleCarouselSelect}
                     onOttSelect={handleOttSelect}
                     onOxSelect={handleOxSelect}
+                    onToggleCardClick={scrollToToggleCard}
                     messageIndex={allMessages.length - 1 - idx} // 역순 배열에서 실제 인덱스 계산
                     selectedData={msg.selectedData}
                     showChatbotIcon={showChatbotIcon}

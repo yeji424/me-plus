@@ -13,12 +13,14 @@ export interface ColorTheme {
 
 interface ToggleCardProps {
   plan: PlanData;
+  onToggleClick?: (cardRef: HTMLDivElement) => void;
 }
 
-function ToggleCard({ plan }: ToggleCardProps) {
+function ToggleCard({ plan, onToggleClick }: ToggleCardProps) {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const [contentHeight, setContentHeight] = useState(0);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // 색상 테마 중앙 관리
   const colorTheme = {
@@ -108,10 +110,24 @@ function ToggleCard({ plan }: ToggleCardProps) {
     config: { tension: 250, friction: 25 },
   });
 
+  const handleClick = () => {
+    const wasOpen = isOpen;
+    setIsOpen(!isOpen);
+
+    // 카드가 닫혀있다가 열릴 때만 스크롤 요청
+    if (!wasOpen && onToggleClick && cardRef.current) {
+      // 애니메이션이 완료된 후 스크롤하도록 지연
+      setTimeout(() => {
+        onToggleClick(cardRef.current!);
+      }, 300); // 애니메이션 duration과 맞춤
+    }
+  };
+
   return (
     <div
+      ref={cardRef}
       className="w-[309px] bg-background-40 rounded-lg relative cursor-pointer overflow-hidden"
-      onClick={() => setIsOpen(!isOpen)}
+      onClick={handleClick}
     >
       <div
         className={`absolute top-0 left-0 w-[5px] h-full ${colorTheme.bgColor}`}
