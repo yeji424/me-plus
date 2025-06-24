@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
-import { GPTConfig } from '../utils/constants.js';
-import { GPTStreamProcessor } from './gptStreamProcessor.js';
+import { GPTConfig, SocketEvent, LoadingType } from '../utils/constants.js';
 import { handleFunctionCall } from './gptFunctionHandler.js';
 import { handleGPTError } from './gptErrorHandler.js';
 import { GPT_TOOLS } from './gptToolDefinitions.js';
@@ -18,54 +17,76 @@ export const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
  */
 export const streamChat = async (messages, socket, onDelta) => {
   try {
-    // 타임아웃 및 스트림 설정
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(
-        () => reject(new Error('REQUEST_TIMEOUT')),
-        GPTConfig.TIMEOUT_MS,
-      );
-    });
-
-    const streamPromise = openai.chat.completions.create({
+    const stream = await openai.responses.create({
       model: GPTConfig.MODEL,
-      messages,
+      input: messages,
       stream: true,
+      tool_choice: 'auto',
       tools: GPT_TOOLS,
+      parallel_tool_calls: true,
     });
 
-    const streamRes = await Promise.race([streamPromise, timeoutPromise]);
+    // 함수 호출 정보 누적용
+    const functionCallMap = {}; // { [item_id]: { ... } }
+    const functionCalls = []; // 최종 실행용 배열
 
-    // 스트림 프로세서 초기화
-    const processor = new GPTStreamProcessor(socket, onDelta);
+    for await (const event of stream) {
+      console.log('event', event);
+      // 1. 함수 호출 item 추가
+      if (
+        event.type === 'response.output_item.added' &&
+        event.item.type === 'function_call'
+      ) {
+        functionCallMap[event.item.id] = {
+          ...event.item,
+          arguments: '',
+        };
 
-    // 스트림 처리
-    for await (const chunk of streamRes) {
-      const delta = chunk.choices[0].delta;
-
-      // tool_calls 처리
-      if (processor.processToolCalls(delta)) {
-        continue;
+        // 함수명에 따라 DB 호출/검색 타입 구분해서 로딩 emit
+        const functionName = event.item.name;
+        socket.emit(SocketEvent.LOADING, {
+          type: functionName?.includes('Plan')
+            ? LoadingType.DB_CALLING
+            : LoadingType.SEARCHING,
+          functionName: functionName,
+        });
+        console.log('🔄 로딩 시작:', functionName);
       }
 
-      // 일반 텍스트 content 처리
-      const content = delta?.content;
-      if (content) {
-        if (processor.processContent(content)) {
-          break; // 스트리밍 종료
+      // 2. arguments 조각 누적
+      else if (event.type === 'response.function_call_arguments.delta') {
+        const id = event.item_id;
+        if (functionCallMap[id]) {
+          functionCallMap[id].arguments += event.delta;
         }
       }
+
+      // 3. arguments 누적 완료(함수 호출 하나 완성)
+      else if (event.type === 'response.function_call_arguments.done') {
+        const id = event.item_id;
+        const call = functionCallMap[id];
+        if (call) {
+          functionCalls.push({
+            functionName: call.name,
+            functionArgsRaw: call.arguments,
+          });
+        }
+      }
+
+      // 4. 일반 텍스트 스트림 (output_text 등)
+      else if (event.type === 'response.output_text.delta') {
+        socket.emit(SocketEvent.STREAM, event.delta);
+        if (onDelta) onDelta(event.delta);
+      }
     }
 
-    // 스트리밍 완료 처리
-    processor.finishStream();
-
-    // 함수 호출이 감지된 경우 처리
-    const { isFunctionCalled, functionName, functionArgsRaw } =
-      processor.getFunctionCallInfo();
-    if (isFunctionCalled) {
+    // 모든 함수 호출 실행
+    console.log(functionCalls);
+    for (const { functionName, functionArgsRaw } of functionCalls) {
       await handleFunctionCall(functionName, functionArgsRaw, socket);
     }
-    socket.emit('done');
+
+    socket.emit(SocketEvent.DONE);
   } catch (error) {
     handleGPTError(error, socket);
   }
