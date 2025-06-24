@@ -85,6 +85,7 @@ export const useChatSocket = () => {
   // 항상 로컬스토리지 사용
   const useLocalStorage = true;
   const responseRef = useRef('');
+  const followUpResponseRef = useRef(''); // 역질문 전용 ref
 
   // 로컬스토리지에 메시지 저장하는 함수
   const saveMessagesToLocal = useCallback(
@@ -447,9 +448,33 @@ export const useChatSocket = () => {
       });
     };
 
+    // 역질문 전용 스트림 핸들러
+    const handleFollowUpStream = (chunk: string) => {
+      followUpResponseRef.current += chunk;
+      console.log('📥 Follow-up stream chunk:', chunk);
+
+      setMessages((prev) => {
+        // 첫 번째 청크인 경우 새 메시지 추가, 그 외는 마지막 메시지 업데이트
+        if (chunk === followUpResponseRef.current) {
+          // 첫 번째 청크 - 새 메시지 추가
+          return [
+            ...prev,
+            { type: 'bot', messageChunks: [followUpResponseRef.current] },
+          ];
+        } else {
+          // 후속 청크 - 마지막 메시지 업데이트
+          return [
+            ...prev.slice(0, -1),
+            { type: 'bot', messageChunks: [followUpResponseRef.current] },
+          ];
+        }
+      });
+    };
+
     const handleDone = () => {
       console.log('✅ Stream completed');
       setIsStreaming(false);
+      followUpResponseRef.current = ''; // 역질문 완료 시 리셋
     };
 
     const handleError = (error: ServerError) => {
@@ -491,12 +516,14 @@ export const useChatSocket = () => {
     };
 
     socket.on('stream', handleStream);
+    socket.on('follow-up-stream', handleFollowUpStream);
     socket.on('done', handleDone);
     socket.on('error', handleError);
     socket.on('disconnect', handleDisconnect);
 
     return () => {
       socket.off('stream', handleStream);
+      socket.off('follow-up-stream', handleFollowUpStream);
       socket.off('done', handleDone);
       socket.off('error', handleError);
       socket.off('disconnect', handleDisconnect);

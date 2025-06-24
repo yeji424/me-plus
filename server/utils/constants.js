@@ -94,6 +94,7 @@ export const ErrorType = {
 
 export const SocketEvent = {
   STREAM: 'stream',
+  FOLLOWUP_STREAM: 'follow-up-stream',
   DONE: 'done',
   LOADING: 'loading',
   LOADING_END: 'loading-end',
