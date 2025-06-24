@@ -1,10 +1,12 @@
 import React from 'react';
+import AnimatedWrapper from '../common/AnimatedWrapper';
 
 interface SelectButton3Props {
   label: string;
   selected: boolean;
   onClick: () => void;
   disabled?: boolean;
+  animationDisabled?: boolean;
 }
 
 const SelectButton3: React.FC<SelectButton3Props> = ({
@@ -12,6 +14,7 @@ const SelectButton3: React.FC<SelectButton3Props> = ({
   selected,
   onClick,
   disabled,
+  animationDisabled,
 }) => {
   const baseClass =
     'w-full px-[27px] py-[25px] text-[16px] rounded-xl font-medium transition-all text-left flex justify-start bg-white';
@@ -37,16 +40,19 @@ const SelectButton3: React.FC<SelectButton3Props> = ({
   const selectedBorder = selected ? 'bg-gradation' : 'bg-gray200';
 
   return (
-    <div className={`p-[2px] rounded-[14px] ${selectedBorder}`}>
+    <AnimatedWrapper
+      className={`p-[2px] rounded-[14px] ${selectedBorder}`}
+      animationDisabled={animationDisabled}
+    >
       <button
         onClick={onClick}
         disabled={disabled}
-        className={`${baseClass} ${selectedClass} ${fadeClass}`}
+        className={`${baseClass} ${selectedClass} ${fadeClass} ${!disabled ? 'cursor-pointer' : ''}`}
         style={style}
       >
         {label}
       </button>
-    </div>
+    </AnimatedWrapper>
   );
 };
 

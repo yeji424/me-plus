@@ -26,7 +26,7 @@ const FloatingIcon: React.FC<FloatingIconProps> = ({
         rotateY: isLarge ? [0, 0, 0] : [0, 15, 0],
       }}
       transition={{
-        duration: isLarge ? 1.2 : 3,
+        duration: isLarge ? 1.5 : 3,
         repeat: Infinity,
         ease: 'easeInOut',
       }}

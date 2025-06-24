@@ -1,6 +1,7 @@
 import React from 'react';
 import YesIcon from '@/assets/icon/yes.svg?react';
 import NoIcon from '@/assets/icon/no.svg?react';
+import AnimatedWrapper from '@/components/common/AnimatedWrapper';
 
 interface SelectButtonProps {
   label: string;
@@ -8,6 +9,7 @@ interface SelectButtonProps {
   onClick: () => void;
   type: 'yes' | 'no';
   disabled?: boolean;
+  animationDisabled?: boolean;
 }
 
 const SelectButton: React.FC<SelectButtonProps> = ({
@@ -16,6 +18,7 @@ const SelectButton: React.FC<SelectButtonProps> = ({
   onClick,
   type,
   disabled,
+  animationDisabled,
 }) => {
   const baseClass =
     'w-[153px] h-[153px] flex flex-col items-center justify-center text-[16px] transition-all rounded-[20px] bg-white';
@@ -44,19 +47,26 @@ const SelectButton: React.FC<SelectButtonProps> = ({
   const selectedBorder = selected ? 'bg-gradation' : 'bg-gray200';
 
   return (
-    <div className={`p-[2px] rounded-[22px] ${selectedBorder}`}>
+    <AnimatedWrapper
+      className={`p-[2px] rounded-[22px] ${selectedBorder}`}
+      animationDisabled={animationDisabled}
+    >
       <button
         onClick={onClick}
         disabled={disabled}
-        className={`${baseClass} ${textColor} ${
-          selected ? '' : ' bg-white'
-        } ${fadeClass}`}
+        className={`
+          ${baseClass}
+          ${textColor}
+          ${selected ? '' : ' bg-white'}
+          ${fadeClass}
+          ${!disabled ? 'cursor-pointer' : ''}
+          `}
         style={selectedStyle}
       >
         <IconComponent className={`w-[50px] h-[50px] mb-1 ${iconColor}`} />
         <span>{label}</span>
       </button>
-    </div>
+    </AnimatedWrapper>
   );
 };
 
