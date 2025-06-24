@@ -1,7 +1,10 @@
 import { Server } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
 import { handlePlanRecommend } from '../controllers/planSocketController.js';
-import { ChatSession } from '../models/ChatSession.js';
+import {
+  emitRecommendReasonByGuide,
+  getPlanIds,
+} from '../services/gptFuncCallTest.js';
 import { conditionByPlanGuide, InputRoleEnum } from '../utils/constants.js';
 
 export const setupSocket = (server) => {
@@ -22,7 +25,7 @@ export const setupSocket = (server) => {
     });
 
     // 기본 대화
-    socket.on('chat', (userInput) => {
+    socket.on('recommend-plan', (userInput) => {
       handlePlanRecommend(socket, userInput);
     });
 

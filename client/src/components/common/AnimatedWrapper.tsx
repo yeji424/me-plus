@@ -34,10 +34,10 @@ const AnimatedCardWrapper: React.FC<AnimatedCardWrapperProps> = ({
     <motion.div
       className={className}
       whileHover={{
-        scale: 0.98,
+        scale: 0.97,
         transition: { duration: 0.2, ease: 'easeInOut' },
       }}
-      whileTap={{ scale: 0.97, transition: { duration: 0.2, ease: 'easeOut' } }}
+      whileTap={{ scale: 0.95, transition: { duration: 0.2, ease: 'easeOut' } }}
       onTap={handleTap}
     >
       {/* 반짝임 레이어 */}
