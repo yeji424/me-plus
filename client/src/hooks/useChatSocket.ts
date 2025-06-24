@@ -104,7 +104,6 @@ export const useChatSocket = () => {
         };
 
         saveSession(chatSession);
-        console.log('💾 Messages saved to localStorage:', messagesArray.length);
       } catch (error) {
         console.error('❌ Failed to save messages to localStorage:', error);
       }
@@ -145,10 +144,6 @@ export const useChatSocket = () => {
         const localMessages = loadMessagesFromLocal(id);
         if (localMessages.length > 0) {
           setMessages(localMessages);
-          console.log(
-            '📂 로컬스토리지에서 세션 히스토리 불러옴:',
-            localMessages.length,
-          );
         } else {
           console.log('📭 로컬스토리지에 저장된 히스토리 없음');
         }
@@ -164,17 +159,13 @@ export const useChatSocket = () => {
     (
       logs: { role: string; content: string; type?: string; data?: unknown }[],
     ) => {
-      console.log('📋 Session history received from server:', logs);
-
       // 로컬스토리지 사용 시에는 서버 히스토리 무시
       if (useLocalStorage) {
-        console.log('💾 로컬스토리지 사용 중이므로 서버 히스토리 무시');
         return;
       }
 
       // 서버 히스토리가 비어있으면 처리하지 않음
       if (!logs || logs.length === 0) {
-        console.log('📭 서버 히스토리가 비어있음');
         return;
       }
 
@@ -195,8 +186,6 @@ export const useChatSocket = () => {
 
         // 새로 추가: function_call 타입 처리
         if (msg.type === 'function_call' && msg.role === 'assistant') {
-          console.log('🔧 Function call message detected:', msg.data);
-
           // data에서 function call 정보 추출
           const functionCallData = msg.data as {
             name?: string;
@@ -223,7 +212,6 @@ export const useChatSocket = () => {
                 selectedServices: functionCallData.selectedServices,
                 isSelected: functionCallData.isSelected,
               };
-              console.log('✅ Selected data loaded:', botMessage.selectedData);
             }
 
             return botMessage;
@@ -375,31 +363,6 @@ export const useChatSocket = () => {
     socket.on('text-card', handleTextCard);
     socket.on('first-card-list', handleFirstCardList);
 
-    // 제거: 서버에서 더 이상 이벤트를 보내지 않음 (로컬스토리지 사용)
-    // socket.on('carousel-selection-updated', ({ messageIndex, selectedItem, isSelected }) => {
-    //   console.log('✅ Carousel selection updated:', { messageIndex, selectedItem, isSelected });
-    //   setMessages((prev) =>
-    //     prev.map((msg, idx) => {
-    //       if (idx === messageIndex && msg.type === 'bot') {
-    //         return { ...msg, selectedData: { selectedItem, isSelected } };
-    //       }
-    //       return msg;
-    //     }),
-    //   );
-    // });
-
-    // socket.on('ott-selection-updated', ({ messageIndex, selectedServices, isSelected }) => {
-    //   console.log('✅ OTT selection updated:', { messageIndex, selectedServices, isSelected });
-    //   setMessages((prev) =>
-    //     prev.map((msg, idx) => {
-    //       if (idx === messageIndex && msg.type === 'bot') {
-    //         return { ...msg, selectedData: { selectedServices, isSelected } };
-    //       }
-    //       return msg;
-    //     }),
-    //   );
-    // });
-
     return () => {
       socket.off('session-id', handleSessionId);
       socket.off('session-history', handleSessionHistory);
@@ -411,8 +374,6 @@ export const useChatSocket = () => {
       socket.off('plan-lists', handlePlanLists);
       socket.off('text-card', handleTextCard);
       socket.off('first-card-list', handleFirstCardList);
-      // socket.off('carousel-selection-updated'); // 제거: 더 이상 사용 안 함
-      // socket.off('ott-selection-updated'); // 제거: 더 이상 사용 안 함
     };
   }, [
     handleSessionId,
@@ -431,7 +392,6 @@ export const useChatSocket = () => {
     const handleStream = (chunk: string) => {
       responseRef.current += chunk;
 
-      // console.log('📥 Stream chunk:', chunk, responseRef.current);
       setMessages((prev) => {
         const last = prev[prev.length - 1];
         if (last?.type === 'bot') {

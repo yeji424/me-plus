@@ -69,7 +69,6 @@ export const saveSession = (session: ChatSession): void => {
     }
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
-    console.log('✅ 세션 저장 완료:', session.sessionId);
   } catch (error) {
     console.error('❌ 세션 저장 실패:', error);
   }
