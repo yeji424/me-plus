@@ -9,7 +9,7 @@ import testIcon from '@/assets/icon/test_icon.png';
 
 const MainPage: React.FC = () => {
   return (
-    <div className="" style={{ top: '-25px' }}>
+    <div className="px-5" style={{ top: '-25px' }}>
       {/* 제목 */}
       <FadeInUpDiv custom={0} className="mb-[37px]">
         <h2 className="text-2xl font-semibold">
