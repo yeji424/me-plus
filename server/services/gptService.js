@@ -135,11 +135,36 @@ export const streamChatWithFollowUp = async (messages, socket, onDelta) => {
       socket,
       onDelta,
     );
-    // 2단계: function calling 완료 후 역질문 필요성 판단
+
+    // 2단계: 특정 함수 호출 시에만 역질문 생성
     if (hasFunctionCalls) {
-      console.log('🔄 Function calls detected, generating follow-up question');
-      // 역질문 생성을 위한 새로운 턴
-      await generateFollowUpQuestion(messages, functionResults, socket);
+      // 역질문 대상 함수들
+      const followUpTargetFunctions = ['requestTextCard', 'showPlanLists'];
+      console.log(functionResults);
+      // 실행된 함수들 중 역질문 대상이 있는지 확인
+      const executedFunctionNames = functionResults
+        .filter((result) => result.role === 'assistant')
+        .map((result) => {
+          const match = result.content.match(/^(\w+) 함수를 호출했습니다/);
+          return match ? match[1] : null;
+        })
+        .filter(Boolean);
+
+      const shouldGenerateFollowUp = executedFunctionNames.some((funcName) =>
+        followUpTargetFunctions.includes(funcName),
+      );
+
+      if (shouldGenerateFollowUp) {
+        console.log(
+          '🔄 Target functions detected, generating follow-up question',
+        );
+        console.log('📝 Executed functions:', executedFunctionNames);
+        // 역질문 생성을 위한 새로운 턴
+        await generateFollowUpQuestion(messages, functionResults, socket);
+      } else {
+        console.log('⏭️ No target functions, skipping follow-up question');
+        console.log('📝 Executed functions:', executedFunctionNames);
+      }
     }
   } catch (error) {
     handleGPTError(error, socket);
