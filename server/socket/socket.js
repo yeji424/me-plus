@@ -26,19 +26,6 @@ export const setupSocket = (server) => {
       handlePlanRecommend(socket, userInput);
     });
 
-    // 제거: 로컬스토리지로 마이그레이션으로 인해 MongoDB 저장 불필요
-    // socket.on('carousel-selection', (selectionData) => {
-    //   handleCarouselSelection(socket, selectionData);
-    // });
-
-    // socket.on('update-carousel-selection', (updateData) => {
-    //   handleUpdateCarouselSelection(socket, updateData);
-    // });
-
-    // socket.on('update-ott-selection', (updateData) => {
-    //   handleUpdateOttSelection(socket, updateData);
-    // });
-
     /** 가이드 별 적절한 요금제를 추천 */
     socket.on('recommend-plan-by-guide', async (message) => {
       console.log('recommend-plan-by-guide >>', message);
