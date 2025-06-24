@@ -1307,7 +1307,7 @@ const ComparePage: React.FC = () => {
               <LoadingBubble type="dbcalling" />
             </div>
           )}
-          <div className="flex flex-col gap-2 select-none mb-3 px-5 mt-[190px]">
+          <div className="flex flex-col gap-2 select-none mb-3 px-5 mt-[178px]">
             {filteredPlans.map((plan, i) => (
               <FadeInUpDiv
                 key={plan._id}

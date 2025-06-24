@@ -58,7 +58,7 @@ const Carousel: React.FC<CategoryCarouselProps> = ({
   return (
     <div
       ref={scrollContainerRef}
-      className="w-full flex gap-2 overflow-x-auto py-3 px-5 text-xs select-none"
+      className="w-full flex gap-2 overflow-x-auto py-[5px] px-5 text-xs select-none"
       style={{
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
@@ -69,7 +69,7 @@ const Carousel: React.FC<CategoryCarouselProps> = ({
       {categoryList.map((label, idx) => (
         <div
           key={idx}
-          className={`h-9 rounded-xl shadow-small flex justify-center items-center cursor-pointer
+          className={`h-9 rounded-xl shadow-sm flex justify-center items-center cursor-pointer
     transition-colors duration-200 ease-in-out px-[13px] whitespace-nowrap
     ${
       activeIndex === idx
