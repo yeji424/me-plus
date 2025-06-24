@@ -156,7 +156,7 @@ const TestResultPage = () => {
             ease: 'easeOut',
           }}
         >
-          <div className="z-10 flex flex-col justfy-center mt-6 gap-2">
+          <div className="z-10 flex flex-col justfy-center gap-2">
             <div className="z-10 text-[21.5px] font-semibold text-secondary-purple-80">
               {plan.name}
             </div>
@@ -252,7 +252,7 @@ const TestResultPage = () => {
           </FadeInUpDiv>
           <FadeInUpDiv
             custom={6}
-            className="z-10 mt-[36px] text-[32px] font-semibold text-primary-pink pb-[50px]"
+            className="z-10 mt-[10px] text-[32px] font-semibold text-primary-pink pb-[50px]"
           >
             월 {plan.price?.toLocaleString()}원
           </FadeInUpDiv>
