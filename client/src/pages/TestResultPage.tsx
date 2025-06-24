@@ -125,7 +125,7 @@ const TestResultPage = () => {
   }
 
   return (
-    <div className="h-screen px-5 flex flex-col items-center text-center">
+    <div className="h-screen flex flex-col items-center text-center">
       <Header
         title="나에게 잘 어울리는 요금제는?"
         onBackClick={handleBackClick}

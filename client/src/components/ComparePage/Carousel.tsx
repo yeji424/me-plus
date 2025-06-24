@@ -58,7 +58,7 @@ const Carousel: React.FC<CategoryCarouselProps> = ({
   return (
     <div
       ref={scrollContainerRef}
-      className="w-full flex gap-2 overflow-x-auto py-[5px] text-xs select-none"
+      className="w-full flex gap-2 overflow-x-auto py-[5px] px-5 text-xs select-none"
       style={{
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',

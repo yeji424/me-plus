@@ -112,7 +112,6 @@ const ChatbotPage = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const [searchParams] = useSearchParams();
   const [showBackModal, setShowBackModal] = useState(false);
-  const [showCallModal, setShowCallModal] = useState(false);
 
   // 사용자 정보 확인: URL 파라미터에서만 읽음 - 메모이제이션으로 최적화
   const userProfile = useMemo(
@@ -173,7 +172,6 @@ const ChatbotPage = () => {
 
   const handleClose = () => {
     setShowBackModal(false);
-    setShowCallModal(false);
   };
   // 인라인 함수들을 useCallback으로 최적화
   const handleInputChange = useCallback((value: string) => {
@@ -325,7 +323,7 @@ const ChatbotPage = () => {
   const iconButtons = useMemo(
     () => [
       { icon: <NewChatIcon />, onClick: () => setShowBackModal(true) },
-      { icon: <CallIcon />, onClick: () => setShowCallModal(true) },
+      { icon: <CallIcon />, onClick: () => {} },
     ],
     [], // setShowBackModal은 setState 함수로 안정적이므로 의존성 불필요
   );
@@ -425,7 +423,7 @@ const ChatbotPage = () => {
           fullWidth
           onClick={handleClose}
         >
-          돌아가기
+          닫기
         </Button>
 
         <Button
@@ -438,34 +436,6 @@ const ChatbotPage = () => {
           }}
         >
           새로 시작하기
-        </Button>
-      </Modal>
-
-      <Modal
-        isOpen={showCallModal}
-        onClose={() => setShowCallModal(false)}
-        modalTitle="고객센터 080-019-7000"
-        modalDesc="상담원 연결을 시작할 경우, 이전에 진행한 상담은 모두 초기화됩니다."
-      >
-        <Button
-          variant="secondary"
-          size="medium"
-          fullWidth
-          onClick={handleClose}
-        >
-          돌아가기
-        </Button>
-
-        <Button
-          variant="primary"
-          size="medium"
-          fullWidth
-          onClick={() => {
-            handleNewChat();
-            handleClose();
-          }}
-        >
-          전화하기
         </Button>
       </Modal>
     </>

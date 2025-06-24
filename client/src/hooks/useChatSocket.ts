@@ -517,7 +517,7 @@ export const useChatSocket = () => {
       setIsStreaming(true);
       responseRef.current = '';
 
-      socket.emit('chat', payload);
+      socket.emit('recommend-plan', payload);
     },
     [sessionId],
   );
