@@ -17,6 +17,7 @@ const FOLLOWUP_TOOLS = GPT_TOOLS.filter((tool) =>
     'requestOTTServiceList',
   ].includes(tool.name),
 );
+let usedTotalTokens = 0;
 
 /**
  * GPT 스트림 채팅을 처리합니다.
@@ -47,7 +48,6 @@ export const streamChat = async (
     const functionCalls = []; // 최종 실행용 배열
 
     for await (const event of stream) {
-      console.log('event', event);
       // 1. 함수 호출 item 추가
       if (
         event.type === 'response.output_item.added' &&
@@ -92,6 +92,9 @@ export const streamChat = async (
       // 4. 일반 텍스트 스트림 (output_text 등)
       else if (event.type === 'response.output_text.delta') {
         socket.emit(SocketEvent.STREAM, event.delta);
+        if (onDelta) onDelta(event.delta);
+      } else if (event.type === 'response.completed') {
+        usedTotalTokens += event.response.usage.total_tokens;
         if (onDelta) onDelta(event.delta);
       }
     }
@@ -191,37 +194,43 @@ const generateFollowUpQuestion = async (
   const followUpMessages = [
     {
       role: 'system',
-      content: `너는 요금제 추천 후 추가 질문이 필요한지 판단하는 전문가야.
+      content: `너는 요금제 추천 후 고객에게 추가 혜택을 안내하는 상담사야.
 
-다음 상황에서만 역질문을 생성해:
-1. 사용자의 데이터 사용량이 구체적이지 않을 때
-2. 가족 결합 할인 가능성이 있을 때  
-3. 특정 OTT 서비스 선호도를 확인해야 할 때
-4. 통신사 선호도가 불분명할 때
+이미 요금제를 보여줬으니, 요금제 설명은 다시 하지 말고 추가 혜택 질문만 해줘:
 
-역질문이 필요하면 다음 기능들을 사용할 수 있어:
-- requestCarouselButtons: 선택지 버튼 제공
-- requestOXCarouselButtons: 예/아니오 선택
-- requestOTTServiceList: OTT 서비스 선택
+**중요: 간결한 질문 후 바로 함수 호출**
 
-역질문이 필요없다면 빈 응답을 해줘.
-역질문이 필요하다면 간단하고 자연스러운 질문 하나만 해줘.`,
+**질문 예시들:**
+1. "혹시 가족 구성원 중 만 18세 이하의 청소년 자녀가 있으신가요? 있으시다면 추가 결합 혜택도 안내드릴게요!" 
+   → 이 질문 후 바로 requestOXCarouselButtons 호출
+   
+2. "혹시 사용 중인 인터넷이 있으신가요? LG U+에서 500Mbps 이상 인터넷을 사용 중이시면 추가 할인을 받을 수 있어요!" 
+   → 이 질문 후 바로 requestOXCarouselButtons 호출
+   
+3. "평소 한 달에 데이터를 얼마나 사용하시나요? 더 정확한 요금제를 추천드릴게요!" 
+   → 이 질문 후 바로 requestCarouselButtons 호출
+   
+4. "평소 자주 시청하시는 OTT 서비스가 있으신가요? 요금제와 함께 이용하시면 더 저렴해질 수 있어요!" 
+   → 이 질문 후 바로 requestOTTServiceList 호출
+
+**절대 규칙:**
+- 요금제 정보는 절대 다시 설명하지 마
+- 간결한 질문만 하고 바로 함수 호출
+- "답변해주세요", "알려주세요" 같은 추가 멘트 금지
+- 질문 끝에 감탄표(!) 후 바로 함수 호출
+- 질문이 필요없다면 빈 응답`,
     },
     ...userMessages,
     {
       role: 'assistant',
-      content: '요금제 검색을 완료했습니다.',
+      content: '요금제를 확인해보세요.',
     },
     {
       role: 'system',
       content: `방금 실행된 함수들:
 ${executedFunctions}
 
-위 함수 실행 결과를 바탕으로 추가 질문이 필요한지 판단해줘.`,
-    },
-    {
-      role: 'user',
-      content: '추가 질문이 필요한가요?',
+간결한 질문 하나만 하고 바로 함수를 호출해줘. 추가 멘트는 하지 마.`,
     },
   ];
 
@@ -230,6 +239,7 @@ ${executedFunctions}
 
   // 역질문 전용 streamChat 호출 (FOLLOWUP_TOOLS 사용)
   await streamChatForFollowUp(followUpMessages, socket, GPTConfig.MODEL_MINI);
+  console.log('🔄 Used total tokens:', usedTotalTokens);
 };
 
 /**
@@ -243,7 +253,6 @@ const streamChatForFollowUp = async (messages, socket, model) => {
       stream: true,
       tool_choice: 'auto',
       tools: FOLLOWUP_TOOLS, // 역질문 전용 도구만 사용
-      parallel_tool_calls: true,
     });
 
     // 함수 호출 정보 누적용
@@ -293,8 +302,9 @@ const streamChatForFollowUp = async (messages, socket, model) => {
       // 4. 일반 텍스트 스트림 (output_text 등) - 역질문 전용 스트림 사용
       else if (event.type === 'response.output_text.delta') {
         hasTextContent = true;
-        socket.emit(SocketEvent.FOLLOWUP_STREAM, event.delta); // 별도 이벤트 사용
-        console.log('📝 Follow-up text stream:', event.delta);
+        socket.emit(SocketEvent.FOLLOWUP_STREAM, event.delta);
+      } else if (event.type === 'response.completed') {
+        usedTotalTokens += event.response.usage.total_tokens;
       }
     }
 
