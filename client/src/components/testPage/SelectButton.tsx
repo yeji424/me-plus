@@ -18,7 +18,7 @@ const SelectButton: React.FC<SelectButtonProps> = ({
   disabled,
 }) => {
   const baseClass =
-    'w-[153px] h-[153px] flex flex-col items-center justify-center text-[16px] transition-all rounded-[20px]';
+    'w-[153px] h-[153px] flex flex-col items-center justify-center text-[16px] transition-all rounded-[20px] bg-white';
 
   const textColor = selected ? 'text-[var(--color-gray700)]' : 'text-gray-400';
   const iconColor = selected
@@ -30,29 +30,33 @@ const SelectButton: React.FC<SelectButtonProps> = ({
 
   const selectedStyle = selected
     ? {
-        borderWidth: '3px',
-        borderStyle: 'solid',
-        borderImage: 'var(--color-gradation)',
+        // borderWidth: '3px',
+        // borderStyle: 'solid',
+        // borderImage: 'var(--color-gradation)',
         borderImageSlice: 1,
         backgroundImage: 'var(--color-gradation-20)',
-        borderRadius: '20px',
+        // borderRadius: '20px',
       }
     : {};
 
   const IconComponent = type === 'yes' ? YesIcon : NoIcon;
 
+  const selectedBorder = selected ? 'bg-gradation' : 'bg-gray200';
+
   return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={`${baseClass} ${textColor} ${
-        selected ? '' : 'border border-gray300 bg-white'
-      } ${fadeClass}`}
-      style={selectedStyle}
-    >
-      <IconComponent className={`w-[50px] h-[50px] mb-1 ${iconColor}`} />
-      <span>{label}</span>
-    </button>
+    <div className={`p-[2px] rounded-[22px] ${selectedBorder}`}>
+      <button
+        onClick={onClick}
+        disabled={disabled}
+        className={`${baseClass} ${textColor} ${
+          selected ? '' : ' bg-white'
+        } ${fadeClass}`}
+        style={selectedStyle}
+      >
+        <IconComponent className={`w-[50px] h-[50px] mb-1 ${iconColor}`} />
+        <span>{label}</span>
+      </button>
+    </div>
   );
 };
 

@@ -81,12 +81,9 @@ const Button: React.FC<ButtonProps> = ({
   const sizeStyles = getSizeStyles();
 
   return (
-    <AnimatedCardWrapper onClick={onClick}>
-      <button
-        type={type}
-        onClick={onClick}
-        disabled={disabled}
-        className={`
+    <AnimatedCardWrapper
+      className={`
+        flex items-center justify-center shadow-special
         ${sizeStyles.padding} 
         ${sizeStyles.fontSize} 
         ${sizeStyles.height} 
@@ -101,7 +98,14 @@ const Button: React.FC<ButtonProps> = ({
             : 'hover:cursor-pointer'
         }
         ${className}
+
       `}
+    >
+      <button
+        type={type}
+        onClick={onClick}
+        disabled={disabled}
+        className="cursor-pointer w-full h-full flex items-center justify-center"
       >
         {children}
       </button>

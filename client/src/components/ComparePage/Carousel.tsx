@@ -69,11 +69,14 @@ const Carousel: React.FC<CategoryCarouselProps> = ({
       {categoryList.map((label, idx) => (
         <div
           key={idx}
-          className={`h-9 rounded-xl shadow-small flex justify-center items-center cursor-pointer transition-colors duration-100 px-[13px] whitespace-nowrap ${
-            activeIndex === idx
-              ? 'bg-secondary-purple-60 text-background-40'
-              : 'bg-white'
-          }`}
+          className={`h-9 rounded-xl shadow-small flex justify-center items-center cursor-pointer
+    transition-colors duration-200 ease-in-out px-[13px] whitespace-nowrap
+    ${
+      activeIndex === idx
+        ? 'bg-secondary-purple-60 text-background-40'
+        : 'bg-white text-gray-700 hover:bg-gray-100'
+    }
+  `}
           onClick={() => handleCardClick(idx)}
         >
           {label}

@@ -10,7 +10,7 @@ interface HeaderProps {
     icon: ReactNode;
     onClick: () => void;
   }[];
-  isTransparent?: boolean;
+  isSpecialColor?: boolean;
   className?: string;
 }
 
@@ -18,7 +18,7 @@ const Header = ({
   title,
   onBackClick,
   iconButtons,
-  isTransparent = false,
+  isSpecialColor = false,
   className = '',
 }: HeaderProps) => {
   const navigate = useNavigate();
@@ -32,8 +32,8 @@ const Header = ({
   return (
     <>
       <header
-        className={`fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] px-3 pt-3 pb-3 flex items-center justify-between z-50 ${
-          isTransparent ? 'bg-transparent' : 'bg-white'
+        className={`fixed top-0 left-1/2 transform -translate-x-1/2 w-full max-w-[600px] px-3 pt-4 pb-3 flex items-center justify-between z-50 ${
+          isSpecialColor ? 'bg-secondary-purple-40' : 'bg-background'
         } ${className}`}
       >
         <TintedWrapper>

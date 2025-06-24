@@ -65,6 +65,7 @@ export const streamChat = async (messages, socket, onDelta) => {
     if (isFunctionCalled) {
       await handleFunctionCall(functionName, functionArgsRaw, socket);
     }
+    socket.emit('done');
   } catch (error) {
     handleGPTError(error, socket);
   }

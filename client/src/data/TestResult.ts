@@ -1,22 +1,8 @@
 import type { PlanResult } from '@/components/types/TestResult';
 
 export const planResults: PlanResult[] = [
-  //음악
   {
-    id: 'music-plus',
-    name: '5G 프리미어 레귤러',
-    description:
-      'U⁺5G 서비스는 물론, 스마트기기 1개와 다양한 콘텐츠까지 마음껏 이용할 수 있는 5G 요금제\n미디어 서비스 기본 제공(택1)\n지니, 벅스, FLO 중 선택 가능',
-    priority: 3,
-    dataUsage: 100,
-    callUsage: 100,
-    messageUsage: 100,
-    price: 95000,
-    tagLine: '지니뮤직 제휴 결합',
-    link: 'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-unlimited/LPZ0000433',
-  },
-  //OTT
-  {
+    _id: '6858ee7ffc03f10c86710103',
     id: 'ott-plus',
     name: '5G 프리미어 플러스',
     description:
@@ -28,23 +14,10 @@ export const planResults: PlanResult[] = [
     price: 105000,
     tagLine: '넷플릭스 / 왓챠 제휴 결합',
     link: 'https://www.lguplus.com/plan/limit-plans/Z202205254',
+    isActive: true,
   },
-  //결합
   {
-    id: 'family',
-    name: '5G 프리미어 에센셜',
-    description:
-      'U⁺5G 서비스를 마음껏 즐길 수 있는 5G 요금제\n친구, 가족과 결합하면 데이터 무제한 요금제를 최대 20,000원 할인',
-    priority: 4,
-    dataUsage: 100,
-    callUsage: 100,
-    messageUsage: 100,
-    price: 85000,
-    tagLine: 'U+ 투게더 결합',
-    link: 'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-unlimited/LPZ0000409',
-  },
-  // 청소년
-  {
+    _id: '6858ee7ffc03f10c86710105',
     id: 'youth1-special',
     name: '5G 라이트 청소년',
     description:
@@ -56,9 +29,10 @@ export const planResults: PlanResult[] = [
     price: 45000,
     tagLine: '데이터 무제한 최대 1Mbps 속도',
     link: 'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-youth/LPZ0000417',
+    isActive: true,
   },
-  //유스
   {
+    _id: '6858ee7ffc03f10c86710106',
     id: 'youth2-special',
     name: '유스 5G 스탠다드',
     description:
@@ -70,9 +44,10 @@ export const planResults: PlanResult[] = [
     price: 75000,
     tagLine: '데이터 무제한 최대 5Mbps 속도',
     link: 'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-young/LPZ1000232',
+    isActive: true,
   },
-  //시니어
   {
+    _id: '6858ee7ffc03f10c86710107',
     id: 'youth3-special',
     name: 'LTE 데이터 시니어 33',
     description:
@@ -84,9 +59,55 @@ export const planResults: PlanResult[] = [
     price: 33000,
     tagLine: '실버지킴이 서비스',
     link: 'https://www.lguplus.com/mobile/plan/mplan/lte-all/lte-senior/LPZ0000296',
+    isActive: true,
   },
-  //무제한데이터
   {
+    _id: '6858ee7ffc03f10c86710103',
+    id: 'ott-plus',
+    name: '5G 프리미어 플러스',
+    description:
+      'U⁺5G 서비스는 물론, 스마트 기기 2개와 다양한 콘텐츠까지 마음껏 이용할 수 있는 5G 요금제\n프리미엄 서비스 기본 제공(택1)\n음악 구독 서비스 지니, 벅스, FLO 중 선택 가능',
+    priority: 2,
+    dataUsage: 100,
+    callUsage: 100,
+    messageUsage: 100,
+    price: 105000,
+    tagLine: '넷플릭스 / 왓챠 제휴 결합',
+    link: 'https://www.lguplus.com/plan/limit-plans/Z202205254',
+    isActive: true,
+  },
+  {
+    _id: '6858ee7ffc03f10c86710102',
+    id: 'music-plus',
+    name: '5G 프리미어 레귤러',
+    description:
+      'U⁺5G 서비스는 물론, 스마트기기 1개와 다양한 콘텐츠까지 마음껏 이용할 수 있는 5G 요금제\n미디어 서비스 기본 제공(택1)\n지니, 벅스, FLO 중 선택 가능',
+    priority: 3,
+    dataUsage: 100,
+    callUsage: 100,
+    messageUsage: 100,
+    price: 95000,
+    tagLine: '지니뮤직 제휴 결합',
+    link: 'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-unlimited/LPZ0000433',
+    isActive: true,
+  },
+  {
+    _id: '6858ee7ffc03f10c86710104',
+    id: 'family',
+    name: '5G 프리미어 에센셜',
+    description:
+      'U⁺5G 서비스를 마음껏 즐길 수 있는 5G 요금제\n친구, 가족과 결합하면 데이터 무제한 요금제를 최대 20,000원 할인',
+    priority: 4,
+    dataUsage: 100,
+    callUsage: 100,
+    messageUsage: 100,
+    price: 85000,
+    tagLine: 'U+ 투게더 결합',
+    link: 'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-unlimited/LPZ0000409',
+    isActive: true,
+  },
+  {
+    _id: '6858ee7ffc03f10c86710108',
     id: 'max-data',
     name: '5G 프리미어 에센셜',
     description:
@@ -98,9 +119,10 @@ export const planResults: PlanResult[] = [
     price: 85000,
     tagLine: '데이터 무제한',
     link: 'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-unlimited/LPZ0000409',
+    isActive: true,
   },
-  //고용량데이터
   {
+    _id: '6858ee7ffc03f10c86710109',
     id: 'data-high',
     name: '5G 스탠다드',
     description:
@@ -112,9 +134,10 @@ export const planResults: PlanResult[] = [
     price: 75000,
     tagLine: '데이터 무제한 최대 5Mbps 속도',
     link: 'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-unlimited/LPZ0000415',
+    isActive: true,
   },
-  //중용량데이터
   {
+    _id: '6858ee7ffc03f10c8671010a',
     id: 'data-medium',
     name: '5G 데이터 플러스',
     description:
@@ -126,6 +149,7 @@ export const planResults: PlanResult[] = [
     price: 66000,
     tagLine: '데이터 무제한 최대 1Mbps 속도',
     link: 'https://www.lguplus.com/mobile/plan/mplan/5g-all/5g-unlimited/LPZ0000782',
+    isActive: true,
   },
 ];
 
