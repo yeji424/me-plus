@@ -176,7 +176,9 @@
     );
     animation: shimmer-move 1.5s infinite;
   }
-
+  .shimmer-text-slow::after {
+    animation: shimmer-move 2.5s infinite;
+  }
   @keyframes shimmer-move {
     0% {
       left: -150%;
