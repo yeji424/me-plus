@@ -145,6 +145,35 @@
       opacity: 1;
     }
   }
+  .shimmer-text {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .shimmer-text::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -150%;
+    width: 150%;
+    height: 100%;
+    background: linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.6) 50%,
+      transparent 100%
+    );
+    animation: shimmer-move 1.5s infinite;
+  }
+
+  @keyframes shimmer-move {
+    0% {
+      left: -150%;
+    }
+    100% {
+      left: 150%;
+    }
+  }
 }
 @layer components {
   .dot {
@@ -282,4 +311,25 @@
   100% {
     transform: rotate(1turn);
   }
+}
+.clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.toggleBtn {
+  margin-top: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: block;
+  margin-left: auto;
+  margin-right: 4px;
+}
+
+.toggleBtn:hover {
+  text-decoration: underline;
 }
