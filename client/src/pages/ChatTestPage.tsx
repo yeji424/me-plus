@@ -163,7 +163,7 @@ const PlanChatTester = () => {
     responseRef.current = '';
     setOptionButtons([]);
 
-    socket.emit('recommend-plan', payload);
+    socket.emit('chat', payload);
   };
 
   const handleNewChat = () => {
