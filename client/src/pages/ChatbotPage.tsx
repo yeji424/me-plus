@@ -123,15 +123,6 @@ const ChatbotPage = () => {
     }
   }, [urlUserProfile, setUserProfile]);
 
-  console.log('=== ChatbotPage 렌더링 ===');
-  console.log('🌐 urlUserProfile:', urlUserProfile);
-  console.log('💾 storedUserProfile:', storedUserProfile);
-  console.log('👤 최종 userProfile:', userProfile);
-  console.log('⏱️ isInitialLoading:', isInitialLoading);
-  console.log('✅ isInitialized:', isInitialized);
-  console.log('📝 messages.length:', messages.length);
-  console.log('🔗 searchParams:', Object.fromEntries(searchParams));
-
   // 초기 메시지 설정 (사용자 정보에 따라 다르게)
   useEffect(() => {
     console.log('🔍 초기 메시지 설정 실행', userProfile);
