@@ -13,6 +13,10 @@ import TestWaitingPage from './TestWaitingPage';
 
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
+import { AnimatePresence, motion } from 'framer-motion';
+import BounceIcon from '@/components/common/BounceIcon';
+import Button from '@/components/common/Button';
+import FadeInUpDiv from '@/components/common/FadeInUpDiv';
 
 // 사용자 정보 타입 정의
 interface UserProfile {
@@ -51,6 +55,8 @@ const TestResultPage = () => {
   const planId = location.state?.planId as string | undefined;
   const [plan, setPlan] = useState<PlanResult | null>(null);
   const { width, height } = useWindowSize();
+  const [showConfetti, setShowConfetti] = useState(true);
+
   useEffect(() => {
     const fetchPlan = async () => {
       if (!planId || typeof planId !== 'string') return;
@@ -67,6 +73,12 @@ const TestResultPage = () => {
 
     fetchPlan();
   }, [planId]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowConfetti(false);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (!planId) {
     return <div>추천 정보가 없습니다. 테스트를 다시 시작해주세요.</div>;
@@ -128,23 +140,35 @@ const TestResultPage = () => {
   }
 
   return (
-    <div className="h-screen px-5 flex flex-col items-center text-center">
+    <>
+      <div className="absolute inset-0 bg-gradient-to-b from-[#dfe4fd] to-white z-0" />
       <Header
         title="나에게 잘 어울리는 요금제는?"
         onBackClick={handleBackClick}
-        // isSpecialColor={true}
+        isSpecialColor={true}
       />
-      <div className="mt-4 text-[21.5px] font-bold text-secondary-purple-80">
-        {plan.name}
-      </div>
-      {plan.tagLine && (
-        <div className="mt-2 px-4 py-1 bg-gradation rounded-full text-[17px] text-white font-semibold inline-flex items-center gap-1">
-          <img src={plus} alt="더해서" className="w-[16px] h-[16px]" />
-          {plan.tagLine}
-        </div>
-      )}
-
-      {/* <div className="relative w-full flex justify-center items-center mt-6">
+      <div className=" z-10 p-5 flex flex-1 flex-col w-full items-center text-center bg-transparent">
+        <motion.div
+          initial={{ scale: 0.7, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{
+            duration: 1.2,
+            ease: 'easeOut',
+          }}
+        >
+          <div className="z-10 flex flex-col justfy-center mt-6 gap-2">
+            <div className="z-10 text-[21.5px] font-semibold text-secondary-purple-80">
+              {plan.name}
+            </div>
+            {plan.tagLine && (
+              <div className="px-4 py-1 shimmer-text shimmer-text-slow bg-gradation rounded-full text-[17px] text-white font-semibold inline-flex items-center gap-1">
+                <img src={plus} alt="더해서" className="w-[16px] h-[16px]" />
+                {plan.tagLine}
+              </div>
+            )}
+          </div>
+        </motion.div>
+        {/* <div className="relative w-full flex justify-center items-center mt-6">
         <img
           src={confetti}
           alt="컨페티"
@@ -157,59 +181,101 @@ const TestResultPage = () => {
         />
       </div> */}
 
-      {plan && (
-        <>
-          <Confetti
-            width={width}
-            height={height}
-            numberOfPieces={1000}
-            recycle={false}
-            gravity={1.0} //컨페티 속도 조절
-            initialVelocityY={40}
-          />
-          <section className="relative w-full flex flex-col items-center justify-center min-h-[150px] mt-6">
-            <img
-              src={confetti}
-              alt="컨페티"
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-full z-0"
-            />
-            <img
-              src={moonerFunImage}
-              alt="무너"
-              className="relative z-10 w-[140px]"
-            />
-          </section>
-        </>
-      )}
-      <div className="mt-6 w-full max-w-md">
-        <UsageBar label="통화" percent={plan.callUsage} />
-        <UsageBar label="메시지" percent={plan.messageUsage} />
-        <UsageBar label="데이터" percent={plan.dataUsage} />
+        {plan && (
+          <>
+            <AnimatePresence>
+              {showConfetti && (
+                <motion.div
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1 }}
+                  style={{
+                    position: 'absolute',
+                    width: '100%',
+                    inset: 0,
+                    maxWidth: '600px',
+                    margin: '0 auto',
+                    overflow: 'hidden',
+                    pointerEvents: 'none',
+                    zIndex: 9999,
+                  }}
+                >
+                  <Confetti
+                    width={width}
+                    height={height}
+                    numberOfPieces={1200}
+                    recycle={false}
+                    gravity={1.0}
+                    initialVelocityY={40}
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <section className="relative w-full flex flex-col items-center justify-center min-h-[150px] mt-6">
+              <BounceIcon
+                src={confetti}
+                alt="컨페티"
+                className="absolute top-0 left-1/2 -translate-x-1/2 w-full z-0"
+                animationType="scaleIn"
+              />
+              <BounceIcon
+                src={moonerFunImage}
+                alt="무너"
+                className="bottom-[-30px] relative z-10 w-[140px]"
+                animationType="bounce"
+              />
+            </section>
+          </>
+        )}
+        <div className="mt-9 relative w-full">
+          <div className="mt-4">
+            <FadeInUpDiv custom={1}>
+              <UsageBar label="통화" percent={plan.callUsage} />
+            </FadeInUpDiv>
+            <FadeInUpDiv custom={2}>
+              <UsageBar label="메시지" percent={plan.messageUsage} />
+            </FadeInUpDiv>
+            <FadeInUpDiv custom={3}>
+              <UsageBar label="데이터" percent={plan.dataUsage} />
+            </FadeInUpDiv>
+          </div>
+          <FadeInUpDiv custom={4} className="mt-6">
+            <ul className="pl-5 z-10 text-sm text-gray500 list-disc max-w-[600px] text-left">
+              {plan.description.split('\n').map((line, idx) => (
+                <li className="leading-[22px] py-[2px]" key={idx}>
+                  {line}
+                </li>
+              ))}
+            </ul>
+          </FadeInUpDiv>
+          <FadeInUpDiv
+            custom={6}
+            className="z-10 mt-[36px] text-[32px] font-semibold text-primary-pink pb-[50px]"
+          >
+            월 {plan.price?.toLocaleString()}원
+          </FadeInUpDiv>
+        </div>
       </div>
-      <ul className="text-sm text-gray500 mt-4 list-disc pl-6 w-full max-w-md text-left">
-        {plan.description.split('\n').map((line, idx) => (
-          <li key={idx}>{line}</li>
-        ))}
-      </ul>
-      <div className="mt-6 text-[32px] font-bold text-pink-500">
-        월 {plan.price?.toLocaleString()}원
-      </div>
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md px-4 pb-6 z-50 flex gap-4">
-        <button
+      <div className="fade-in-up fixed px-5 pb-6 bottom-0 w-full max-w-[600px] z-10 flex justify-center gap-[13px]">
+        <Button
+          fullWidth
+          variant="secondary"
+          size="large"
           onClick={handleChatbotClick}
-          className="w-1/2 rounded-xl bg-secondary-purple-40 text-gray600 text-sm font-semibold py-3 shadow-[0_4px_4px_rgba(0,0,0,0.25)]"
         >
           챗봇 상담하기
-        </button>
-
-        <button
+        </Button>
+        <Button
+          fullWidth
+          size="large"
           onClick={() => window.open(plan.link, '_blank')}
-          className="w-1/2 rounded-xl bg-secondary-purple-60 text-white text-[14px] font-semibold py-3 shadow-[0_4px_4px_rgba(0,0,0,0.25)]"
         >
           요금제 바꾸러가기
-        </button>
+        </Button>
       </div>
-    </div>
+    </>
   );
 };
 

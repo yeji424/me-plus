@@ -6,6 +6,7 @@ interface BounceIconProps {
   alt?: string;
   className?: string;
   playAnimation?: boolean;
+  animationType?: 'scaleIn' | 'bounce';
 }
 
 const BounceIcon: React.FC<BounceIconProps> = ({
@@ -13,12 +14,12 @@ const BounceIcon: React.FC<BounceIconProps> = ({
   alt = 'bounce icon',
   className = '',
   playAnimation = true,
+  animationType = 'scaleIn',
 }) => {
   const [shouldAnimate, setShouldAnimate] = useState(false);
 
   useEffect(() => {
     if (playAnimation) {
-
       const timeout = setTimeout(() => setShouldAnimate(true), 50);
       return () => clearTimeout(timeout);
     } else {
@@ -26,21 +27,26 @@ const BounceIcon: React.FC<BounceIconProps> = ({
     }
   }, [playAnimation]);
 
+  const getScaleAnimation = () => {
+    if (!shouldAnimate) return {};
+    if (animationType === 'scaleIn') {
+      return { scale: [0.4, 1.2, 1.1] };
+    }
+    if (animationType === 'bounce') {
+      return { scale: [0.4, 1.3, 1.2] };
+    }
+    return {};
+  };
+
   return (
     <motion.img
       src={src}
       alt={alt}
       className={className}
       initial={{ scale: 1 }}
-      animate={
-        shouldAnimate
-          ? {
-              scale: [1, 0.9, 1.1, 1],
-            }
-          : {}
-      }
+      animate={getScaleAnimation()}
       transition={{
-        duration: 0.6,
+        duration: 1.2,
         ease: 'easeInOut',
       }}
     />
