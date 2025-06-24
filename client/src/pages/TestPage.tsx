@@ -243,9 +243,9 @@ const TestPage = () => {
   const allAnswered = questions.every(
     (q) => selectedOptions[q.id] !== undefined,
   );
-  
+
   return (
-    <div className="h-screen flex flex-col">
+    <div className="px-5 h-screen flex flex-col">
       <Header
         title="나에게 잘 어울리는 요금제는?"
         onBackClick={handleBackClick}
