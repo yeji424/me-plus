@@ -37,7 +37,7 @@ const ServiceGuidePage: React.FC = () => {
             />
           </Link>
           <SwiperSlide>
-            <div className="flex flex-col items-center text-xl font-semibold text-center w-full h-full absolute top-1/16">
+            <div className="flex flex-col justify-center items-center text-xl font-semibold text-center w-full h-full">
               <img
                 src={serviceGuideIcon1}
                 alt="serviceGuideIcon1"
@@ -58,7 +58,7 @@ const ServiceGuidePage: React.FC = () => {
             </div>
           </SwiperSlide>
           <SwiperSlide>
-            <div className="flex flex-col items-center text-xl font-semibold text-center w-full h-full absolute top-1/16">
+            <div className="flex flex-col justify-center items-center text-xl font-semibold text-center w-full h-full">
               <img
                 src={serviceGuideIcon2}
                 alt="serviceGuideIcon1"
@@ -77,7 +77,7 @@ const ServiceGuidePage: React.FC = () => {
             </div>
           </SwiperSlide>
           <SwiperSlide>
-            <div className="flex flex-col items-center text-xl font-semibold text-center w-full h-full absolute top-1/16">
+            <div className="flex flex-col justify-center items-center text-xl font-semibold text-center w-full h-full">
               <img
                 src={serviceGuideIcon34}
                 alt="serviceGuideIcon1"
@@ -96,7 +96,7 @@ const ServiceGuidePage: React.FC = () => {
             </div>
           </SwiperSlide>
           <SwiperSlide>
-            <div className="flex flex-col items-center text-xl font-semibold text-center w-full h-full absolute top-1/16">
+            <div className="flex flex-col justify-center items-center text-xl font-semibold text-center w-full h-full">
               <img
                 src={serviceGuideIcon34}
                 alt="serviceGuideIcon"
@@ -114,7 +114,7 @@ const ServiceGuidePage: React.FC = () => {
             </div>
           </SwiperSlide>
           <SwiperSlide>
-            <div className="flex flex-col items-center text-xl font-semibold text-center w-full h-full absolute top-1/16">
+            <div className="flex flex-col justify-center items-center text-xl font-semibold text-center w-full h-full">
               <img
                 src={serviceGuideIcon5}
                 alt="serviceGuideIcon1"
