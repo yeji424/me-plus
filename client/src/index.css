@@ -260,7 +260,7 @@
 /* 서비스 가이드 스와이퍼 */
 .swiper-pagination {
   z-index: -1;
-  top: 185px !important;
+  top: 240px !important;
   display: flex;
   justify-content: center;
   align-items: end;
