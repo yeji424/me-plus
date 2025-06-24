@@ -19,7 +19,7 @@ const SlotCard = ({
   shouldHighlight?: boolean;
 }) => {
   return (
-    <div className="relative flex-[2] flex w-full aspect-square rounded-[17px] cursor-pointer">
+    <div className="relative flex-[1] flex aspect-square rounded-[17px] cursor-pointer max-w-[160px]">
       <AnimatedCardWrapper
         className={`relative flex-1 flex justify-center bg-background-40 rounded-[17px] ${
           selected
@@ -30,9 +30,9 @@ const SlotCard = ({
         shouldHighlight={!selected && shouldHighlight} // 여기에 넘기기
       >
         {selected ? (
-          <div className="w-full h-full px-3 py-[34px]">
+          <div className="w-full h-full flex justify-center items-center">
             <div
-              className="absolute top-[10px] right-[10px] z-20"
+              className="absolute top-0 right-0 z-20 p-[10px]"
               onClick={(e) => {
                 e.stopPropagation();
                 onClear();
@@ -40,7 +40,7 @@ const SlotCard = ({
             >
               <img src={closeIcon} alt="closeIcon" className="w-4 h-4" />
             </div>
-            <div className="flex flex-col justify-between items-start z-10 h-full">
+            <div className="flex flex-col justify-center gap-[5%] items-start z-10 h-[92%] w-[92%]">
               <h3 className="text-[15px] font-semibold text-gradation w-fit leading-tight">
                 {selected.name}
               </h3>
@@ -84,15 +84,15 @@ const PlanSelectionCard: React.FC<PlanSelectionCardProps> = ({
 }) => {
   const noneSelected = !selectedLeft && !selectedRight;
   return (
-    <div className="flex justify-center my-[29px]">
-      <div className="flex justify-between w-full">
+    <div className="my-[29px]">
+      <div className="flex w-full justify-around">
         <SlotCard
           selected={selectedLeft}
           onClick={() => onSelectSlot('left')}
           onClear={() => onClearSlot('left')}
           shouldHighlight={noneSelected || !selectedLeft}
         />
-        <div className="flex-[1] flex justify-center items-center">
+        <div className="flex justify-center items-center">
           <FloatingIcon src={versusIcon} alt="versus icon" />
         </div>
         <SlotCard

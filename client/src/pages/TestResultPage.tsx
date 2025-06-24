@@ -11,6 +11,9 @@ import confetti from '../assets/image/confetti.png';
 import plus from '@/assets/icon/plus.png';
 import TestWaitingPage from './TestWaitingPage';
 
+import Confetti from 'react-confetti';
+import { useWindowSize } from 'react-use';
+
 // 사용자 정보 타입 정의
 interface UserProfile {
   plan: {
@@ -47,7 +50,7 @@ const TestResultPage = () => {
   const location = useLocation();
   const planId = location.state?.planId as string | undefined;
   const [plan, setPlan] = useState<PlanResult | null>(null);
-
+  const { width, height } = useWindowSize();
   useEffect(() => {
     const fetchPlan = async () => {
       if (!planId || typeof planId !== 'string') return;
@@ -131,11 +134,9 @@ const TestResultPage = () => {
         onBackClick={handleBackClick}
         // isSpecialColor={true}
       />
-
       <div className="mt-4 text-[21.5px] font-bold text-secondary-purple-80">
         {plan.name}
       </div>
-
       {plan.tagLine && (
         <div className="mt-2 px-4 py-1 bg-gradation rounded-full text-[17px] text-white font-semibold inline-flex items-center gap-1">
           <img src={plus} alt="더해서" className="w-[16px] h-[16px]" />
@@ -143,7 +144,7 @@ const TestResultPage = () => {
         </div>
       )}
 
-      <div className="relative w-full flex justify-center items-center mt-6">
+      {/* <div className="relative w-full flex justify-center items-center mt-6">
         <img
           src={confetti}
           alt="컨페티"
@@ -154,24 +155,45 @@ const TestResultPage = () => {
           alt="무너"
           className="relative z-10 w-[140px]"
         />
-      </div>
+      </div> */}
 
+      {plan && (
+        <>
+          <Confetti
+            width={width}
+            height={height}
+            numberOfPieces={1000}
+            recycle={false}
+            gravity={1.0} //컨페티 속도 조절
+            initialVelocityY={40}
+          />
+          <section className="relative w-full flex flex-col items-center justify-center min-h-[150px] mt-6">
+            <img
+              src={confetti}
+              alt="컨페티"
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-full z-0"
+            />
+            <img
+              src={moonerFunImage}
+              alt="무너"
+              className="relative z-10 w-[140px]"
+            />
+          </section>
+        </>
+      )}
       <div className="mt-6 w-full max-w-md">
         <UsageBar label="통화" percent={plan.callUsage} />
         <UsageBar label="메시지" percent={plan.messageUsage} />
         <UsageBar label="데이터" percent={plan.dataUsage} />
       </div>
-
       <ul className="text-sm text-gray500 mt-4 list-disc pl-6 w-full max-w-md text-left">
         {plan.description.split('\n').map((line, idx) => (
           <li key={idx}>{line}</li>
         ))}
       </ul>
-
       <div className="mt-6 text-[32px] font-bold text-pink-500">
         월 {plan.price?.toLocaleString()}원
       </div>
-
       <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md px-4 pb-6 z-50 flex gap-4">
         <button
           onClick={handleChatbotClick}
