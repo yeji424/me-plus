@@ -113,7 +113,6 @@ const ChatbotPage = () => {
   const [searchParams] = useSearchParams();
   const [showBackModal, setShowBackModal] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
-
   // 사용자 정보 확인: URL 파라미터에서만 읽음 - 메모이제이션으로 최적화
   const userProfile = useMemo(
     () => parseUserProfileFromURL(searchParams),
@@ -305,13 +304,49 @@ const ChatbotPage = () => {
     lastMessage?.type === 'bot' && lastMessage.functionCall;
   const isNewMessageAdded = allMessages.length > prevMessageLengthRef.current;
 
-  // 새 메시지가 추가되었을 때만 스크롤 조정
+  // 스크롤을 맨 아래로 보내는 함수
+  const scrollToBottom = useCallback(() => {
+    if (!containerRef.current) return;
+    containerRef.current.scrollTo({
+      top: 0, // flex-col-reverse에서는 음수값이 맨 아래
+      behavior: 'smooth',
+    });
+  }, []);
+
+  // 새 메시지가 추가되었을 때 스크롤 조정
   useEffect(() => {
-    if (!containerRef.current || !isNewMessageAdded) return;
-    const container = containerRef.current;
-    container.scrollTop = container.scrollHeight - container.clientHeight;
+    if (!isNewMessageAdded) return;
+
+    // 즉시 스크롤 (텍스트 메시지용)
+    scrollToBottom();
+
+    // 컴포넌트 렌더링을 위한 지연 스크롤
+    const timer = setTimeout(scrollToBottom, 150);
+
     prevMessageLengthRef.current = allMessages.length;
-  }, [allMessages, isNewMessageAdded]);
+
+    return () => clearTimeout(timer);
+  }, [allMessages, isNewMessageAdded, scrollToBottom]);
+
+  // ResizeObserver로 컨테이너 크기 변화 감지 (캐러셀 등 동적 컴포넌트용)
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+    const observer = new ResizeObserver(() => {
+      // 컨테이너 내용이 변경되어 크기가 바뀔 때마다 자동 스크롤
+      scrollToBottom();
+    });
+
+    // 컨테이너의 첫 번째 자식 (실제 메시지들이 들어있는 div) 관찰
+    const messageContainer = container.querySelector('div');
+    console.log(messageContainer);
+    if (messageContainer) {
+      observer.observe(messageContainer);
+    }
+
+    return () => observer.disconnect();
+  }, [scrollToBottom]);
 
   const reversedMessages = useMemo(
     () =>
@@ -344,12 +379,12 @@ const ChatbotPage = () => {
       {/* 원래 삭제해도 되는데 같이 넣으니까 더 자연스러워서 넣음 */}
       {/* <div className="pointer-events-none fixed top-13 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-[40px] z-30 bg-gradient-to-b from-[#ffffff] to-transparent" /> */}
       {/* 2. ChatArea - Flex */}
-      <div className="gradient-scroll-container flex flex-col h-[100vh]">
+      <div className="px-5 pt-[70px] pb-[70px] gradient-scroll-container flex flex-col h-[100vh]">
         {/* 패딩으로 보이는 영역 조절 (= 스크롤 가능 영역) */}
         {/* 마진으로 안하고 패딩으로 한 이유 : 마진으로 하면 그라데이션 넣은 이유 사라짐 */}
         <div
           ref={containerRef}
-          className="relative flex-1 overflow-y-auto pb-[60px] flex flex-col-reverse"
+          className="relative flex-1 overflow-y-auto  pb-5 flex flex-col-reverse"
         >
           <div className="gap-2 max-w-[560px] min-h-full flex flex-col-reverse">
             {reversedMessages.map((msg, idx) => {

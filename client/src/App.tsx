@@ -19,7 +19,7 @@ import ServiceGuidePage from './pages/ServiceGuidePage';
 const MainLayout = () => {
   return (
     <>
-      <div className="pt-[50px] min-h-screen flex flex-col">
+      <div className=" min-h-screen flex flex-col">
         <main
           className="flex-1"
           style={{ minHeight: 'calc(100vh - 50px - 80px)' }}
