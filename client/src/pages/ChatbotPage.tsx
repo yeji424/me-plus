@@ -17,23 +17,9 @@ import ChatbotIcon from '@/assets/icon/meplus_icon.png';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import type { UserProfile } from '@/utils/chatStorage';
 
-// 사용자 정보 타입 (TestResultPage와 동일)
-interface UserProfile {
-  plan: {
-    id: string;
-    name: string;
-    monthlyFee: number;
-    benefits: string[];
-  };
-  usage: {
-    call: number;
-    message: number;
-    data: number;
-  };
-  preferences: string[];
-  source: 'plan-test' | 'url-params';
-}
+// 사용자 정보 타입 제거 (chatStorage에서 import)
 
 type Message =
   | { type: 'user'; text: string }
@@ -102,33 +88,55 @@ const ChatbotPage = () => {
     messages,
     isStreaming,
     isInitialLoading,
+    storedUserProfile, // 복원된 사용자 프로필
     sendMessage,
     updateCarouselSelection,
     updateOttSelection,
     updateOxSelection,
     startNewChat,
+    setUserProfile, // 사용자 프로필 설정 함수
   } = useChatSocket();
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const [searchParams] = useSearchParams();
   const [showBackModal, setShowBackModal] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
+  const hasInitializedForUrlParams = useRef(false); // URL 파라미터 초기화 여부 추적
+
   // 사용자 정보 확인: URL 파라미터에서만 읽음 - 메모이제이션으로 최적화
-  const userProfile = useMemo(
+  const urlUserProfile = useMemo(
     () => parseUserProfileFromURL(searchParams),
     [searchParams],
   );
+  // 최종 사용자 프로필: URL 파라미터가 있으면 우선, 없으면 저장된 프로필 사용
+  const userProfile = urlUserProfile || storedUserProfile;
 
-  // userProfile이 있으면 새 채팅 시작
+  // URL 파라미터 사용자의 경우 프로필 저장
   useEffect(() => {
-    if (userProfile) {
-      startNewChat(); // 기존 세션 초기화
+    if (urlUserProfile && !hasInitializedForUrlParams.current) {
+      hasInitializedForUrlParams.current = true;
+      setUserProfile(urlUserProfile); // 사용자 프로필 저장
+      console.log(
+        '💾 URL 파라미터 사용자 프로필 저장:',
+        urlUserProfile.plan.name,
+      );
     }
-  }, [userProfile, startNewChat]);
+  }, [urlUserProfile, setUserProfile]);
+
+  console.log('=== ChatbotPage 렌더링 ===');
+  console.log('🌐 urlUserProfile:', urlUserProfile);
+  console.log('💾 storedUserProfile:', storedUserProfile);
+  console.log('👤 최종 userProfile:', userProfile);
+  console.log('⏱️ isInitialLoading:', isInitialLoading);
+  console.log('✅ isInitialized:', isInitialized);
+  console.log('📝 messages.length:', messages.length);
+  console.log('🔗 searchParams:', Object.fromEntries(searchParams));
 
   // 초기 메시지 설정 (사용자 정보에 따라 다르게)
   useEffect(() => {
-    if (!isInitialized) {
+    console.log('🔍 초기 메시지 설정 실행', userProfile);
+    // 로딩이 완료되고, 아직 초기화되지 않았고, 기존 메시지가 없을 때만 실행
+    if (!isInitialLoading && !isInitialized) {
       if (userProfile) {
         // 맞춤형 요금제 찾기에서 온 사용자
         setInitialMessages([
@@ -168,7 +176,7 @@ const ChatbotPage = () => {
       }
       setIsInitialized(true);
     }
-  }, [isInitialized, userProfile]);
+  }, [isInitialLoading, isInitialized, userProfile, messages.length]);
 
   const handleClose = () => {
     setShowBackModal(false);
