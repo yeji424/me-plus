@@ -17,6 +17,9 @@ import next from '../assets/icon/next_icon.svg';
 import back from '../assets/icon/back_icon.svg';
 import { useRef } from 'react';
 import type { PlanResult } from '@/components/types/TestResult';
+// import FloatingIcon from '@/components/common/FloadingIcon';
+// import BounceIcon from '@/components/common/BounceIcon';
+import IconSwitcher from '@/components/common/IconSwitcher';
 
 // 컴포넌트 외부로 이동하여 재생성 방지
 const localFallbackPlans: PlanResult[] = [
@@ -186,8 +189,10 @@ const TestPage = () => {
   const currentQuestion = questions[currentIndex];
   const selected = selectedOptions[currentQuestion.id];
   const isAnswered = selected !== undefined;
-  const moonerSrc = isAnswered ? moonerAhaImage : moonerImage;
+  // const moonerSrc = isAnswered ? moonerAhaImage : moonerImage;
   const [fetchedPlans, setFetchedPlans] = useState<PlanResult[]>([]);
+  const [animationDisabled, setAnimationDisabled] = useState(false);
+  const [shouldBounce, setShouldBounce] = useState(false);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -215,7 +220,11 @@ const TestPage = () => {
 
   const handleSelect = (value: string) => {
     setSelectedOptions((prev) => ({ ...prev, [currentQuestion.id]: value }));
+
+    setShouldBounce(true);
+    setAnimationDisabled(true);
     setIsTransitioning(true);
+
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
@@ -224,7 +233,10 @@ const TestPage = () => {
       if (currentIndex < questions.length - 1) {
         setCurrentIndex((prev) => prev + 1);
       }
+
+      setAnimationDisabled(false);
       setIsTransitioning(false);
+      setShouldBounce(false);
     }, 1000);
   };
 
@@ -258,7 +270,14 @@ const TestPage = () => {
 
       <div className="flex flex-col items-center justify-between flex-1 py-6">
         <div className="flex flex-col items-center gap-4 w-full">
-          <img src={moonerSrc} alt="무너" className="w-[140px]" />
+          <IconSwitcher
+            isAnswered={isAnswered}
+            shouldBounce={shouldBounce}
+            srcAnswered={moonerAhaImage}
+            srcIdle={moonerImage}
+            alt={isAnswered ? '무너 (답변 완료)' : '무너 (대기 중)'}
+            className="w-[140px]"
+          />
 
           <div className="relative w-full flex justify-center">
             <p className="text-center text-gray800 text-[20px] font-semibold w-[calc(100%-64px)]">
@@ -268,7 +287,10 @@ const TestPage = () => {
             <button
               onClick={handleBack}
               disabled={currentIndex === 0 || isTransitioning}
-              className="absolute left-0 top-1/2 -translate-y-1/2 p-3 cursor-pointer"
+              className="absolute left-0 top-1/2 -translate-y-1/2 p-3 cursor-pointer
+             transition-transform duration-200 ease-in-out
+             hover:scale-130 disabled:cursor-not-allowed disabled:opacity-50"
+              style={{ willChange: 'transform' }}
             >
               <img src={back} alt="이전질문" className="w-[8px] h-[16px]" />
             </button>
@@ -278,7 +300,9 @@ const TestPage = () => {
               disabled={
                 currentIndex === questions.length - 1 || isTransitioning
               }
-              className="absolute right-0 top-1/2 -translate-y-1/2 p-3 cursor-pointer"
+              className="absolute right-0 top-1/2 -translate-y-1/2 p-3 cursor-pointer             transition-transform duration-200 ease-in-out
+             hover:scale-130 disabled:cursor-not-allowed disabled:opacity-50"
+              style={{ willChange: 'transform' }}
             >
               <img src={next} alt="다음질문" className="w-[8px] h-[16px]" />
             </button>
@@ -292,6 +316,7 @@ const TestPage = () => {
                 onClick={() => handleSelect('yes')}
                 type="yes"
                 disabled={isTransitioning}
+                animationDisabled={animationDisabled}
               />
               <SelectButton
                 label="아니다"
@@ -299,6 +324,7 @@ const TestPage = () => {
                 onClick={() => handleSelect('no')}
                 type="no"
                 disabled={isTransitioning}
+                animationDisabled={animationDisabled}
               />
             </div>
           ) : (
@@ -310,15 +336,18 @@ const TestPage = () => {
                   selected={selected === opt}
                   onClick={() => handleSelect(opt)}
                   disabled={isTransitioning}
+                  animationDisabled={animationDisabled}
                 />
               ))}
             </div>
           )}
 
           <div className="flex flex-col items-start mt-6 w-full px-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center gap-1 text-primary-pink shimmer-text">
               <img src={tips} alt="꿀팁" className="w-[17px]" />
-              <p className="text-primary text-[12px] font-semibold">꿀팁</p>
+              <p className="text-primary text-[12px] leading-none align-middle">
+                꿀팁
+              </p>
             </div>
             <p className="text-gray500 text-[11px] font-medium leading-snug mt-2">
               <span className="text-secondary-purple-80">
@@ -327,7 +356,7 @@ const TestPage = () => {
               {currentQuestion.tip.rest}
             </p>{' '}
             {allAnswered && (
-              <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-md px-4 pb-6 z-50">
+              <div className="fade-in-up fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[560px] px-4 pb-6 z-50">
                 <Button
                   onClick={() => {
                     const matchedRules = rules.filter((rule) =>
