@@ -167,10 +167,8 @@ export const handleFunctionCall = async (
 ) => {
   try {
     console.log('🔧 Function called:', functionName);
-    console.log('📄 Raw arguments:', functionArgsRaw);
 
     const args = parseFunctionArgs(functionArgsRaw);
-    console.log('✅ 파싱된 arguments:', args);
 
     await executeFunctionCall(functionName, args, socket);
   } catch (functionError) {

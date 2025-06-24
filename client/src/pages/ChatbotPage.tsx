@@ -17,23 +17,9 @@ import ChatbotIcon from '@/assets/icon/meplus_icon.png';
 import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
+import type { UserProfile } from '@/utils/chatStorage';
 
-// 사용자 정보 타입 (TestResultPage와 동일)
-interface UserProfile {
-  plan: {
-    id: string;
-    name: string;
-    monthlyFee: number;
-    benefits: string[];
-  };
-  usage: {
-    call: number;
-    message: number;
-    data: number;
-  };
-  preferences: string[];
-  source: 'plan-test' | 'url-params';
-}
+// 사용자 정보 타입 제거 (chatStorage에서 import)
 
 type Message =
   | { type: 'user'; text: string }
@@ -102,34 +88,46 @@ const ChatbotPage = () => {
     messages,
     isStreaming,
     isInitialLoading,
+    storedUserProfile, // 복원된 사용자 프로필
     sendMessage,
     updateCarouselSelection,
     updateOttSelection,
     updateOxSelection,
     startNewChat,
+    setUserProfile, // 사용자 프로필 설정 함수
   } = useChatSocket();
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
   const [searchParams] = useSearchParams();
   const [showBackModal, setShowBackModal] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
+  const hasInitializedForUrlParams = useRef(false); // URL 파라미터 초기화 여부 추적
 
   // 사용자 정보 확인: URL 파라미터에서만 읽음 - 메모이제이션으로 최적화
-  const userProfile = useMemo(
+  const urlUserProfile = useMemo(
     () => parseUserProfileFromURL(searchParams),
     [searchParams],
   );
+  // 최종 사용자 프로필: URL 파라미터가 있으면 우선, 없으면 저장된 프로필 사용
+  const userProfile = urlUserProfile || storedUserProfile;
 
-  // userProfile이 있으면 새 채팅 시작
+  // URL 파라미터 사용자의 경우 프로필 저장
   useEffect(() => {
-    if (userProfile) {
-      startNewChat(); // 기존 세션 초기화
+    if (urlUserProfile && !hasInitializedForUrlParams.current) {
+      hasInitializedForUrlParams.current = true;
+      setUserProfile(urlUserProfile); // 사용자 프로필 저장
+      console.log(
+        '💾 URL 파라미터 사용자 프로필 저장:',
+        urlUserProfile.plan.name,
+      );
     }
-  }, [userProfile, startNewChat]);
+  }, [urlUserProfile, setUserProfile]);
 
   // 초기 메시지 설정 (사용자 정보에 따라 다르게)
   useEffect(() => {
-    if (!isInitialized) {
+    console.log('🔍 초기 메시지 설정 실행', userProfile);
+    // 로딩이 완료되고, 아직 초기화되지 않았고, 기존 메시지가 없을 때만 실행
+    if (!isInitialLoading && !isInitialized) {
       if (userProfile) {
         // 맞춤형 요금제 찾기에서 온 사용자
         setInitialMessages([
@@ -169,7 +167,7 @@ const ChatbotPage = () => {
       }
       setIsInitialized(true);
     }
-  }, [isInitialized, userProfile]);
+  }, [isInitialLoading, isInitialized, userProfile, messages.length]);
 
   const handleClose = () => {
     setShowBackModal(false);
@@ -305,13 +303,68 @@ const ChatbotPage = () => {
     lastMessage?.type === 'bot' && lastMessage.functionCall;
   const isNewMessageAdded = allMessages.length > prevMessageLengthRef.current;
 
-  // 새 메시지가 추가되었을 때만 스크롤 조정
+  // 스크롤을 맨 아래로 보내는 함수
+  const scrollToBottom = useCallback(() => {
+    if (!containerRef.current) return;
+    containerRef.current.scrollTo({
+      top: 0, // flex-col-reverse에서는 음수값이 맨 아래
+      behavior: 'smooth',
+    });
+  }, []);
+
+  // ToggleCard 위치로 스크롤하는 함수
+  const scrollToToggleCard = useCallback((cardElement: HTMLDivElement) => {
+    if (!containerRef.current) return;
+
+    // 카드의 위치 정보 가져오기
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const cardRect = cardElement.getBoundingClientRect();
+
+    // flex-col-reverse 때문에 계산이 복잡함
+    // 카드가 뷰포트 상단에 오도록 스크롤 위치 계산
+    const scrollTop = containerRef.current.scrollTop;
+    const targetScrollTop = scrollTop + (cardRect.top - containerRect.top) - 50;
+
+    containerRef.current.scrollTo({
+      top: targetScrollTop,
+      behavior: 'smooth',
+    });
+  }, []);
+
+  // 새 메시지가 추가되었을 때 스크롤 조정
   useEffect(() => {
-    if (!containerRef.current || !isNewMessageAdded) return;
-    const container = containerRef.current;
-    container.scrollTop = container.scrollHeight - container.clientHeight;
+    if (!isNewMessageAdded) return;
+
+    // 즉시 스크롤 (텍스트 메시지용)
+    scrollToBottom();
+
+    // 컴포넌트 렌더링을 위한 지연 스크롤
+    const timer = setTimeout(scrollToBottom, 150);
+
     prevMessageLengthRef.current = allMessages.length;
-  }, [allMessages, isNewMessageAdded]);
+
+    return () => clearTimeout(timer);
+  }, [allMessages, isNewMessageAdded, scrollToBottom]);
+
+  // ResizeObserver로 컨테이너 크기 변화 감지 (캐러셀 등 동적 컴포넌트용)
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const container = containerRef.current;
+    const observer = new ResizeObserver(() => {
+      // 컨테이너 내용이 변경되어 크기가 바뀔 때마다 자동 스크롤
+      scrollToBottom();
+    });
+
+    // 컨테이너의 첫 번째 자식 (실제 메시지들이 들어있는 div) 관찰
+    const messageContainer = container.querySelector('div');
+    console.log(messageContainer);
+    if (messageContainer) {
+      observer.observe(messageContainer);
+    }
+
+    return () => observer.disconnect();
+  }, [scrollToBottom]);
 
   const reversedMessages = useMemo(
     () =>
@@ -344,12 +397,12 @@ const ChatbotPage = () => {
       {/* 원래 삭제해도 되는데 같이 넣으니까 더 자연스러워서 넣음 */}
       {/* <div className="pointer-events-none fixed top-13 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-[40px] z-30 bg-gradient-to-b from-[#ffffff] to-transparent" /> */}
       {/* 2. ChatArea - Flex */}
-      <div className="gradient-scroll-container flex flex-col h-[100vh]">
+      <div className="px-5 pt-[70px] pb-[70px] gradient-scroll-container flex flex-col h-[100vh]">
         {/* 패딩으로 보이는 영역 조절 (= 스크롤 가능 영역) */}
         {/* 마진으로 안하고 패딩으로 한 이유 : 마진으로 하면 그라데이션 넣은 이유 사라짐 */}
         <div
           ref={containerRef}
-          className="relative flex-1 overflow-y-auto pb-[60px] flex flex-col-reverse"
+          className="relative flex-1 overflow-y-auto  pb-5 flex flex-col-reverse"
         >
           <div className="gap-2 max-w-[560px] min-h-full flex flex-col-reverse">
             {reversedMessages.map((msg, idx) => {
@@ -391,6 +444,7 @@ const ChatbotPage = () => {
                     onCarouselSelect={handleCarouselSelect}
                     onOttSelect={handleOttSelect}
                     onOxSelect={handleOxSelect}
+                    onToggleCardClick={scrollToToggleCard}
                     messageIndex={allMessages.length - 1 - idx} // 역순 배열에서 실제 인덱스 계산
                     selectedData={msg.selectedData}
                     showChatbotIcon={showChatbotIcon}

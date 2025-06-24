@@ -69,6 +69,7 @@ export const InputRoleEnum = {
 
 export const GPTConfig = {
   MODEL: 'gpt-4.1',
+  MODEL_MINI: 'gpt-4o-mini',
   TIMEOUT_MS: 30000,
   MAX_REDIRECTS: 5,
   REQUEST_TIMEOUT: 10000,
@@ -93,6 +94,7 @@ export const ErrorType = {
 
 export const SocketEvent = {
   STREAM: 'stream',
+  FOLLOWUP_STREAM: 'follow-up-stream',
   DONE: 'done',
   LOADING: 'loading',
   LOADING_END: 'loading-end',

@@ -20,7 +20,7 @@ const Modal: React.FC<ModalProps> = ({
     if (isOpen) {
       document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = 'hidden';
     }
 
     const handleEsc = (event: KeyboardEvent) => {
@@ -32,7 +32,7 @@ const Modal: React.FC<ModalProps> = ({
     window.addEventListener('keydown', handleEsc);
     return () => {
       window.removeEventListener('keydown', handleEsc);
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = 'hidden';
     };
   }, [isOpen, onClose]);
 

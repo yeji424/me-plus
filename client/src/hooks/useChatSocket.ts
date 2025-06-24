@@ -12,6 +12,7 @@ import {
   convertFromStoredMessage,
   type ChatSession,
   type StoredMessage,
+  type UserProfile,
 } from '@/utils/chatStorage';
 
 // 서버 에러 타입 정의
@@ -82,13 +83,47 @@ export const useChatSocket = () => {
   const [isStreaming, setIsStreaming] = useState(false);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [isInitialLoading, setIsInitialLoading] = useState(true); // 초기 로딩 상태 추가
+  const [storedUserProfile, setStoredUserProfile] =
+    useState<UserProfile | null>(null); // 저장된 사용자 프로필
   // 항상 로컬스토리지 사용
   const useLocalStorage = true;
   const responseRef = useRef('');
+  const followUpResponseRef = useRef(''); // 역질문 전용 ref
+  const hasLoggedSession = useRef(false); // 세션 로그 출력 여부 추적
 
-  // 로컬스토리지에 메시지 저장하는 함수
+  // 로컬스토리지에서 메시지 불러오는 함수
+  const loadMessagesFromLocal = useCallback(
+    (
+      sessionIdToLoad: string,
+    ): { messages: Message[]; userProfile?: UserProfile } => {
+      if (!useLocalStorage) return { messages: [] };
+
+      try {
+        const session = getSession(sessionIdToLoad);
+        console.log('🔍 실제 로컬스토리지 세션 데이터:', session);
+        if (!session) return { messages: [] };
+
+        const messages: Message[] = session.messages.map(
+          (msg) => convertFromStoredMessage(msg) as Message,
+        );
+
+        console.log('📂 Messages loaded from localStorage:', messages.length);
+        console.log('👤 로컬스토리지 userProfile 원본:', session.userProfile);
+        return {
+          messages,
+          userProfile: session.userProfile,
+        };
+      } catch (error) {
+        console.error('❌ Failed to load messages from localStorage:', error);
+        return { messages: [] };
+      }
+    },
+    [useLocalStorage],
+  );
+
+  // 로컬스토리지에 메시지 저장하는 함수 (userProfile도 함께 저장)
   const saveMessagesToLocal = useCallback(
-    (messagesArray: Message[]) => {
+    (messagesArray: Message[], userProfile?: UserProfile | null) => {
       if (!useLocalStorage || !sessionId) return;
 
       try {
@@ -99,57 +134,67 @@ export const useChatSocket = () => {
         const chatSession: ChatSession = {
           sessionId,
           messages: storedMessages,
+          userProfile: userProfile || storedUserProfile || undefined,
           lastUpdated: Date.now(),
         };
 
+        console.log('💾 로컬스토리지 저장할 데이터:', {
+          sessionId,
+          messagesCount: storedMessages.length,
+          userProfile: chatSession.userProfile?.plan?.name || 'undefined',
+        });
+
         saveSession(chatSession);
-        console.log('💾 Messages saved to localStorage:', messagesArray.length);
       } catch (error) {
         console.error('❌ Failed to save messages to localStorage:', error);
       }
     },
-    [useLocalStorage, sessionId],
-  );
-
-  // 로컬스토리지에서 메시지 불러오는 함수
-  const loadMessagesFromLocal = useCallback(
-    (sessionIdToLoad: string): Message[] => {
-      if (!useLocalStorage) return [];
-
-      try {
-        const session = getSession(sessionIdToLoad);
-        if (!session) return [];
-
-        const messages: Message[] = session.messages.map(
-          (msg) => convertFromStoredMessage(msg) as Message,
-        );
-
-        console.log('📂 Messages loaded from localStorage:', messages.length);
-        return messages;
-      } catch (error) {
-        console.error('❌ Failed to load messages from localStorage:', error);
-        return [];
-      }
-    },
-    [useLocalStorage],
+    [useLocalStorage, sessionId, storedUserProfile],
   );
 
   const handleSessionId = useCallback(
     (id: string) => {
+      console.log('🆔 handleSessionId 호출됨:', id);
       setSessionId(id);
       localStorage.setItem('sessionId', id);
 
       // 로컬스토리지 사용 시 기존 세션 불러오기
       if (useLocalStorage) {
-        const localMessages = loadMessagesFromLocal(id);
+        const { messages: localMessages, userProfile } =
+          loadMessagesFromLocal(id);
+        console.log('📂 로컬스토리지 조회 결과:');
+        console.log('  - 메시지 개수:', localMessages.length);
+        console.log('  - userProfile:', userProfile);
+
         if (localMessages.length > 0) {
           setMessages(localMessages);
-          console.log(
-            '📂 로컬스토리지에서 세션 히스토리 불러옴:',
-            localMessages.length,
-          );
+          // userProfile이 있을 때만 설정, 없으면 기존 storedUserProfile 유지
+          if (userProfile) {
+            setStoredUserProfile(userProfile);
+          }
+          if (!hasLoggedSession.current) {
+            console.log(
+              '📂 로컬스토리지에서 기존 채팅 히스토리를 불러왔습니다:',
+              localMessages.length,
+              '개',
+            );
+            if (userProfile) {
+              console.log(
+                '👤 사용자 프로필도 복원되었습니다:',
+                userProfile.plan.name,
+              );
+            }
+            hasLoggedSession.current = true;
+          }
         } else {
-          console.log('📭 로컬스토리지에 저장된 히스토리 없음');
+          // 메시지가 없어도 userProfile이 있으면 설정
+          if (userProfile) {
+            setStoredUserProfile(userProfile);
+          }
+          if (!hasLoggedSession.current) {
+            console.log('📭 새로운 세션을 시작합니다');
+            hasLoggedSession.current = true;
+          }
         }
       }
 
@@ -163,17 +208,13 @@ export const useChatSocket = () => {
     (
       logs: { role: string; content: string; type?: string; data?: unknown }[],
     ) => {
-      console.log('📋 Session history received from server:', logs);
-
       // 로컬스토리지 사용 시에는 서버 히스토리 무시
       if (useLocalStorage) {
-        console.log('💾 로컬스토리지 사용 중이므로 서버 히스토리 무시');
         return;
       }
 
       // 서버 히스토리가 비어있으면 처리하지 않음
       if (!logs || logs.length === 0) {
-        console.log('📭 서버 히스토리가 비어있음');
         return;
       }
 
@@ -194,8 +235,6 @@ export const useChatSocket = () => {
 
         // 새로 추가: function_call 타입 처리
         if (msg.type === 'function_call' && msg.role === 'assistant') {
-          console.log('🔧 Function call message detected:', msg.data);
-
           // data에서 function call 정보 추출
           const functionCallData = msg.data as {
             name?: string;
@@ -222,7 +261,6 @@ export const useChatSocket = () => {
                 selectedServices: functionCallData.selectedServices,
                 isSelected: functionCallData.isSelected,
               };
-              console.log('✅ Selected data loaded:', botMessage.selectedData);
             }
 
             return botMessage;
@@ -374,31 +412,6 @@ export const useChatSocket = () => {
     socket.on('text-card', handleTextCard);
     socket.on('first-card-list', handleFirstCardList);
 
-    // 제거: 서버에서 더 이상 이벤트를 보내지 않음 (로컬스토리지 사용)
-    // socket.on('carousel-selection-updated', ({ messageIndex, selectedItem, isSelected }) => {
-    //   console.log('✅ Carousel selection updated:', { messageIndex, selectedItem, isSelected });
-    //   setMessages((prev) =>
-    //     prev.map((msg, idx) => {
-    //       if (idx === messageIndex && msg.type === 'bot') {
-    //         return { ...msg, selectedData: { selectedItem, isSelected } };
-    //       }
-    //       return msg;
-    //     }),
-    //   );
-    // });
-
-    // socket.on('ott-selection-updated', ({ messageIndex, selectedServices, isSelected }) => {
-    //   console.log('✅ OTT selection updated:', { messageIndex, selectedServices, isSelected });
-    //   setMessages((prev) =>
-    //     prev.map((msg, idx) => {
-    //       if (idx === messageIndex && msg.type === 'bot') {
-    //         return { ...msg, selectedData: { selectedServices, isSelected } };
-    //       }
-    //       return msg;
-    //     }),
-    //   );
-    // });
-
     return () => {
       socket.off('session-id', handleSessionId);
       socket.off('session-history', handleSessionHistory);
@@ -410,8 +423,6 @@ export const useChatSocket = () => {
       socket.off('plan-lists', handlePlanLists);
       socket.off('text-card', handleTextCard);
       socket.off('first-card-list', handleFirstCardList);
-      // socket.off('carousel-selection-updated'); // 제거: 더 이상 사용 안 함
-      // socket.off('ott-selection-updated'); // 제거: 더 이상 사용 안 함
     };
   }, [
     handleSessionId,
@@ -430,7 +441,6 @@ export const useChatSocket = () => {
     const handleStream = (chunk: string) => {
       responseRef.current += chunk;
 
-      // console.log('📥 Stream chunk:', chunk, responseRef.current);
       setMessages((prev) => {
         const last = prev[prev.length - 1];
         if (last?.type === 'bot') {
@@ -447,9 +457,33 @@ export const useChatSocket = () => {
       });
     };
 
+    // 역질문 전용 스트림 핸들러
+    const handleFollowUpStream = (chunk: string) => {
+      followUpResponseRef.current += chunk;
+      console.log('📥 Follow-up stream chunk:', chunk);
+
+      setMessages((prev) => {
+        // 첫 번째 청크인 경우 새 메시지 추가, 그 외는 마지막 메시지 업데이트
+        if (chunk === followUpResponseRef.current) {
+          // 첫 번째 청크 - 새 메시지 추가
+          return [
+            ...prev,
+            { type: 'bot', messageChunks: [followUpResponseRef.current] },
+          ];
+        } else {
+          // 후속 청크 - 마지막 메시지 업데이트
+          return [
+            ...prev.slice(0, -1),
+            { type: 'bot', messageChunks: [followUpResponseRef.current] },
+          ];
+        }
+      });
+    };
+
     const handleDone = () => {
       console.log('✅ Stream completed');
       setIsStreaming(false);
+      followUpResponseRef.current = ''; // 역질문 완료 시 리셋
     };
 
     const handleError = (error: ServerError) => {
@@ -491,12 +525,14 @@ export const useChatSocket = () => {
     };
 
     socket.on('stream', handleStream);
+    socket.on('follow-up-stream', handleFollowUpStream);
     socket.on('done', handleDone);
     socket.on('error', handleError);
     socket.on('disconnect', handleDisconnect);
 
     return () => {
       socket.off('stream', handleStream);
+      socket.off('follow-up-stream', handleFollowUpStream);
       socket.off('done', handleDone);
       socket.off('error', handleError);
       socket.off('disconnect', handleDisconnect);
@@ -605,12 +641,20 @@ export const useChatSocket = () => {
     [],
   );
 
+  // storedUserProfile 상태 변화 디버깅
+  useEffect(() => {
+    console.log(
+      '📊 storedUserProfile 상태 변화:',
+      storedUserProfile?.plan?.name || 'null',
+    );
+  }, [storedUserProfile]);
+
   // 메시지가 변경될 때마다 로컬스토리지에 저장
   useEffect(() => {
     if (useLocalStorage && messages.length > 0) {
-      saveMessagesToLocal(messages);
+      saveMessagesToLocal(messages, storedUserProfile);
     }
-  }, [messages, useLocalStorage, saveMessagesToLocal]);
+  }, [messages, useLocalStorage, saveMessagesToLocal, storedUserProfile]);
 
   // 제거: 항상 로컬스토리지 사용으로 토글 불필요
 
@@ -620,17 +664,27 @@ export const useChatSocket = () => {
     socket.emit('reset-session', { sessionId });
     setMessages([]);
     responseRef.current = '';
+    hasLoggedSession.current = false; // 새 채팅 시작 시 로그 플래그 리셋
+    setStoredUserProfile(null); // 새 채팅 시작 시 사용자 프로필도 리셋
   }, [sessionId]);
+
+  // userProfile 설정 함수 (ChatbotPage에서 사용)
+  const setUserProfile = useCallback((userProfile: UserProfile | null) => {
+    console.log('💾 setUserProfile 호출됨:', userProfile?.plan?.name || 'null');
+    setStoredUserProfile(userProfile);
+  }, []);
 
   return {
     messages,
     isStreaming,
     sessionId,
     isInitialLoading,
+    storedUserProfile, // 복원된 사용자 프로필
     sendMessage,
     updateCarouselSelection,
     updateOttSelection,
     updateOxSelection,
     startNewChat,
+    setUserProfile, // 사용자 프로필 설정 함수
   };
 };
