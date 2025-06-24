@@ -26,7 +26,7 @@ const DataComparisonBar: React.FC<DataComparisonBarProps> = ({
         />
         <div className="text-xs text-gray500">{leftLabel}</div>
       </div>
-      <div className="flex-[1] text-sm">{title}</div>
+      <div className="w-20 text-sm flex justify-center">{title}</div>
       <div className="flex-[2] relative flex flex-col items-start gap-1">
         <div
           className="bg-gradation rounded-r-full h-5 transition-all duration-800"
