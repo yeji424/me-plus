@@ -24,13 +24,13 @@ const PlanListItem: React.FC<PlanListItemProps> = ({
         whileHover={
           !isOpen
             ? {
-                scale: 1.03,
+                scale: 1.01,
                 boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.08)',
               }
             : undefined // 열린 상태면 hover 효과 없음
         }
         whileTap={{
-          scale: 0.98,
+          scale: 0.99,
           boxShadow: '0px 0px 0px rgba(0,0,0,0)',
         }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
