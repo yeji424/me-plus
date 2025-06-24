@@ -1293,7 +1293,7 @@ const ComparePage: React.FC = () => {
         onDismiss={() => setOpen(false)}
         snapPoints={({ maxHeight }) => [maxHeight / 1.25]}
       >
-        <div className="px-5">
+        <div className="">
           <FilterSection
             dataList={dataList}
             priceList={priceList}
@@ -1307,7 +1307,7 @@ const ComparePage: React.FC = () => {
               <LoadingBubble type="dbcalling" />
             </div>
           )}
-          <div className="flex flex-col gap-2 select-none mb-3">
+          <div className="flex flex-col gap-2 select-none mb-3 px-5 mt-[190px]">
             {filteredPlans.map((plan, i) => (
               <FadeInUpDiv
                 key={plan._id}
