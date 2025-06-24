@@ -5,24 +5,28 @@ interface FloatingIconProps {
   src: string;
   alt?: string;
   className?: string;
+  variant?: 'default' | 'large';
 }
 
 const FloatingIcon: React.FC<FloatingIconProps> = ({
   src,
   alt = 'floating icon',
   className = '',
+  variant = 'default',
 }) => {
+  const isLarge = variant === 'large';
+
   return (
     <motion.img
       src={src}
       alt={alt}
       className={className}
       animate={{
-        y: [0, -5, 0],
-        rotateY: [0, 15, 0],
+        y: isLarge ? [0, -10, 0] : [0, -5, 0],
+        rotateY: isLarge ? [0, 0, 0] : [0, 15, 0],
       }}
       transition={{
-        duration: 3,
+        duration: isLarge ? 1.5 : 3,
         repeat: Infinity,
         ease: 'easeInOut',
       }}
