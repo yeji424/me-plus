@@ -139,10 +139,6 @@ const BotBubbleFrame = ({
         ) : null;
       case 'requestOTTServiceList':
         // 디버깅 로그 추가
-        console.log(
-          '🎬 BotBubbleFrame rendering OTT with selectedData:',
-          selectedData,
-        );
 
         return (
           <OttButtonGroup
@@ -205,7 +201,7 @@ const BotBubbleFrame = ({
             />
           </div>
         ) : (
-          <div className="flex-shrink-0 w-8 h-8 mt-1" />
+          <div className="flex-shrink-0 w-8  mt-1" />
         )}
 
         {/* 메시지 및 버튼 그룹 영역 */}
