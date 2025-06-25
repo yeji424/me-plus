@@ -25,7 +25,7 @@ const MainPage: React.FC = () => {
 
   return (
     <div
-      className={`h-[100vh] flex flex-col ${shouldCenter ? 'justify-center' : 'justify-start pt-8 pb-8'}`}
+      className={`flex flex-col ${shouldCenter ? 'justify-center h-[100vh] ' : 'justify-start pt-8 pb-8'}`}
     >
       <div className="px-5" style={{ top: '25px' }}>
         {/* 제목 */}
