@@ -1,11 +1,8 @@
 import versusIcon from '@/assets/icon/versus_icon.svg';
 import closeIcon from '@/assets/icon/close.svg';
+import AnimatedCardWrapper from '@/components/common/AnimatedWrapper';
+import FloatingIcon from '@/components/common/FloatingIcon';
 import type { Plan } from '@/components/types/Plan';
-import AnimatedCardWrapper from '../common/AnimatedWrapper';
-// import { motion } from 'framer-motion';
-import React from 'react';
-import FloatingIcon from '../common/FloadingIcon';
-// import { useNavigate } from 'react-router-dom';
 
 const SlotCard = ({
   selected,
@@ -19,9 +16,9 @@ const SlotCard = ({
   shouldHighlight?: boolean;
 }) => {
   return (
-    <div className="relative flex-[1] flex aspect-square rounded-[17px] cursor-pointer max-w-[160px]">
+    <div className="relative flex-[2] w-full flex rounded-[17px] cursor-pointer justify-center">
       <AnimatedCardWrapper
-        className={`relative flex-1 flex justify-center bg-background-40 rounded-[17px] ${
+        className={`relative flex-1 flex justify-center bg-background-40 rounded-[17px] aspect-square max-w-[160px] ${
           selected
             ? 'outline outline-primary-pink gap-[clamp(0px,2vw,8px)]'
             : 'shadow-md items-center'
@@ -69,14 +66,14 @@ const SlotCard = ({
   );
 };
 
-interface PlanSelectionCardProps {
+interface PlanSelectionCardAreaProps {
   selectedLeft: Plan | null;
   selectedRight: Plan | null;
   onSelectSlot: (slot: 'left' | 'right') => void;
   onClearSlot: (slot: 'left' | 'right') => void;
 }
 
-const PlanSelectionCard: React.FC<PlanSelectionCardProps> = ({
+const PlanSelectionCardArea: React.FC<PlanSelectionCardAreaProps> = ({
   selectedLeft,
   selectedRight,
   onSelectSlot,
@@ -85,14 +82,14 @@ const PlanSelectionCard: React.FC<PlanSelectionCardProps> = ({
   const noneSelected = !selectedLeft && !selectedRight;
   return (
     <div className="my-[29px]">
-      <div className="flex w-full justify-around">
+      <div className="flex w-full">
         <SlotCard
           selected={selectedLeft}
           onClick={() => onSelectSlot('left')}
           onClear={() => onClearSlot('left')}
           shouldHighlight={noneSelected || !selectedLeft}
         />
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center w-20">
           <FloatingIcon src={versusIcon} alt="versus icon" />
         </div>
         <SlotCard
@@ -106,4 +103,4 @@ const PlanSelectionCard: React.FC<PlanSelectionCardProps> = ({
   );
 };
 
-export default PlanSelectionCard;
+export default PlanSelectionCardArea;

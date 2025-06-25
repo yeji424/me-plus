@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import PlanDetailInfo from './PlanDetailInfo';
 import dropdownIcon from '@/assets/icon/dropdown_icon.svg';
+import PlanDetailInfo from '@/components/ComparePage/PlanDetailInfo';
 import type { Plan } from '@/components/types/Plan';
 
 interface PlanListItemProps {
@@ -27,7 +27,7 @@ const PlanListItem: React.FC<PlanListItemProps> = ({
                 scale: 1.01,
                 boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.08)',
               }
-            : undefined // 열린 상태면 hover 효과 없음
+            : undefined
         }
         whileTap={{
           scale: 0.99,

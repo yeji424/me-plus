@@ -1,12 +1,11 @@
-import DataComparisonBar from './DataComparisonBar';
-import BenefitComparisonRow from './BenefitComparisonRow';
-import ComparisonActionButtons from './ComparisonActionButtons';
 import togetherIcon from '@/assets/image/card_family.png';
 import premiumAddonsIcon from '@/assets/icon/special.png';
 import mediaAddonsIcon from '@/assets/icon/media.png';
-
+import BenefitText from '@/components/common/BenefitText';
+import DataComparisonBar from '@/components/ComparePage/DataComparisonBar';
+import BenefitComparisonRow from '@/components/ComparePage/BenefitComparisonRow';
+import ComparisonActionButtons from '@/components/ComparePage/ComparisonActionButtons';
 import type { Plan } from '@/components/types/Plan';
-import BenefitText from '../common/BenefitText';
 
 interface ComparisonResultProps {
   selectedLeft: Plan | null;
@@ -77,7 +76,6 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
             leftLabel={leftDataLabel}
             rightLabel={rightDataLabel}
             title="데이터"
-            // showComparison={hasBothPlans}
           />
           <DataComparisonBar
             leftValue={leftSharedDataValue}
@@ -85,7 +83,6 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
             leftLabel={leftSharedDataLabel}
             rightLabel={rightSharedDataLabel}
             title="공유 데이터"
-            // showComparison={hasBothPlans}
           />
         </div>
 
