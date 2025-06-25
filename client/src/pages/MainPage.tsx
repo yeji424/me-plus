@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import LinkCard from '@/components/MainPage/LinkCard';
 import FadeInUpDiv from '@/components/common/FadeInUpDiv';
 import AnimatedShaker from '@/components/common/AnimatedShaker';
@@ -8,8 +9,24 @@ import chatbotIcon from '@/assets/icon/chatbot_icon.png';
 import testIcon from '@/assets/icon/test_icon.png';
 
 const MainPage: React.FC = () => {
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowHeight(window.innerHeight);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // 높이가 750px 이상일 때만 justify-center 적용
+  const shouldCenter = windowHeight >= 790;
+
   return (
-    <div className="h-[100vh] flex flex-col justify-center ">
+    <div
+      className={`h-[100vh] flex flex-col ${shouldCenter ? 'justify-center' : 'justify-start pt-8 pb-8'}`}
+    >
       <div className="px-5" style={{ top: '25px' }}>
         {/* 제목 */}
         <FadeInUpDiv custom={0} className="mb-[37px]">
