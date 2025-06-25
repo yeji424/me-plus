@@ -156,7 +156,7 @@ const TestResultPage = () => {
             ease: 'easeOut',
           }}
         >
-          <div className="z-10 flex flex-col justfy-center gap-2">
+          <div className="z-10 flex flex-col justfy-center mt-10 gap-2">
             <div className="z-10 text-[21.5px] font-semibold text-secondary-purple-80">
               {plan.name}
             </div>
