@@ -1,11 +1,8 @@
 import versusIcon from '@/assets/icon/versus_icon.svg';
 import closeIcon from '@/assets/icon/close.svg';
+import AnimatedCardWrapper from '@/components/common/AnimatedWrapper';
+import FloatingIcon from '@/components/common/FloatingIcon';
 import type { Plan } from '@/components/types/Plan';
-import AnimatedCardWrapper from '../common/AnimatedWrapper';
-// import { motion } from 'framer-motion';
-import React from 'react';
-import FloatingIcon from '../common/FloadingIcon';
-// import { useNavigate } from 'react-router-dom';
 
 const SlotCard = ({
   selected,
@@ -69,14 +66,14 @@ const SlotCard = ({
   );
 };
 
-interface PlanSelectionCardProps {
+interface PlanSelectionCardAreaProps {
   selectedLeft: Plan | null;
   selectedRight: Plan | null;
   onSelectSlot: (slot: 'left' | 'right') => void;
   onClearSlot: (slot: 'left' | 'right') => void;
 }
 
-const PlanSelectionCard: React.FC<PlanSelectionCardProps> = ({
+const PlanSelectionCardArea: React.FC<PlanSelectionCardAreaProps> = ({
   selectedLeft,
   selectedRight,
   onSelectSlot,
@@ -106,4 +103,4 @@ const PlanSelectionCard: React.FC<PlanSelectionCardProps> = ({
   );
 };
 
-export default PlanSelectionCard;
+export default PlanSelectionCardArea;
