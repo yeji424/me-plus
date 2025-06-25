@@ -1,10 +1,12 @@
 import { extractMetadata } from '../utils/metadataExtractor.js';
 import { handleFunctionError } from './gptErrorHandler.js';
+import { searchPlansFromDB } from './gptFuncDefinitions.js';
 import {
   ErrorType,
   SocketEvent,
   OTTServices,
   OXOptions,
+  LoadingType,
 } from '../utils/constants.js';
 
 /**
@@ -91,6 +93,47 @@ export const executeFunctionCall = async (functionName, args, socket) => {
       break;
     }
 
+    case 'searchPlans': {
+      console.log('🔍 searchPlans 함수 호출됨:', args);
+
+      socket.emit(SocketEvent.LOADING, {
+        type: functionName?.includes('Plan')
+          ? LoadingType.DB_CALLING
+          : LoadingType.SEARCHING,
+        functionName: functionName,
+      });
+      try {
+        // MongoDB에서 조건에 맞는 요금제 검색
+        const result = await searchPlansFromDB(args);
+        const { plans } = result;
+
+        console.log(`📋 검색된 요금제 수: ${plans.length}개`);
+
+        if (plans.length === 0) {
+          console.warn('⚠️ 조건에 맞는 요금제가 없습니다.');
+          // 검색 결과가 없어도 빈 배열을 전송
+          socket.emit(SocketEvent.LOADING_END);
+          socket.emit(SocketEvent.PLAN_LISTS, []);
+        } else {
+          // 검색된 요금제를 클라이언트에 전송
+          console.log('🔍 검색된 요금제:', plans);
+          socket.emit(SocketEvent.LOADING_END);
+          socket.emit(SocketEvent.PLAN_LISTS, plans);
+        }
+      } catch (dbError) {
+        console.error('❌ DB 조회 실패:', dbError);
+        // 에러 발생 시에도 로딩 종료
+        socket.emit(SocketEvent.LOADING_END);
+        handleFunctionError(
+          ErrorType.FUNCTION_EXECUTION_ERROR,
+          '요금제 검색 중 오류가 발생했습니다.',
+          { functionName, args, error: dbError.message },
+          socket,
+        );
+      }
+      break;
+    }
+
     case 'showPlanLists': {
       const { plans } = args;
       if (!plans) {
@@ -166,8 +209,6 @@ export const handleFunctionCall = async (
   socket,
 ) => {
   try {
-    console.log('🔧 Function called:', functionName);
-
     const args = parseFunctionArgs(functionArgsRaw);
 
     await executeFunctionCall(functionName, args, socket);

@@ -138,12 +138,6 @@ export const useChatSocket = () => {
           lastUpdated: Date.now(),
         };
 
-        console.log('💾 로컬스토리지 저장할 데이터:', {
-          sessionId,
-          messagesCount: storedMessages.length,
-          userProfile: chatSession.userProfile?.plan?.name || 'undefined',
-        });
-
         saveSession(chatSession);
       } catch (error) {
         console.error('❌ Failed to save messages to localStorage:', error);

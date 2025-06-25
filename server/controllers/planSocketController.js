@@ -128,28 +128,6 @@ export const handlePlanRecommend = async (socket, { sessionId, message }) => {
       console.error('❌ GPT streaming error:', gptError);
       return;
     }
-    // // GPT 스트리밍 호출
-    // try {
-    //   await streamChat(
-    //     messages,
-    //     socket,
-    //     (chunk) => {
-    //       assistantReply += chunk;
-    //     },
-    //     (funcInfo) => {
-    //       console.log('🔧 Function call detected:', funcInfo);
-    //     },
-    //   );
-    // } catch (gptError) {
-    //   console.error('❌ GPT streaming error:', gptError);
-    //   return;
-    // }
-
-    // MongoDB 저장 제거 - 로컬스토리지에서 관리
-    console.log(
-      '✅ Message processed successfully (saved to localStorage):',
-      sessionId,
-    );
   } catch (error) {
     console.error('❌ handlePlanRecommend error:', error);
     socket.emit('error', {
