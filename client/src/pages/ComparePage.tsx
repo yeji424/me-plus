@@ -147,7 +147,7 @@ const ComparePage: React.FC = () => {
         </Modal>
       )}
       <FadeInUpDiv custom={0}>
-        <h1 className="font-semibold text-2xl text-center mt-[20px]">
+        <h1 className="font-semibold text-2xl text-center mt-[74px]">
           비교하고 싶은
           <br />
           요금제를 선택해 주세요

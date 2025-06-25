@@ -19,9 +19,9 @@ const SlotCard = ({
   shouldHighlight?: boolean;
 }) => {
   return (
-    <div className="relative flex-[1] flex aspect-square rounded-[17px] cursor-pointer max-w-[160px]">
+    <div className="relative flex-[2] w-full flex rounded-[17px] cursor-pointer justify-center">
       <AnimatedCardWrapper
-        className={`relative flex-1 flex justify-center bg-background-40 rounded-[17px] ${
+        className={`relative flex-1 flex justify-center bg-background-40 rounded-[17px] aspect-square max-w-[160px] ${
           selected
             ? 'outline outline-primary-pink gap-[clamp(0px,2vw,8px)]'
             : 'shadow-md items-center'
@@ -85,14 +85,14 @@ const PlanSelectionCard: React.FC<PlanSelectionCardProps> = ({
   const noneSelected = !selectedLeft && !selectedRight;
   return (
     <div className="my-[29px]">
-      <div className="flex w-full justify-around">
+      <div className="flex w-full">
         <SlotCard
           selected={selectedLeft}
           onClick={() => onSelectSlot('left')}
           onClear={() => onClearSlot('left')}
           shouldHighlight={noneSelected || !selectedLeft}
         />
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center w-20">
           <FloatingIcon src={versusIcon} alt="versus icon" />
         </div>
         <SlotCard
