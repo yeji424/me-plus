@@ -166,7 +166,7 @@ export const streamChatWithFollowUp = async (messages, socket, onDelta) => {
     // 2단계: 특정 함수 호출 시에만 역질문 생성
     if (hasFunctionCalls) {
       // 역질문 대상 함수들
-      const followUpTargetFunctions = ['requestTextCard', 'searchPlans'];
+      const followUpTargetFunctions = ['requestTextCard', 'showPlanLists'];
       console.log(functionResults);
       // 실행된 함수들 중 역질문 대상이 있는지 확인
       const executedFunctionNames = functionResults
@@ -238,7 +238,7 @@ ${
 }
 
 **검색 결과 확인 우선:**
-- 방금 searchPlans 함수가 빈 배열([])을 반환했다면, 조건에 맞는 요금제가 없다는 뜻이야
+- 방금 showPlanLists 함수가 빈 배열([])을 반환했다면, 조건에 맞는 요금제가 없다는 뜻이야
 - 이 경우 "조건에 맞는 요금제를 찾지 못했어요. 😅 다른 옵션을 확인해보시는 것은 어떨까요?"라고 안내하고 다음 중 하나를 제안해줘:
 
 **검색 결과 없음 시 대안 제시:**
@@ -247,7 +247,7 @@ ${
 3. "대신 인기 요금제들을 추천해드릴까요?" → requestCarouselButtons로 ["인기 요금제 보기", "조건 다시 설정", "상담원 연결"] 제공
 4. "조건을 다시 설정해서 찾아보시겠어요?" → requestCarouselButtons로 새로운 선택지 제공
 
-**검색 결과가 있는 경우에만 아래 추가 혜택 질문:**
+**매우 중요함**
 이미 요금제를 보여줬으니, 요금제 설명은 다시 하지 말고 추가 혜택 질문만 해줘:
 
 **중요: 질문 텍스트를 먼저 출력하고 그 다음에 함수 호출**
