@@ -23,8 +23,8 @@ const IconSwitcher: React.FC<IconSwitcherProps> = ({
   const animation = isAnswered
     ? shouldBounce
       ? { scale: [1, 0.9, 1.1, 1], y: 0, rotateY: 0 }
-      : { scale: 1, y: [0, -10, 0], rotateY: 0 }
-    : { scale: 1, y: [0, -10, 0], rotateY: [0, 15, 0] };
+      : { scale: 1, y: [0, -5, 0], rotateY: [0, 7, 0] }
+    : { scale: 1, y: [0, -5, 0], rotateY: [0, 7, 0] };
 
   return (
     <motion.img

@@ -45,17 +45,19 @@ const OXButtonGroup = ({
   };
 
   return (
-    <DraggableScroll className="overflow-visible gap-1 items-start px-1 mx-1.5">
-      {options.map((option) => (
-        <ChatButton
-          key={option.id}
-          label={option.label}
-          icon={iconMap[option.id]}
-          disabled={clickedButton !== null && clickedButton !== option.label}
-          onClick={() => handleButtonClick(option.label)}
-        />
-      ))}
-    </DraggableScroll>
+    <>
+      <DraggableScroll className="flex flex-nowrap gap-2">
+        {options.map((option) => (
+          <ChatButton
+            key={option.id}
+            label={option.label}
+            icon={iconMap[option.id]}
+            disabled={clickedButton !== null && clickedButton !== option.label}
+            onClick={() => handleButtonClick(option.label)}
+          />
+        ))}
+      </DraggableScroll>
+    </>
   );
 };
 
