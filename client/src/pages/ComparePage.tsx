@@ -22,7 +22,7 @@ import { localFallbackPlans } from '@/constants/localFallbackPlans';
 import { usePlanFilter } from '@/hooks/usePlanFilter';
 
 const ComparePage: React.FC = () => {
-  const [open, setOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [activeDataIndex, setActiveDataIndex] = useState(0);
   const [activePriceIndex, setActivePriceIndex] = useState(0);
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>(
@@ -55,20 +55,22 @@ const ComparePage: React.FC = () => {
     activePriceIndex,
   );
 
+  const resetDropdowns = () => setOpenDropdowns({});
+
   const handleSetActiveDataIndex = (index: number) => {
     setActiveDataIndex(index);
-    setOpenDropdowns({});
+    resetDropdowns();
   };
 
   const handleSetActivePriceIndex = (index: number) => {
     setActivePriceIndex(index);
-    setOpenDropdowns({});
+    resetDropdowns();
   };
 
   const handleSelectPlan = (plan: Plan) => {
-    if (selectedLeft?._id === plan._id || selectedRight?._id === plan._id) {
-      return;
-    }
+    const isAlreadySelected =
+      selectedLeft?._id === plan._id || selectedRight?._id === plan._id;
+    if (isAlreadySelected) return;
 
     if (selectedSlot === 'left') {
       setSelectedLeft(plan);
@@ -76,14 +78,14 @@ const ComparePage: React.FC = () => {
       setSelectedRight(plan);
     }
 
-    setOpen(false);
+    setSheetOpen(false);
     setSelectedSlot(null);
   };
 
   const openSheetForSlot = (slot: 'left' | 'right') => {
     setSelectedSlot(slot);
     setOpenDropdowns({});
-    setOpen(true);
+    setSheetOpen(true);
   };
 
   const handleClearSlot = (slot: 'left' | 'right') => {
@@ -156,8 +158,8 @@ const ComparePage: React.FC = () => {
 
       <BottomSheet
         className="fixed left-1/2 top-0 bottom-0 -translate-x-1/2 w-full max-w-[600px] flex justify-center items-center z-50"
-        open={open}
-        onDismiss={() => setOpen(false)}
+        open={sheetOpen}
+        onDismiss={() => setSheetOpen(false)}
         snapPoints={({ maxHeight }) => [maxHeight / 1.25]}
       >
         <div>
