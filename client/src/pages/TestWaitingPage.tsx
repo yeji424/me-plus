@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import moonerImage from '../assets/image/mooner_hmm.png';
-import FloatingIcon from '@/components/common/FloadingIcon';
+import FloatingIcon from '@/components/common/FloatingIcon';
 
 const TestWaitingPage: React.FC = () => {
   const navigate = useNavigate();
