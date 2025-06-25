@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import PlanDetailInfo from './PlanDetailInfo';
 import dropdownIcon from '@/assets/icon/dropdown_icon.svg';
+import PlanDetailInfo from '@/components/ComparePage/PlanDetailInfo';
 import type { Plan } from '@/components/types/Plan';
 
 interface PlanListItemProps {
