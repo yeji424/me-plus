@@ -29,7 +29,7 @@ const ToggleCardContent = ({
 
       {/* 상세 정보 그리드 */}
       <div
-        className={`grid w-[274px] grid-cols-[24%_76%] gap-x-[5px] gap-y-[10px] text-xs ${colorTheme.textColor} text-[12px] py-[10px]`}
+        className={`grid w-full grid-cols-[24%_76%] gap-x-[5px] gap-y-[10px] text-xs ${colorTheme.textColor} text-[12px] py-[10px]`}
       >
         {otherDetails.map(({ key, value }, idx) => (
           <React.Fragment key={idx}>

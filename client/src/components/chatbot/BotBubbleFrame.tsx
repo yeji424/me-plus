@@ -205,7 +205,10 @@ const BotBubbleFrame = ({
         )}
 
         {/* 메시지 및 버튼 그룹 영역 */}
-        <div className="flex-1 space-y-2">
+        <div
+          className=" flex-1 space-y-2"
+          style={{ maxWidth: 'calc(min(100vw, 600px) - 40px)' }}
+        >
           {shouldShowMessage && <BotBubble messageChunks={messageChunks} />}
           {buttonGroup && (
             <motion.div

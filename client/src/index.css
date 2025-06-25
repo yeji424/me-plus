@@ -127,11 +127,11 @@
 .user-bubble {
   background: linear-gradient(
       180deg,
-      #5732a1 0%,
-      #5b038c 25%,
+      #eb008b 0%,
+      #ce018b 25%,
       #a0018b 50%,
-      #ce018b 75%,
-      #eb008b 100%
+      #5b038c 75%,
+      #5732a1 100%
     )
     no-repeat center;
   background-attachment: fixed;

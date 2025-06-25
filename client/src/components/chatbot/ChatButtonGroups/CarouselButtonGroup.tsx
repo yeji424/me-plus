@@ -39,16 +39,18 @@ const CarouselButtonGroup = ({
   };
 
   return (
-    <DraggableScroll className="flex flex-nowrap gap-1 hide-scrollbar overflow-visible mx-1.5">
-      {options.map((option, idx) => (
-        <ChatButton
-          key={idx}
-          label={option.label}
-          disabled={clickedButton !== null && clickedButton !== option.label}
-          onClick={() => handleButtonClick(option)}
-        />
-      ))}
-    </DraggableScroll>
+    <>
+      <DraggableScroll className="flex flex-nowrap gap-2">
+        {options.map((option, idx) => (
+          <ChatButton
+            key={idx}
+            label={option.label}
+            disabled={clickedButton !== null && clickedButton !== option.label}
+            onClick={() => handleButtonClick(option)}
+          />
+        ))}
+      </DraggableScroll>
+    </>
   );
 };
 

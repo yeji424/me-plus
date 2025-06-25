@@ -84,7 +84,6 @@ const Button: React.FC<ButtonProps> = ({
     <AnimatedCardWrapper
       className={`
         flex items-center justify-center shadow-special
-        ${sizeStyles.padding} 
         ${sizeStyles.fontSize} 
         ${sizeStyles.height} 
         ${sizeStyles.borderRadius}
@@ -103,9 +102,12 @@ const Button: React.FC<ButtonProps> = ({
       onClick={onClick}
     >
       <button
+        // onClick={disabled ? undefined : onClick}
         type={type}
         disabled={disabled}
-        className="cursor-pointer w-full h-full flex items-center justify-center"
+        className={`cursor-pointer w-full h-full flex items-center justify-center
+    ${sizeStyles.padding}
+  `}
       >
         {children}
       </button>

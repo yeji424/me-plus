@@ -126,7 +126,7 @@ function ToggleCard({ plan, onToggleClick }: ToggleCardProps) {
   return (
     <div
       ref={cardRef}
-      className="w-[309px] bg-background-40 rounded-lg relative cursor-pointer overflow-hidden"
+      className="w-[265px] bg-background-40 rounded-lg relative cursor-pointer overflow-hidden"
       onClick={handleClick}
     >
       <div
