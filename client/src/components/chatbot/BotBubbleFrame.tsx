@@ -201,7 +201,7 @@ const BotBubbleFrame = ({
             />
           </div>
         ) : (
-          <div className="flex-shrink-0 w-8 h-8 mt-1" />
+          <div className="flex-shrink-0 w-8  mt-1" />
         )}
 
         {/* 메시지 및 버튼 그룹 영역 */}

@@ -66,6 +66,10 @@ export const GPT_TOOLS = [
           type: 'number',
           description: '최대 월 요금 (원)',
         },
+        minMonthlyFee: {
+          type: 'number',
+          description: '최소 월 요금 (원)',
+        },
         minDataGb: {
           type: 'number',
           description: '최소 데이터량 (GB, -1은 무제한)',
@@ -78,6 +82,37 @@ export const GPT_TOOLS = [
         isPopular: {
           type: 'boolean',
           description: '인기 요금제만 조회할지 여부',
+        },
+        preferredAddons: {
+          type: 'array',
+          description:
+            '선호하는 부가서비스 키워드 (예: ["NETFLIX", "DISNEY", "TVING", "MUSIC", "YOUTUBE", "BOOK", "KIDS", "UPLAY"])',
+          items: {
+            type: 'string',
+            enum: [
+              'NETFLIX',
+              'DISNEY',
+              'DISNEY+',
+              'TVING',
+              '티빙',
+              'MUSIC',
+              '음악',
+              'YOUTUBE',
+              '유튜브',
+              'BOOK',
+              '책',
+              '독서',
+              'KIDS',
+              '아이',
+              '어린이',
+              'UPLAY',
+              '유플레이',
+              'MEDIA',
+              '미디어',
+              'PREMIUM',
+              '프리미엄',
+            ],
+          },
         },
         limit: {
           type: 'number',
