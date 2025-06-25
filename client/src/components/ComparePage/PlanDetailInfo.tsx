@@ -1,5 +1,5 @@
+import Button from '@/components/common/Button';
 import type { Plan } from '@/components/types/Plan';
-import Button from '../common/Button';
 
 interface PlanDetailInfoProps {
   plan: Plan;

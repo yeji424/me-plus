@@ -100,10 +100,10 @@ const Button: React.FC<ButtonProps> = ({
         ${className}
 
       `}
+      onClick={onClick}
     >
       <button
         type={type}
-        onClick={onClick}
         disabled={disabled}
         className="cursor-pointer w-full h-full flex items-center justify-center"
       >
