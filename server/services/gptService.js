@@ -103,16 +103,40 @@ export const streamChat = async (
     console.log(functionCalls);
     const functionResults = [];
     for (const { functionName, functionArgsRaw } of functionCalls) {
-      await handleFunctionCall(functionName, functionArgsRaw, socket);
-      // 간단한 메시지 형식으로 함수 실행 정보 추가
+      const result = await handleFunctionCall(
+        functionName,
+        functionArgsRaw,
+        socket,
+      );
+
+      // 함수 실행 정보 추가
       functionResults.push({
         role: 'assistant',
         content: `${functionName} 함수를 호출했습니다. 인자: ${functionArgsRaw}`,
       });
-      functionResults.push({
-        role: 'user',
-        content: `${functionName} 함수가 성공적으로 실행되었습니다.`,
-      });
+
+      // searchPlans 함수의 경우 검색 결과 상세 정보 추가
+      console.log('여기야', functionName, result);
+      if (functionName === 'searchPlans' && result) {
+        if (result.result === 'empty') {
+          functionResults.push({
+            role: 'function',
+            name: functionName,
+            content: `검색 결과: 빈 배열 (조건에 맞는 요금제 없음)`,
+          });
+        } else if (result.result === 'found') {
+          functionResults.push({
+            role: 'function',
+            name: functionName,
+            content: `검색 결과: ${result.plansCount}개 요금제 발견 (${result.planNames?.join(', ')})`,
+          });
+        }
+      } else {
+        functionResults.push({
+          role: 'user',
+          content: `${functionName} 함수가 성공적으로 실행되었습니다.`,
+        });
+      }
     }
 
     socket.emit(SocketEvent.DONE);

@@ -57,6 +57,7 @@ const parseFunctionArgs = (functionArgsRaw) => {
  * @param {string} functionName - 호출할 함수 이름
  * @param {Object} args - 함수 인자
  * @param {Socket} socket - 소켓 객체
+ * @returns {Object} 함수 실행 결과
  */
 export const executeFunctionCall = async (functionName, args, socket) => {
   switch (functionName) {
@@ -66,7 +67,7 @@ export const executeFunctionCall = async (functionName, args, socket) => {
         question: '어떤 OTT 서비스를 함께 사용 중이신가요?',
         options: OTTServices,
       });
-      break;
+      return { success: true, functionName, result: 'OTT 서비스 선택지 제공' };
     }
 
     case 'requestOXCarouselButtons': {
@@ -114,10 +115,23 @@ export const executeFunctionCall = async (functionName, args, socket) => {
           // 검색 결과가 없어도 빈 배열을 전송
           socket.emit(SocketEvent.LOADING_END);
           socket.emit(SocketEvent.PLAN_LISTS, []);
+          return {
+            success: true,
+            functionName,
+            result: 'empty',
+            plansCount: 0,
+          };
         } else {
           // 검색된 요금제를 클라이언트에 전송
           socket.emit(SocketEvent.LOADING_END);
           socket.emit(SocketEvent.PLAN_LISTS, plans);
+          return {
+            success: true,
+            functionName,
+            result: 'found',
+            plansCount: plans.length,
+            planNames: plans.map((p) => p.name),
+          };
         }
       } catch (dbError) {
         console.error('❌ DB 조회 실패:', dbError);
@@ -129,6 +143,7 @@ export const executeFunctionCall = async (functionName, args, socket) => {
           { functionName, args, error: dbError.message },
           socket,
         );
+        return { success: false, functionName, error: dbError.message };
       }
       break;
     }
@@ -193,6 +208,7 @@ export const executeFunctionCall = async (functionName, args, socket) => {
         { functionName, args },
         socket,
       );
+      return { success: false, functionName, error: 'Unknown function' };
   }
 };
 
@@ -210,7 +226,8 @@ export const handleFunctionCall = async (
   try {
     const args = parseFunctionArgs(functionArgsRaw);
 
-    await executeFunctionCall(functionName, args, socket);
+    const result = await executeFunctionCall(functionName, args, socket);
+    return result;
   } catch (functionError) {
     console.error(`Function call 처리 실패 (${functionName}):`, functionError);
 
@@ -236,6 +253,7 @@ export const handleFunctionCall = async (
         },
         socket,
       );
+      return { success: false, functionName, error: functionError.message };
     }
   }
 };

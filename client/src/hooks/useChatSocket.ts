@@ -541,7 +541,52 @@ export const useChatSocket = () => {
           if (msg.type === 'user') {
             return { role: 'user', content: msg.text };
           } else if (msg.type === 'bot' && 'messageChunks' in msg) {
-            return { role: 'assistant', content: msg.messageChunks.join('') };
+            const content = msg.messageChunks.join('');
+            // 빈 문자열인 메시지는 제외 (function call만 있는 메시지들)
+            if (content.trim() === '') {
+              const functionName = msg.functionCall?.name;
+              if (
+                functionName === 'showPlanLists' &&
+                msg.functionCall?.args?.plans
+              ) {
+                const planNames = msg.functionCall.args.plans
+                  .map((plan: { name: string }) => plan.name)
+                  .join(', ');
+                return {
+                  role: 'assistant',
+                  content: `${planNames}를 추천받았다`,
+                };
+              }
+              if (
+                functionName === 'requestCarouselButtons' &&
+                msg.functionCall?.args?.items
+              ) {
+                const itemLabels = msg.functionCall.args.items
+                  .map((item: { label: string }) => item.label)
+                  .join(', ');
+                return {
+                  role: 'assistant',
+                  content: `${itemLabels} 선택지를 제공했다`,
+                };
+              }
+              if (functionName === 'requestOXCarouselButtons') {
+                return {
+                  role: 'assistant',
+                  content: '예/아니오 선택지를 제공했다',
+                };
+              }
+              if (functionName === 'requestOTTServiceList') {
+                return {
+                  role: 'assistant',
+                  content: 'OTT 서비스 선택지를 제공했다',
+                };
+              }
+              return {
+                role: 'assistant',
+                content: `${functionName}을 수행하였음`,
+              };
+            }
+            return { role: 'assistant', content };
           }
           return null;
         })
