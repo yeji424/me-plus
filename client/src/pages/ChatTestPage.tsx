@@ -153,17 +153,24 @@ const PlanChatTester = () => {
     const messageToSend = text || input.trim();
     if (!messageToSend || !sessionId) return;
 
+    // 🔧 현재 메시지를 추가한 전체 대화 히스토리 생성
+    const newUserMessage = { role: 'user', content: messageToSend };
+    const allMessages = [...chatLog, newUserMessage];
+
+    // 🔧 전체 대화 히스토리를 서버로 전송
     const payload = {
       sessionId,
       message: messageToSend,
+      history: allMessages, // 🔧 전체 대화 히스토리 추가
     };
+
     setChatLog((prev) => [...prev, { role: 'user', content: messageToSend }]);
     setInput('');
     setIsStreaming(true);
     responseRef.current = '';
     setOptionButtons([]);
 
-    socket.emit('recommend-plan', payload);
+    socket.emit('chat', payload);
   };
 
   const handleNewChat = () => {

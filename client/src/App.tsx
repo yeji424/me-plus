@@ -14,12 +14,16 @@ import ComparePage from './pages/ComparePage';
 import TestResultPage from './pages/TestResultPage';
 import MainPage from './pages/MainPage';
 import Footer from './components/common/Footer';
+import ServiceGuidePage from './pages/ServiceGuidePage';
 
 const MainLayout = () => {
   return (
     <>
       <div className=" min-h-screen flex flex-col">
-        <main className="flex-grow mt-[55px]">
+        <main
+          className="flex-1"
+          style={{ minHeight: 'calc(100vh - 50px - 80px)' }}
+        >
           <Outlet />
         </main>
         <Footer />
@@ -40,6 +44,7 @@ function App() {
           <Route path="test-wait" element={<TestWaitingPage />} />
           <Route path="test-result" element={<TestResultPage />} />
           <Route path="compare" element={<ComparePage />} />
+          <Route path="service-guide" element={<ServiceGuidePage />} />
           <Route path="/chat-test" element={<ChatTestPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

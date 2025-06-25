@@ -1,3 +1,5 @@
+import Button from '@/components/common/Button';
+
 interface ComparisonActionButtonsProps {
   leftButtonText?: string;
   rightButtonText?: string;
@@ -13,29 +15,31 @@ const ComparisonActionButtons: React.FC<ComparisonActionButtonsProps> = ({
 }) => {
   return (
     <div
-      className="flex flex-col justify-center items-center text-center gap-6 fixed bottom-[24px] max-w-[560px] h-[116px]"
+      className="flex flex-col justify-center items-center text-center gap-6 fixed bottom-[50px] max-w-[560px]"
       style={{ width: 'calc(100% - 40px)' }}
     >
       <div className="flex w-full">
-        <div className="flex-[2] relative flex flex-col items-center gap-1 justify-center rounded-[10px]">
+        <div className="flex-[2] relative flex flex-col items-center justify-center rounded-[10px]">
           {leftButtonText && (
-            <button
+            <Button
               onClick={onLeftClick}
               className="text-xs text-background-40 font-semibold bg-primary-pink w-full h-[38px] flex items-center justify-center rounded-[10px] cursor-pointer shadow-basic"
+              variant="custom"
             >
               {leftButtonText}
-            </button>
+            </Button>
           )}
         </div>
         <div className="flex-[1] text-sm flex items-center justify-center" />
         <div className="flex-[2] relative flex flex-col items-center gap-1 justify-center rounded-[10px]">
           {rightButtonText && (
-            <button
+            <Button
               onClick={onRightClick}
               className="text-xs text-background-40 font-semibold bg-primary-pink w-full h-[38px] flex items-center justify-center rounded-[10px] cursor-pointer shadow-basic"
+              variant="custom"
             >
               {rightButtonText}
-            </button>
+            </Button>
           )}
         </div>
       </div>

@@ -4,6 +4,23 @@ import type {
   FunctionCall,
 } from '@/components/chatbot/BotBubbleFrame';
 
+// UserProfile 타입 정의 (ChatbotPage와 동일)
+export interface UserProfile {
+  plan: {
+    id: string;
+    name: string;
+    monthlyFee: number;
+    benefits: string[];
+  };
+  usage: {
+    call: number;
+    message: number;
+    data: number;
+  };
+  preferences: string[];
+  source: 'plan-test' | 'url-params';
+}
+
 export interface StoredMessage {
   type: 'user' | 'bot' | 'loading';
   text?: string;
@@ -22,6 +39,7 @@ export interface StoredMessage {
 export interface ChatSession {
   sessionId: string;
   messages: StoredMessage[];
+  userProfile?: UserProfile; // URL 파라미터로 온 사용자의 정보
   lastUpdated: number;
 }
 
@@ -69,7 +87,6 @@ export const saveSession = (session: ChatSession): void => {
     }
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(sessions));
-    console.log('✅ 세션 저장 완료:', session.sessionId);
   } catch (error) {
     console.error('❌ 세션 저장 실패:', error);
   }

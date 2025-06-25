@@ -1,9 +1,10 @@
-import DataComparisonBar from './DataComparisonBar';
-import BenefitComparisonRow from './BenefitComparisonRow';
-import ComparisonActionButtons from './ComparisonActionButtons';
 import togetherIcon from '@/assets/image/card_family.png';
 import premiumAddonsIcon from '@/assets/icon/special.png';
 import mediaAddonsIcon from '@/assets/icon/media.png';
+import BenefitText from '@/components/common/BenefitText';
+import DataComparisonBar from '@/components/ComparePage/DataComparisonBar';
+import BenefitComparisonRow from '@/components/ComparePage/BenefitComparisonRow';
+import ComparisonActionButtons from '@/components/ComparePage/ComparisonActionButtons';
 import type { Plan } from '@/components/types/Plan';
 
 interface ComparisonResultProps {
@@ -75,7 +76,6 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
             leftLabel={leftDataLabel}
             rightLabel={rightDataLabel}
             title="데이터"
-            // showComparison={hasBothPlans}
           />
           <DataComparisonBar
             leftValue={leftSharedDataValue}
@@ -83,7 +83,6 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
             leftLabel={leftSharedDataLabel}
             rightLabel={rightSharedDataLabel}
             title="공유 데이터"
-            // showComparison={hasBothPlans}
           />
         </div>
 
@@ -91,24 +90,34 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
 
         <div className="flex flex-col justify-center items-center text-center w-full gap-6 mb-[106px]">
           <BenefitComparisonRow
-            leftContent={selectedLeft?.bundleBenefit || null}
-            rightContent={selectedRight?.bundleBenefit || null}
+            leftContent={
+              selectedLeft?.bundleBenefit ? (
+                <BenefitText text={selectedLeft.bundleBenefit} />
+              ) : null
+            }
+            rightContent={
+              selectedRight?.bundleBenefit ? (
+                <BenefitText text={selectedRight.bundleBenefit} />
+              ) : null
+            }
             title="결합 할인"
             leftIcon={selectedLeft?.bundleBenefit ? togetherIcon : undefined}
             rightIcon={selectedRight?.bundleBenefit ? togetherIcon : undefined}
             iconAlt="togetherIcon"
+            hasLeftPlan={!!selectedLeft}
+            hasRightPlan={!!selectedRight}
           />
 
           <BenefitComparisonRow
             leftContent={
-              selectedLeft?.premiumAddons
-                ? `(택1) ${selectedLeft?.premiumAddons}`
-                : null
+              selectedLeft?.premiumAddons ? (
+                <BenefitText text={`(택1) ${selectedLeft.premiumAddons}`} />
+              ) : null
             }
             rightContent={
-              selectedRight?.premiumAddons
-                ? `(택1) ${selectedRight?.premiumAddons}`
-                : null
+              selectedRight?.premiumAddons ? (
+                <BenefitText text={`(택1) ${selectedRight.premiumAddons}`} />
+              ) : null
             }
             title="프리미엄 서비스"
             leftIcon={
@@ -118,23 +127,27 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
               selectedRight?.premiumAddons ? premiumAddonsIcon : undefined
             }
             iconAlt="premiumIcon"
+            hasLeftPlan={!!selectedLeft}
+            hasRightPlan={!!selectedRight}
           />
 
           <BenefitComparisonRow
             leftContent={
-              selectedLeft?.mediaAddons
-                ? `(택1) ${selectedLeft?.mediaAddons}`
-                : null
+              selectedLeft?.mediaAddons ? (
+                <BenefitText text={`(택1) ${selectedLeft.mediaAddons}`} />
+              ) : null
             }
             rightContent={
-              selectedRight?.mediaAddons
-                ? `(택1) ${selectedRight?.mediaAddons}`
-                : null
+              selectedRight?.mediaAddons ? (
+                <BenefitText text={`(택1) ${selectedRight.mediaAddons}`} />
+              ) : null
             }
             title="미디어 서비스"
             leftIcon={selectedLeft?.mediaAddons ? mediaAddonsIcon : undefined}
             rightIcon={selectedRight?.mediaAddons ? mediaAddonsIcon : undefined}
             iconAlt="premiumIcon"
+            hasLeftPlan={!!selectedLeft}
+            hasRightPlan={!!selectedRight}
           />
         </div>
       </div>

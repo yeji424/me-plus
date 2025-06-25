@@ -72,6 +72,7 @@ export interface BotBubbleFrameProps {
   ) => void;
   onOttSelect?: (selectedServices: string[], messageIndex?: number) => void;
   onOxSelect?: (selectedOption: string, messageIndex?: number) => void;
+  onToggleCardClick?: (cardElement: HTMLDivElement) => void;
   messageIndex?: number;
   selectedData?: {
     selectedItem?: CarouselItem;
@@ -89,6 +90,7 @@ const BotBubbleFrame = ({
   onCarouselSelect,
   onOttSelect,
   onOxSelect,
+  onToggleCardClick,
   messageIndex,
   selectedData,
   showChatbotIcon = true,
@@ -137,10 +139,6 @@ const BotBubbleFrame = ({
         ) : null;
       case 'requestOTTServiceList':
         // 디버깅 로그 추가
-        console.log(
-          '🎬 BotBubbleFrame rendering OTT with selectedData:',
-          selectedData,
-        );
 
         return (
           <OttButtonGroup
@@ -174,7 +172,11 @@ const BotBubbleFrame = ({
         return args?.plans ? (
           <div className="space-y-3">
             {args.plans.map((plan, index) => (
-              <ToggleCard key={plan._id || index} plan={plan} />
+              <ToggleCard
+                key={plan._id || index}
+                plan={plan}
+                onToggleClick={onToggleCardClick}
+              />
             ))}
           </div>
         ) : null;
@@ -199,11 +201,14 @@ const BotBubbleFrame = ({
             />
           </div>
         ) : (
-          <div className="flex-shrink-0 w-8 h-8 mt-1" />
+          <div className="flex-shrink-0 w-8  mt-1" />
         )}
 
         {/* 메시지 및 버튼 그룹 영역 */}
-        <div className="flex-1 space-y-2">
+        <div
+          className=" flex-1 space-y-2"
+          style={{ maxWidth: 'calc(min(100vw, 600px) - 40px)' }}
+        >
           {shouldShowMessage && <BotBubble messageChunks={messageChunks} />}
           {buttonGroup && (
             <motion.div

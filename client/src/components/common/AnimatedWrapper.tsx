@@ -1,5 +1,5 @@
-import { motion, useAnimation } from 'framer-motion';
-import React from 'react';
+import { motion } from 'framer-motion';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface AnimatedCardWrapperProps {
@@ -7,66 +7,89 @@ interface AnimatedCardWrapperProps {
   children: React.ReactNode;
   to?: string;
   onClick?: () => void;
+  shouldHighlight?: boolean;
+  animationDisabled?: boolean;
 }
-const AnimatedCardWrapper: React.FC<AnimatedCardWrapperProps> = ({
+
+const AnimatedWrapper: React.FC<AnimatedCardWrapperProps> = ({
   className = '',
   children,
   to,
   onClick,
+  shouldHighlight = false,
+  animationDisabled = false,
 }) => {
-  const controls = useAnimation();
   const navigate = useNavigate();
-
-  const handleTapStart = () => {
-    controls.start({
-      scaleX: 2,
-      opacity: 0.15,
-      transition: { duration: 0.2, ease: 'easeOut' },
-    });
-  };
-
-  const handleTapEnd = () => {
-    controls.start({
-      opacity: 0,
-      transition: { duration: 0.3, ease: 'easeIn' },
-    });
-  };
+  const [isTapping, setIsTapping] = useState(false);
 
   const handleTap = () => {
-    if (onClick) {
-      onClick();
-    }
+    if (onClick) onClick();
     if (to) {
       setTimeout(() => {
         navigate(to);
       }, 400);
     }
   };
+  if (animationDisabled) {
+    return (
+      <div className={className} onClick={handleTap}>
+        {shouldHighlight && (
+          <div
+            className="absolute inset-0 rounded-[17px] pointer-events-none z-0"
+            style={{ boxShadow: '0 0 6px 1.5px rgba(255, 192, 203, 0.6)' }}
+          />
+        )}
+        <div className="relative z-10 w-full">{children}</div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
-      whileHover={{
+      className={className}
+      whileHover={
+        !isTapping
+          ? {
+              scale: 0.98,
+              transition: { duration: 0.2, ease: 'easeInOut' },
+            }
+          : {}
+      }
+      whileTap={{
         scale: 0.97,
-        transition: { duration: 0.2, ease: 'easeInOut' },
+        transition: { duration: 0.2, ease: 'easeOut' },
       }}
-      whileTap={{ scale: 0.95, transition: { duration: 0.2, ease: 'easeOut' } }}
-      onTapStart={handleTapStart}
-      onTapCancel={handleTapEnd}
+      onTapStart={() => setIsTapping(true)}
+      onTapCancel={() => setIsTapping(false)}
       onTap={() => {
+        setIsTapping(false);
         handleTap();
-        handleTapEnd();
       }}
-      className={`relative w-full inline-flex rounded-[17px] p-[1px] overflow-hidden cursor-pointer ${className}`}
+      onPointerUp={() => setIsTapping(false)}
     >
-      <motion.div
-        style={{ transformOrigin: 'center' }}
-        className="absolute top-0 bottom-0 left-[20px] right-[20px] z-20 bg-black/90 rounded-[16px]"
-        initial={{ scaleX: 0, opacity: 0 }}
-        animate={controls}
-      />
+      {shouldHighlight && (
+        <motion.div
+          className="absolute inset-0 rounded-[17px] pointer-events-none z-0"
+          style={{ boxShadow: '0 0 6px 1.5px rgba(255, 192, 203, 0.6)' }}
+          animate={{
+            scale: [1, 1.01, 1],
+            boxShadow: [
+              '0 0 6px 1.5px rgba(255, 192, 203, 0.6)',
+              '0 0 8px 2px rgba(255, 192, 203, 0.9)',
+              '0 0 6px 1.5px rgba(255, 192, 203, 0.6)',
+            ],
+          }}
+          transition={{
+            repeat: Infinity,
+            duration: 1.5,
+            ease: 'easeInOut',
+          }}
+        />
+      )}
+
       <div className="relative z-10 w-full">{children}</div>
     </motion.div>
   );
 };
 
-export default AnimatedCardWrapper;
+export default AnimatedWrapper;

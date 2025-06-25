@@ -159,3 +159,185 @@ export const getPlanResultsByIds = async (planIds) => {
     throw error;
   }
 };
+
+/** 조건에 맞는 요금제 검색 (최대 3개) */
+export const searchPlansFromDB = async (searchConditions) => {
+  try {
+    const {
+      category,
+      maxMonthlyFee,
+      minMonthlyFee, // 🔧 최소 월 요금 추가
+      minDataGb,
+      ageGroup,
+      isPopular,
+      preferredAddons, // 🔧 선호하는 부가서비스 추가 (예: ["MEDIA", "OTT", "MUSIC"])
+      limit = 3,
+    } = searchConditions;
+
+    console.log('🔍 요금제 검색 조건:', searchConditions);
+
+    // 동적 쿼리 조건 생성
+    const query = {};
+
+    // 카테고리 조건
+    if (category) {
+      query.category = category;
+    }
+
+    // 월 요금 조건 (범위 검색)
+    if (maxMonthlyFee || minMonthlyFee) {
+      const monthlyFeeCondition = {};
+      if (minMonthlyFee) {
+        monthlyFeeCondition.$gte = minMonthlyFee;
+      }
+      if (maxMonthlyFee) {
+        monthlyFeeCondition.$lte = maxMonthlyFee;
+      }
+      query.monthlyFee = monthlyFeeCondition;
+    }
+
+    // 최소 데이터량 조건
+    if (minDataGb !== undefined) {
+      if (minDataGb === -1) {
+        // 무제한 데이터 요청
+        query.dataGb = -1;
+      } else {
+        // 특정 데이터량 이상 요청
+        query.$or = [
+          { dataGb: -1 }, // 무제한도 포함
+          { dataGb: { $gte: minDataGb } }, // 지정된 데이터량 이상
+        ];
+      }
+    }
+
+    // 연령대 조건
+    if (ageGroup) {
+      query.ageGroup = ageGroup;
+    }
+
+    // 인기 요금제 조건
+    if (isPopular !== undefined) {
+      query.isPopular = isPopular;
+    }
+
+    // 🔧 부가서비스 조건 추가
+    if (preferredAddons && preferredAddons.length > 0) {
+      // 부가서비스 키워드를 포함하는 요금제 필터링
+      const addonConditions = [];
+
+      preferredAddons.forEach((addon) => {
+        switch (addon.toUpperCase()) {
+          case 'NETFLIX':
+          case 'NETFLEX':
+            addonConditions.push({
+              $or: [
+                { mediaAddons: { $regex: '넷플릭스', $options: 'i' } },
+                { premiumAddons: { $regex: '넷플릭스', $options: 'i' } },
+              ],
+            });
+            break;
+          case 'DISNEY':
+          case 'DISNEY+':
+            addonConditions.push({
+              $or: [
+                { mediaAddons: { $regex: '디즈니', $options: 'i' } },
+                { premiumAddons: { $regex: '디즈니', $options: 'i' } },
+              ],
+            });
+            break;
+          case 'TVING':
+          case '티빙':
+            addonConditions.push({
+              $or: [
+                { mediaAddons: { $regex: '티빙', $options: 'i' } },
+                { premiumAddons: { $regex: '티빙', $options: 'i' } },
+              ],
+            });
+            break;
+          case 'MUSIC':
+          case '음악':
+            addonConditions.push({
+              $or: [
+                { mediaAddons: { $regex: '바이브|지니뮤직', $options: 'i' } },
+                { premiumAddons: { $regex: '바이브|지니뮤직', $options: 'i' } },
+              ],
+            });
+            break;
+          case 'YOUTUBE':
+          case '유튜브':
+            addonConditions.push({
+              $or: [
+                { mediaAddons: { $regex: '유튜브', $options: 'i' } },
+                { premiumAddons: { $regex: '유튜브', $options: 'i' } },
+              ],
+            });
+            break;
+          case 'BOOK':
+          case '책':
+          case '독서':
+            addonConditions.push({
+              $or: [
+                { mediaAddons: { $regex: '밀리의 서재', $options: 'i' } },
+                { premiumAddons: { $regex: '밀리의 서재', $options: 'i' } },
+              ],
+            });
+            break;
+          case 'KIDS':
+          case '아이':
+          case '어린이':
+            addonConditions.push({
+              $or: [
+                { mediaAddons: { $regex: '아이들나라', $options: 'i' } },
+                {
+                  premiumAddons: { $regex: '아이들나라|돌봄이', $options: 'i' },
+                },
+              ],
+            });
+            break;
+          case 'UPLAY':
+          case '유플레이':
+            addonConditions.push({
+              $or: [
+                { mediaAddons: { $regex: '유플레이', $options: 'i' } },
+                { premiumAddons: { $regex: '유플레이', $options: 'i' } },
+              ],
+            });
+            break;
+          case 'MEDIA':
+          case '미디어':
+            addonConditions.push({ mediaAddons: { $ne: null, $ne: '' } });
+            break;
+          case 'PREMIUM':
+          case '프리미엄':
+            addonConditions.push({ premiumAddons: { $ne: null, $ne: '' } });
+            break;
+        }
+      });
+
+      if (addonConditions.length > 0) {
+        // 부가서비스 조건들을 AND로 연결 (모든 조건을 만족하는 요금제)
+        query.$and = query.$and
+          ? [...query.$and, ...addonConditions]
+          : addonConditions;
+      }
+    }
+
+    console.log('📋 생성된 MongoDB 쿼리:', JSON.stringify(query, null, 2));
+
+    // 쿼리 실행
+    const plans = await Plan.find(query)
+      .select(EXCLUDED_FIELDS)
+      .sort({
+        isPopular: -1, // 인기 요금제 우선
+        monthlyFee: 1, // 가격 낮은 순
+      })
+      .limit(limit);
+
+    console.log(`✅ 검색 결과: ${plans.length}개 요금제 찾음`);
+
+    return { plans: plans };
+  } catch (error) {
+    console.error('searchPlansFromDB >>', error);
+    throw error;
+  }
+};

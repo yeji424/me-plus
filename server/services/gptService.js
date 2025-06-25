@@ -1,747 +1,382 @@
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
-import axios from 'axios';
-import * as cheerio from 'cheerio';
+import { GPTConfig, SocketEvent, LoadingType } from '../utils/constants.js';
+import { handleFunctionCall } from './gptFunctionHandler.js';
+import { handleGPTError } from './gptErrorHandler.js';
+import { GPT_TOOLS } from './gptToolDefinitions.js';
 
 dotenv.config();
 
 export const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-// 메타데이터 추출 함수
-const extractMetadata = async (url) => {
-  try {
-    const response = await axios.get(url, {
-      timeout: 10000,
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-      },
-      maxRedirects: 5,
-    });
+// 역질문 전용 도구들 (캐러셀, OX, OTT 버튼만)
+const FOLLOWUP_TOOLS = GPT_TOOLS.filter((tool) =>
+  [
+    'requestCarouselButtons',
+    'requestOXCarouselButtons',
+    'requestOTTServiceList',
+  ].includes(tool.name),
+);
+let usedTotalTokens = 0;
 
-    const html = response.data;
-    const $ = cheerio.load(html);
-
-    const getMetaContent = (selector) => {
-      const element = $(selector);
-      return element.attr('content') || element.text() || null;
-    };
-
-    let imageUrl =
-      getMetaContent('meta[property="og:image"]') ||
-      getMetaContent('meta[name="twitter:image"]') ||
-      null;
-
-    // 상대 URL을 절대 URL로 변환
-    if (imageUrl && !imageUrl.startsWith('http')) {
-      const validUrl = new URL(url);
-      if (imageUrl.startsWith('//')) {
-        imageUrl = validUrl.protocol + imageUrl;
-      } else if (imageUrl.startsWith('/')) {
-        imageUrl = validUrl.origin + imageUrl;
-      } else {
-        imageUrl = validUrl.origin + '/' + imageUrl;
-      }
-    }
-
-    return imageUrl;
-  } catch (error) {
-    console.warn('메타데이터 추출 실패:', error.message);
-    return null;
-  }
-};
-
+/**
+ * GPT 스트림 채팅을 처리합니다.
+ * @param {Array} messages - 채팅 메시지 배열
+ * @param {Socket} socket - 소켓 객체
+ * @param {Function} onDelta - 델타 콜백 함수
+ * @param {string} model - 사용할 GPT 모델 (기본값: GPTConfig.MODEL)
+ * @returns {Promise<{ hasFunctionCalls: boolean, functionResults: Array }>}
+ */
 export const streamChat = async (
   messages,
   socket,
   onDelta,
-  onFunctionCall = null,
+  model = GPTConfig.MODEL,
 ) => {
   try {
-    // 타임아웃 설정 (30초)
-    const timeoutMs = 30000;
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('REQUEST_TIMEOUT')), timeoutMs);
-    });
-
-    const streamPromise = openai.chat.completions.create({
-      model: 'gpt-4.1',
-      messages,
+    const stream = await openai.responses.create({
+      model: model,
+      input: messages,
       stream: true,
-      tools: [
-        {
-          type: 'function',
-          function: {
-            name: 'requestOTTServiceList',
-            description:
-              '유저에게 통신사와 연결된 OTT 서비스 목록을 선택하도록 응답 받습니다.',
-            parameters: { type: 'object', properties: {} },
-          },
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'requestOXCarouselButtons',
-            description:
-              '유저에게 예/아니오로만 대답할 수 있는 선택지를 캐러셀 형태로 제공합니다.',
-            parameters: { type: 'object', properties: {} },
-          },
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'requestCarouselButtons',
-            description:
-              '유저에게 짧은 키워드나 명사형 선택지를 가로 스크롤 캐러셀 형태로 제공합니다. 통신사명, 요금대, 데이터량, 기술(5G/LTE) 등 단순한 카테고리 선택에 사용합니다.',
-            parameters: {
-              type: 'object',
-              properties: {
-                items: {
-                  type: 'array',
-                  description: '캐러셀 버튼으로 보여줄 항목 리스트',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      id: {
-                        type: 'string',
-                        description: '항목 고유 ID 또는 태그',
-                      },
-                      label: {
-                        type: 'string',
-                        description: '버튼에 보여질 텍스트',
-                      },
-                    },
-                    required: ['id', 'label'],
-                  },
-                },
-              },
-              required: ['items'],
-            },
-          },
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'showPlanLists',
-            description:
-              '유저에게 여러 요금제 상세 정보를 카드 형식으로 제공합니다. 보통 3개 이상의 요금제를 추천할 때 사용합니다.',
-            parameters: {
-              type: 'object',
-              properties: {
-                plans: {
-                  type: 'array',
-                  description: '추천할 요금제 목록',
-                  items: {
-                    type: 'object',
-                    properties: {
-                      _id: { type: 'string', description: '요금제 고유 ID' },
-                      category: {
-                        type: 'string',
-                        description: '요금제 카테고리 (5G, LTE 등)',
-                      },
-                      name: { type: 'string', description: '요금제 이름' },
-                      description: {
-                        type: 'string',
-                        description: '요금제 설명',
-                      },
-                      isPopular: {
-                        type: 'boolean',
-                        description: '인기 요금제 여부',
-                      },
-                      dataGb: {
-                        type: 'number',
-                        description: '기본 데이터 제공량 (-1은 무제한)',
-                      },
-                      sharedDataGb: {
-                        type: 'number',
-                        description: '공유/테더링 데이터 (GB)',
-                      },
-                      voiceMinutes: {
-                        type: 'number',
-                        description: '음성통화 시간 (-1은 무제한)',
-                      },
-                      addonVoiceMinutes: {
-                        type: 'number',
-                        description: '추가 음성통화 시간',
-                      },
-                      smsCount: {
-                        type: 'number',
-                        description: 'SMS 개수 (-1은 무제한)',
-                      },
-                      monthlyFee: { type: 'number', description: '월 요금' },
-                      optionalDiscountAmount: {
-                        type: 'number',
-                        description: '최대 할인 가능 금액',
-                      },
-                      ageGroup: {
-                        type: 'string',
-                        description: '대상 연령대 (ALL, YOUTH 등)',
-                      },
-                      detailUrl: {
-                        type: 'string',
-                        description: '자세히 보기 링크 URL',
-                      },
-                      bundleBenefit: {
-                        type: ['string', 'null'],
-                        description: '결합 할인 정보',
-                      },
-                      mediaAddons: {
-                        type: ['string', 'null'],
-                        description: '미디어 부가서비스',
-                      },
-                      premiumAddons: {
-                        type: ['string', 'null'],
-                        description: '프리미엄 부가서비스',
-                      },
-                      basicService: {
-                        type: 'string',
-                        description: '기본 제공 서비스',
-                      },
-                    },
-                    required: [
-                      '_id',
-                      'category',
-                      'name',
-                      'description',
-                      'isPopular',
-                      'dataGb',
-                      'sharedDataGb',
-                      'voiceMinutes',
-                      'addonVoiceMinutes',
-                      'smsCount',
-                      'monthlyFee',
-                      'optionalDiscountAmount',
-                      'ageGroup',
-                      'detailUrl',
-                      'basicService',
-                    ],
-                  },
-                },
-              },
-              required: ['plans'],
-            },
-          },
-        },
-        {
-          type: 'function',
-          function: {
-            name: 'requestTextCard',
-            description:
-              '유저에게 특정 웹사이트나 링크로 안내할 때 사용합니다. URL의 미리보기 이미지와 함께 카드 형태로 보여줍니다. 유플러스 사이트나 추천하는 외부 링크를 안내할 때 사용합니다.',
-            parameters: {
-              type: 'object',
-              properties: {
-                title: {
-                  type: 'string',
-                  description: '카드에 표시될 제목',
-                },
-                description: {
-                  type: 'string',
-                  description: '카드에 표시될 설명 텍스트',
-                },
-                url: {
-                  type: 'string',
-                  description: '안내할 링크 URL',
-                },
-                buttonText: {
-                  type: 'string',
-                  description:
-                    '버튼에 표시될 텍스트 (예: "자세히 보기", "사이트 방문하기")',
-                },
-                imageUrl: {
-                  type: 'string',
-                  description: '카드에 표시될 이미지 URL (선택사항)',
-                },
-              },
-              required: ['title', 'description', 'url', 'buttonText'],
-            },
-          },
-        },
-      ],
+      tool_choice: 'auto',
+      tools: GPT_TOOLS,
+      parallel_tool_calls: false,
     });
 
-    const streamRes = await Promise.race([streamPromise, timeoutPromise]);
+    // 함수 호출 정보 누적용
+    const functionCallMap = {}; // { [item_id]: { ... } }
+    const functionCalls = []; // 최종 실행용 배열
 
-    let isFunctionCalled = false;
-    let functionName = '';
-    let functionArgsRaw = '';
-    let accumulatedContent = ''; // 텍스트 누적용
+    for await (const event of stream) {
+      // 1. 함수 호출 item 추가
+      if (
+        event.type === 'response.output_item.added' &&
+        event.item.type === 'function_call'
+      ) {
+        functionCallMap[event.item.id] = {
+          ...event.item,
+          arguments: '',
+        };
 
-    for await (const chunk of streamRes) {
-      const delta = chunk.choices[0].delta;
+        // 함수명에 따라 DB 호출/검색 타입 구분해서 로딩 emit
+        const functionName = event.item.name;
+        socket.emit(SocketEvent.LOADING, {
+          type: functionName?.includes('Plan')
+            ? LoadingType.DB_CALLING
+            : LoadingType.SEARCHING,
+          functionName: functionName,
+        });
+        console.log('🔄 로딩 시작:', functionName);
+      }
 
-      // tool_calls 감지 (새로운 API 형식)
-      if (delta.tool_calls && delta.tool_calls.length > 0) {
-        // console.log('🛠️ Tool calls detected:', delta.tool_calls);
+      // 2. arguments 조각 누적
+      else if (event.type === 'response.function_call_arguments.delta') {
+        const id = event.item_id;
+        if (functionCallMap[id]) {
+          functionCallMap[id].arguments += event.delta;
+        }
+      }
 
-        // 처음 tool_calls 감지 시 로딩 시작
-        if (!isFunctionCalled) {
-          isFunctionCalled = true;
-
-          // Function calling 시작 - 로딩 상태 emit
-          const toolCall = delta.tool_calls[0];
-          const detectedFunctionName = toolCall.function?.name || 'unknown';
-          socket.emit('loading', {
-            type: detectedFunctionName.includes('Plan')
-              ? 'dbcalling'
-              : 'searching',
-            functionName: detectedFunctionName,
+      // 3. arguments 누적 완료(함수 호출 하나 완성)
+      else if (event.type === 'response.function_call_arguments.done') {
+        const id = event.item_id;
+        const call = functionCallMap[id];
+        if (call) {
+          functionCalls.push({
+            functionName: call.name,
+            functionArgsRaw: call.arguments,
           });
-          console.log('🔄 로딩 시작:', detectedFunctionName);
         }
-
-        const toolCall = delta.tool_calls[0];
-
-        if (toolCall.function?.name) {
-          functionName = toolCall.function.name;
-          // console.log('🎯 Function name detected:', functionName);
-        }
-
-        if (toolCall.function?.arguments) {
-          functionArgsRaw += toolCall.function.arguments;
-          // console.log('📝 Adding args chunk:', toolCall.function.arguments);
-        }
-        continue;
-      }
-      // console.log('🔍 delta:', delta);
-
-      // delta 구조 상세 확인
-      if (delta.tool_calls) {
-        console.log('✅ tool_calls 존재:', delta.tool_calls);
-      }
-      if (delta.function_call) {
-        console.log('✅ function_call 존재:', delta.function_call);
       }
 
-      // 일반 메시지 content
-      const content = delta?.content;
-      if (content) {
-        accumulatedContent += content;
-
-        // 텍스트에서 function call 패턴 감지 (더 엄격한 패턴)
-        const functionCallMatch = accumulatedContent.match(
-          /functions?\.(\w+)\s*\(\s*\{([\s\S]*?)\}\s*\)\s*$/,
-        );
-
-        if (functionCallMatch) {
-          console.log(
-            '🔍 Text-based function call detected:',
-            functionCallMatch[0],
-          );
-
-          // function call 부분을 제거한 텍스트만 전송
-          const cleanContent = accumulatedContent
-            .replace(/functions?\.(\w+)\s*\(\s*\{[\s\S]*?}\s*\)\s*$/, '')
-            .trim();
-
-          // 스트리밍 종료 신호 먼저 전송
-          socket.emit('done');
-
-          // function call 실행
-          isFunctionCalled = true;
-          functionName = functionCallMatch[1];
-
-          // 텍스트 기반 function call 감지 시 로딩 시작
-          socket.emit('loading', {
-            type: functionName.includes('Plan') ? 'dbcalling' : 'searching',
-            functionName: functionName,
-          });
-          console.log('🔄 텍스트 기반 로딩 시작:', functionName);
-
-          try {
-            functionArgsRaw = `{${functionCallMatch[2]}}`;
-          } catch (e) {
-            console.error('❌ Failed to parse function args from text:', e);
-          }
-
-          break; // 스트리밍 종료
-        } else {
-          // function call이 시작되는 패턴 감지 (전송 중단)
-          if (
-            accumulatedContent.includes('functions.') ||
-            accumulatedContent.includes('function.')
-          ) {
-            // function call이 완성되기를 기다리므로 전송하지 않음
-            // console.log(
-            //   '🔍 Function call 시작 감지, 스트리밍 중단:',
-            //   accumulatedContent.substring(
-            //     accumulatedContent.lastIndexOf('function'),
-            //   ),
-            // );
-          } else {
-            // "functions" 또는 "function" 단어만 있는 경우 체크
-            if (
-              accumulatedContent.includes(' functions') ||
-              accumulatedContent.includes(' function') ||
-              accumulatedContent.endsWith('functions') ||
-              accumulatedContent.endsWith('function')
-            ) {
-              // 다음 청크를 기다려서 완전한 function call인지 확인
-              console.log('🔍 Function 키워드 감지, 다음 청크 대기 중...');
-            } else {
-              // 정상 텍스트 전송
-              socket.emit('stream', content);
-              onDelta?.(content);
-            }
-          }
-        }
+      // 4. 일반 텍스트 스트림 (output_text 등)
+      else if (event.type === 'response.output_text.delta') {
+        socket.emit(SocketEvent.STREAM, event.delta);
+        if (onDelta) onDelta(event.delta);
+      } else if (event.type === 'response.completed') {
+        usedTotalTokens += event.response.usage.total_tokens;
+        if (onDelta) onDelta(event.delta);
       }
     }
 
-    if (isFunctionCalled) {
-      try {
-        console.log('🔧 Function called:', functionName);
-        console.log('📄 Raw arguments:', functionArgsRaw);
+    // 모든 함수 호출 실행
+    console.log(functionCalls);
+    const functionResults = [];
+    for (const { functionName, functionArgsRaw } of functionCalls) {
+      const result = await handleFunctionCall(
+        functionName,
+        functionArgsRaw,
+        socket,
+      );
 
-        // 로딩 시작은 이미 tool_calls 감지 시 처리됨 (제거)
+      // 함수 실행 정보 추가
+      functionResults.push({
+        role: 'assistant',
+        content: `${functionName} 함수를 호출했습니다. 인자: ${functionArgsRaw}`,
+      });
 
-        let args = {};
-        if (functionArgsRaw) {
-          try {
-            // JavaScript 객체 형식을 JSON으로 변환 (더 정교한 변환)
-            let fixedJson = functionArgsRaw
-              // 1. 키에 따옴표 추가 (단어로 시작하는 키들만)
-              .replace(/([{,]\s*)([a-zA-Z_$][a-zA-Z0-9_$]*)\s*:/g, '$1"$2":')
-              // 2. 작은따옴표를 큰따옴표로 변환
-              .replace(/'/g, '"')
-              // 3. 숫자 뒤의 불필요한 소수점 제거 (-1.0 → -1)
-              .replace(/(-?\d+)\.0(?=[,\s\]\}])/g, '$1')
-              // 4. 줄바꿈과 연속된 공백 정리
-              .replace(/\n\s*/g, ' ')
-              .replace(/\s+/g, ' ')
-              .trim();
-
-            console.log(
-              '🔄 변환 시도 (처음 200자):',
-              fixedJson.substring(0, 200) + '...',
-            );
-            args = JSON.parse(fixedJson);
-            console.log('✅ JavaScript 객체 → JSON 변환 성공');
-          } catch (secondParseError) {
-            // 더 강력한 방법: eval 사용 (보안상 주의 필요하지만 서버에서만 사용)
-            try {
-              console.warn('🔄 eval 방식으로 재시도...');
-              args = eval(`(${functionArgsRaw})`);
-              console.log('✅ eval 방식으로 변환 성공');
-            } catch (evalError) {
-              console.error('❌ 최종 JSON 파싱 실패:', secondParseError);
-              console.error('❌ eval 방식도 실패:', evalError);
-              console.log('🔍 원본:', functionArgsRaw);
-              console.log('🔍 변환 시도:', fixedJson);
-
-              // 로딩 종료
-              socket.emit('loading-end');
-
-              // JSON 파싱 실패 에러를 클라이언트에게 전송
-              socket.emit('error', {
-                type: 'FUNCTION_ARGS_PARSE_ERROR',
-                message: 'Function arguments 파싱에 실패했습니다.',
-                details: {
-                  functionName,
-                  rawArgs: functionArgsRaw,
-                  parseError: secondParseError.message,
-                },
-              });
-              return;
-            }
-          }
+      // searchPlans 함수의 경우 검색 결과 상세 정보 추가
+      console.log('여기야', functionName, result);
+      if (functionName === 'searchPlans' && result) {
+        if (result.result === 'empty') {
+          functionResults.push({
+            role: 'function',
+            name: functionName,
+            content: `검색 결과: 빈 배열 (조건에 맞는 요금제 없음)`,
+          });
+        } else if (result.result === 'found') {
+          functionResults.push({
+            role: 'function',
+            name: functionName,
+            content: `검색 결과: ${result.plansCount}개 요금제 발견 (${result.planNames?.join(', ')})`,
+          });
         }
-
-        switch (functionName) {
-          case 'requestOTTServiceList': {
-            // 새로 추가: function call 정보 수집
-            const functionCallInfo = {
-              name: functionName,
-              args: args || {},
-            };
-
-            // onFunctionCall 콜백이 있으면 호출 (안전하게)
-            if (onFunctionCall && typeof onFunctionCall === 'function') {
-              try {
-                onFunctionCall(functionCallInfo);
-              } catch (callbackError) {
-                console.error('❌ onFunctionCall error:', callbackError);
-              }
-            }
-
-            socket.emit('loading-end');
-            socket.emit('ott-service-list', {
-              question: '어떤 OTT 서비스를 함께 사용 중이신가요?',
-              options: ['넷플릭스', '디즈니+', '티빙', '왓챠'],
-            });
-            break;
-          }
-
-          case 'requestOXCarouselButtons': {
-            // 새로 추가: function call 정보 수집
-            const functionCallInfo = {
-              name: functionName,
-              args: args || {},
-            };
-
-            // onFunctionCall 콜백이 있으면 호출 (안전하게)
-            if (onFunctionCall && typeof onFunctionCall === 'function') {
-              try {
-                onFunctionCall(functionCallInfo);
-              } catch (callbackError) {
-                console.error('❌ onFunctionCall error:', callbackError);
-              }
-            }
-
-            socket.emit('loading-end');
-            socket.emit('ox-carousel-buttons', {
-              options: ['예', '아니오'],
-            });
-            break;
-          }
-
-          case 'requestCarouselButtons': {
-            const { items } = args;
-            if (!items) {
-              socket.emit('loading-end');
-              socket.emit('error', {
-                type: 'MISSING_FUNCTION_ARGS',
-                message: 'requestCarouselButtons에 필요한 items가 없습니다.',
-                details: { functionName, args },
-              });
-              return;
-            }
-
-            // 새로 추가: function call 정보 수집
-            const functionCallInfo = {
-              name: functionName,
-              args: { items },
-            };
-
-            // onFunctionCall 콜백이 있으면 호출 (안전하게)
-            if (onFunctionCall && typeof onFunctionCall === 'function') {
-              try {
-                onFunctionCall(functionCallInfo);
-              } catch (callbackError) {
-                console.error('❌ onFunctionCall error:', callbackError);
-              }
-            }
-
-            socket.emit('loading-end');
-            socket.emit('carousel-buttons', items);
-            break;
-          }
-
-          case 'showPlanLists': {
-            const { plans } = args;
-            if (!plans) {
-              socket.emit('loading-end');
-              socket.emit('error', {
-                type: 'MISSING_FUNCTION_ARGS',
-                message: 'showPlanLists에 필요한 plans가 없습니다.',
-                details: { functionName, args },
-              });
-              return;
-            }
-
-            // 새로 추가: function call 정보 수집
-            const functionCallInfo = {
-              name: functionName,
-              args: { plans },
-            };
-
-            // onFunctionCall 콜백이 있으면 호출 (안전하게)
-            if (onFunctionCall && typeof onFunctionCall === 'function') {
-              try {
-                onFunctionCall(functionCallInfo);
-              } catch (callbackError) {
-                console.error('❌ onFunctionCall error:', callbackError);
-              }
-            }
-
-            socket.emit('loading-end');
-            socket.emit('plan-lists', plans);
-            break;
-          }
-
-          case 'requestTextCard': {
-            const { title, description, url, buttonText, imageUrl } = args;
-            if (!title || !description || !url || !buttonText) {
-              socket.emit('loading-end');
-              socket.emit('error', {
-                type: 'MISSING_FUNCTION_ARGS',
-                message:
-                  'requestTextCard에 필요한 title, description, url, buttonText가 없습니다.',
-                details: { functionName, args },
-              });
-              return;
-            }
-
-            // 새로 추가: function call 정보 수집
-            const functionCallInfo = {
-              name: functionName,
-              args: { title, description, url, buttonText, imageUrl },
-            };
-
-            // onFunctionCall 콜백이 있으면 호출 (안전하게)
-            if (onFunctionCall && typeof onFunctionCall === 'function') {
-              try {
-                onFunctionCall(functionCallInfo);
-              } catch (callbackError) {
-                console.error('❌ onFunctionCall error:', callbackError);
-              }
-            }
-
-            socket.emit('loading-end');
-
-            // imageUrl이 없으면 URL에서 메타데이터 추출
-            let finalImageUrl = imageUrl;
-            if (!finalImageUrl) {
-              console.log('🔍 URL에서 메타데이터 추출 중:', url);
-              finalImageUrl = await extractMetadata(url);
-              console.log('📸 추출된 이미지 URL:', finalImageUrl);
-            }
-
-            socket.emit('text-card', {
-              title,
-              description,
-              url,
-              buttonText,
-              imageUrl: finalImageUrl,
-            });
-            break;
-          }
-
-          case 'showFirstCardList': {
-            // 새로 추가: function call 정보 수집
-            const functionCallInfo = {
-              name: functionName,
-              args: args || {},
-            };
-
-            // onFunctionCall 콜백이 있으면 호출 (안전하게)
-            if (onFunctionCall && typeof onFunctionCall === 'function') {
-              try {
-                onFunctionCall(functionCallInfo);
-              } catch (callbackError) {
-                console.error('❌ onFunctionCall error:', callbackError);
-              }
-            }
-
-            socket.emit('loading-end');
-            socket.emit('first-card-list');
-            break;
-          }
-
-          default:
-            socket.emit('loading-end');
-            socket.emit('error', {
-              type: 'UNKNOWN_FUNCTION',
-              message: `알 수 없는 function: ${functionName}`,
-              details: { functionName, args },
-            });
-        }
-      } catch (functionError) {
-        console.error(
-          `Function call 처리 실패 (${functionName}):`,
-          functionError,
-        );
-        socket.emit('loading-end');
-        socket.emit('error', {
-          type: 'FUNCTION_EXECUTION_ERROR',
-          message: '기능 처리 중 오류가 발생했습니다.',
-          details: {
-            functionName,
-            args,
-            error: functionError.message,
-          },
+      } else {
+        functionResults.push({
+          role: 'user',
+          content: `${functionName} 함수가 성공적으로 실행되었습니다.`,
         });
       }
     }
 
-    // function call이 처리되지 않은 경우에만 done 신호 전송
-    if (!isFunctionCalled) {
-      // function call 시작 패턴이 있지만 완성되지 않은 경우 처리
-      if (
-        accumulatedContent.includes('functions.') ||
-        accumulatedContent.includes('function.') ||
-        accumulatedContent.includes(' functions') ||
-        accumulatedContent.includes(' function') ||
-        accumulatedContent.endsWith('functions') ||
-        accumulatedContent.endsWith('function')
-      ) {
-        console.warn(
-          '⚠️ 불완전한 function call 감지:',
-          accumulatedContent.substring(
-            Math.max(0, accumulatedContent.lastIndexOf('function') - 20),
-          ),
+    socket.emit(SocketEvent.DONE);
+
+    return {
+      hasFunctionCalls: functionCalls.length > 0,
+      functionResults: functionResults,
+    };
+  } catch (error) {
+    handleGPTError(error, socket);
+    return { hasFunctionCalls: false, functionResults: [] };
+  }
+};
+
+/**
+ * 멀티턴 채팅 (function calling → 역질문 생성)
+ */
+export const streamChatWithFollowUp = async (messages, socket, onDelta) => {
+  try {
+    // 1단계: 기존 streamChat 사용하여 function call 여부 확인
+    const { hasFunctionCalls, functionResults } = await streamChat(
+      messages,
+      socket,
+      onDelta,
+    );
+
+    // 2단계: 특정 함수 호출 시에만 역질문 생성
+    if (hasFunctionCalls) {
+      // 역질문 대상 함수들
+      const followUpTargetFunctions = ['requestTextCard', 'searchPlans'];
+      console.log(functionResults);
+      // 실행된 함수들 중 역질문 대상이 있는지 확인
+      const executedFunctionNames = functionResults
+        .filter((result) => result.role === 'assistant')
+        .map((result) => {
+          const match = result.content.match(/^(\w+) 함수를 호출했습니다/);
+          return match ? match[1] : null;
+        })
+        .filter(Boolean);
+
+      const shouldGenerateFollowUp = executedFunctionNames.some((funcName) =>
+        followUpTargetFunctions.includes(funcName),
+      );
+
+      if (shouldGenerateFollowUp) {
+        console.log(
+          '🔄 Target functions detected, generating follow-up question',
         );
+        console.log('📝 Executed functions:', executedFunctionNames);
+        // 역질문 생성을 위한 새로운 턴
+        await generateFollowUpQuestion(messages, functionResults, socket);
+      } else {
+        console.log('⏭️ No target functions, skipping follow-up question');
+        console.log('📝 Executed functions:', executedFunctionNames);
+      }
+    }
 
-        // 불완전한 function call 부분 제거 후 전송
-        const cleanedContent = accumulatedContent
-          .replace(/\s*functions?\s*$/, '')
-          .replace(/\s*function\s*$/, '')
-          .trim();
+    console.log('🔄 Used total tokens:', usedTotalTokens);
+  } catch (error) {
+    handleGPTError(error, socket);
+  }
+};
 
-        if (cleanedContent) {
-          socket.emit('stream', cleanedContent);
+/**
+ * 역질문 생성 (별도 턴)
+ */
+const generateFollowUpQuestion = async (
+  originalMessages,
+  functionResults,
+  socket,
+) => {
+  // 역질문 전용 메시지 구성 (기존 시스템 프롬프트 제외)
+  const userMessages = originalMessages.filter((msg) => msg.role !== 'system');
+
+  // 실행된 함수들 정보 추출
+  const executedFunctions = functionResults
+    .filter((result) => result.role === 'assistant')
+    .map((result) => result.content)
+    .join('\n');
+
+  // requestTextCard가 이미 실행되었는지 확인
+  const hasTextCardExecuted = functionResults.some(
+    (result) =>
+      result.role === 'assistant' && result.content.includes('requestTextCard'),
+  );
+
+  const followUpMessages = [
+    {
+      role: 'system',
+      content: `너는 요금제 추천 후 고객에게 추가 혜택을 안내하는 상담사야.
+
+**ImageCard(requestTextCard) 실행 확인:**
+${
+  hasTextCardExecuted
+    ? `- 이미 링크 정보가 제공되었으므로, 추가 부가서비스 링크는 보내지 않아야 함
+- 대신 "추천드린 요금제들을 참고해서 본인에게 맞는 요금제를 선택해보세요! 😊 추가 궁금한 점이 있으시면 언제든 말씀해주세요!" 같은 자연스러운 마무리 멘트로 대화를 정리해줘
+- 새로운 함수 호출은 하지 말고, 일반적인 텍스트 응답으로만 마무리하기`
+    : `- 아직 링크 정보가 제공되지 않았으므로, 아래 패턴에 따라 추가 혜택 질문을 진행해도 됨`
+}
+
+**검색 결과 확인 우선:**
+- 방금 searchPlans 함수가 빈 배열([])을 반환했다면, 조건에 맞는 요금제가 없다는 뜻이야
+- 이 경우 "조건에 맞는 요금제를 찾지 못했어요. 😅 다른 옵션을 확인해보시는 것은 어떨까요?"라고 안내하고 다음 중 하나를 제안해줘:
+
+**검색 결과 없음 시 대안 제시:**
+1. "예산을 조금 더 늘려서 찾아볼까요?" → requestCarouselButtons로 더 높은 가격대 옵션 제공
+2. "다른 통신 기술(5G/LTE)도 함께 살펴보시겠어요?" → requestOXCarouselButtons 호출  
+3. "대신 인기 요금제들을 추천해드릴까요?" → requestCarouselButtons로 ["인기 요금제 보기", "조건 다시 설정", "상담원 연결"] 제공
+4. "조건을 다시 설정해서 찾아보시겠어요?" → requestCarouselButtons로 새로운 선택지 제공
+
+**검색 결과가 있는 경우에만 아래 추가 혜택 질문:**
+이미 요금제를 보여줬으니, 요금제 설명은 다시 하지 말고 추가 혜택 질문만 해줘:
+
+**중요: 질문 텍스트를 먼저 출력하고 그 다음에 함수 호출**
+
+**질문 예시들:**
+1. "혹시 가족 구성원 중 만 18세 이하의 청소년 자녀가 있으신가요? 있으시다면 추가 결합 혜택도 안내드릴게요!" 
+   → 이 질문 텍스트를 먼저 출력한 후 requestOXCarouselButtons 호출
+   
+2. "혹시 사용 중인 인터넷이 있으신가요? LG U+에서 500Mbps 이상 인터넷을 사용 중이시면 추가 할인을 받을 수 있어요!" 
+   → 이 질문 텍스트를 먼저 출력한 후 requestOXCarouselButtons 호출
+   
+3. "평소 한 달에 데이터를 얼마나 사용하시나요? 더 정확한 요금제를 추천드릴게요!" 
+   → 이 질문 텍스트를 먼저 출력한 후 requestCarouselButtons 호출
+   
+4. "평소 자주 시청하시는 OTT 서비스가 있으신가요? 요금제와 함께 이용하시면 더 저렴해질 수 있어요!" 
+   → 이 질문 텍스트를 먼저 출력한 후 requestOTTServiceList 호출
+
+**절대 규칙:**
+- 요금제 정보는 절대 다시 설명하지 마
+- **매우 중요**: 반드시 질문 텍스트를 먼저 출력하고 그 다음에 함수 호출해야 함
+- 텍스트 없이 바로 함수만 호출하는 것은 절대 금지
+- "답변해주세요", "알려주세요" 같은 추가 멘트 금지
+- 검색 결과가 없으면 검색 결과 없음 대안 제시가 우선, 결과가 있으면 추가 혜택 질문
+
+**올바른 응답 형식:**
+1. 먼저 텍스트로 질문을 출력 (예: "혹시 가족 구성원 중 만 18세 이하의 청소년 자녀가 있으신가요?")
+2. 그 다음에 함수 호출 (예: requestOXCarouselButtons)
+
+**잘못된 예시 (금지):**
+- 텍스트 없이 바로 requestCarouselButtons 호출 
+- 텍스트 없이 바로 requestOXCarouselButtons 호출 
+- 텍스트 없이 바로 requestOTTServiceList 호출 `,
+    },
+    ...userMessages,
+    {
+      role: 'assistant',
+      content: '요금제를 확인해보세요.',
+    },
+    {
+      role: 'system',
+      content: `방금 실행된 함수들:
+${executedFunctions}
+
+🚨 중요: 무조건 아래 순서대로 해야 함:
+1. 먼저 텍스트로 질문 출력 (예: "혹시 가족분들과 함께 가입하시면 더 저렴해질 수 있는데, 관심 있으신가요?")
+2. 그 다음에 함수 호출 (예: requestOXCarouselButtons)
+
+텍스트 없이 바로 함수만 호출하는 것은 절대 금지. 반드시 텍스트 먼저 출력하고 함수 호출.`,
+    },
+  ];
+
+  // 역질문 전용 streamChat 호출 (FOLLOWUP_TOOLS 사용)
+  await streamChatForFollowUp(followUpMessages, socket, GPTConfig.MODEL_MINI);
+};
+
+/**
+ * 역질문 전용 스트림 채팅 (제한된 도구만 사용)
+ */
+const streamChatForFollowUp = async (messages, socket, model) => {
+  try {
+    const stream = await openai.responses.create({
+      model: model,
+      input: messages,
+      stream: true,
+      tool_choice: 'auto',
+      tools: FOLLOWUP_TOOLS, // 역질문 전용 도구만 사용
+    });
+
+    // 함수 호출 정보 누적용
+    const functionCallMap = {}; // { [item_id]: { ... } }
+    const functionCalls = []; // 최종 실행용 배열
+    let hasTextContent = false; // 텍스트 응답이 있는지 확인
+    usedTotalTokens = 0;
+    for await (const event of stream) {
+      // 1. 함수 호출 item 추가
+      if (
+        event.type === 'response.output_item.added' &&
+        event.item.type === 'function_call'
+      ) {
+        functionCallMap[event.item.id] = {
+          ...event.item,
+          arguments: '',
+        };
+
+        const functionName = event.item.name;
+        socket.emit(SocketEvent.LOADING, {
+          type: LoadingType.SEARCHING,
+          functionName: functionName,
+        });
+      }
+
+      // 2. arguments 조각 누적
+      else if (event.type === 'response.function_call_arguments.delta') {
+        const id = event.item_id;
+        if (functionCallMap[id]) {
+          functionCallMap[id].arguments += event.delta;
         }
       }
 
-      socket.emit('done');
-    }
-  } catch (error) {
-    console.error('❌ GPT Service Error:', error);
+      // 3. arguments 누적 완료(함수 호출 하나 완성)
+      else if (event.type === 'response.function_call_arguments.done') {
+        const id = event.item_id;
+        const call = functionCallMap[id];
+        if (call) {
+          functionCalls.push({
+            functionName: call.name,
+            functionArgsRaw: call.arguments,
+          });
+        }
+      }
 
-    // 타임아웃 에러
-    if (error.message === 'REQUEST_TIMEOUT') {
-      socket.emit('error', {
-        type: 'REQUEST_TIMEOUT',
-        message: '⏱️ 응답 시간이 초과되었습니다. 다시 시도해주세요.',
-        details: {
-          timeout: '30초',
-          message: error.message,
-        },
-      });
+      // 4. 일반 텍스트 스트림 (output_text 등) - 역질문 전용 스트림 사용
+      else if (event.type === 'response.output_text.delta') {
+        hasTextContent = true;
+        socket.emit(SocketEvent.FOLLOWUP_STREAM, event.delta);
+      } else if (event.type === 'response.completed') {
+        usedTotalTokens += event.response.usage.total_tokens;
+      }
     }
-    // OpenAI API 관련 에러
-    else if (error.response) {
-      socket.emit('error', {
-        type: 'OPENAI_API_ERROR',
-        message: 'AI 서비스 연결에 문제가 발생했습니다.',
-        details: {
-          status: error.response.status,
-          statusText: error.response.statusText,
-          message: error.message,
-        },
-      });
+
+    // 역질문 함수 호출 실행
+    console.log('Has text content:', hasTextContent);
+
+    for (const { functionName, functionArgsRaw } of functionCalls) {
+      await handleFunctionCall(functionName, functionArgsRaw, socket);
     }
-    // 네트워크 에러
-    else if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
-      socket.emit('error', {
-        type: 'NETWORK_ERROR',
-        message: '네트워크 연결에 문제가 발생했습니다.',
-        details: {
-          code: error.code,
-          message: error.message,
-        },
-      });
-    }
-    // 스트리밍 에러
-    else if (error.name === 'AbortError') {
-      socket.emit('error', {
-        type: 'STREAM_ABORTED',
-        message: '스트리밍이 중단되었습니다.',
-        details: {
-          message: error.message,
-        },
-      });
-    }
-    // 기타 에러
-    else {
-      socket.emit('error', {
-        type: 'UNKNOWN_ERROR',
-        message: '예상치 못한 오류가 발생했습니다.',
-        details: {
-          message: error.message,
-          stack: error.stack,
-        },
-      });
-    }
+
+    socket.emit(SocketEvent.DONE);
+  } catch (error) {
+    handleGPTError(error, socket);
   }
 };

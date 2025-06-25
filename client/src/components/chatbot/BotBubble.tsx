@@ -127,7 +127,7 @@ const BotBubble = ({ messageChunks }: BotBubbleProps) => {
       {/* 숨겨진 텍스트로 크기 측정용 박스 (패딩 추가로 여유공간 확보) */}
       <div
         ref={ghostRef}
-        className="absolute invisible max-w-[309px] p-2 text-[14px] leading-5 whitespace-pre-wrap break-words"
+        className="absolute invisible max-w-[265px] p-2 text-[14px] leading-5 whitespace-pre-wrap break-words"
         style={{ minHeight: '24px', padding: '12px' }}
       >
         <MarkedText chars={chars} />

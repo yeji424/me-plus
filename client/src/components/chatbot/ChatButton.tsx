@@ -13,7 +13,6 @@ const ChatButton = ({
 }: ChatButtonProps) => {
   const handleClick = () => {
     if (disabled) return;
-    console.log('사용자 메시지:', label);
     if (onClick) onClick();
   };
 
@@ -21,7 +20,7 @@ const ChatButton = ({
     <button
       onClick={handleClick}
       disabled={disabled}
-      className={`flex items-center p-[10px] gap-[6px] rounded-[12px] shadow-small min-w-fit whitespace-nowrap transition-all ${
+      className={`flex items-center p-[10px] gap-[6px] rounded-[12px] shadow-md min-w-fit whitespace-nowrap transition-all ${
         disabled ? 'bg-white ' : 'bg-white hover:bg-gray-50 cursor-pointer'
       }`}
     >
