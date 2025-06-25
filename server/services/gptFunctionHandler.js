@@ -1,10 +1,12 @@
 import { extractMetadata } from '../utils/metadataExtractor.js';
 import { handleFunctionError } from './gptErrorHandler.js';
+import { searchPlansFromDB } from './gptFuncDefinitions.js';
 import {
   ErrorType,
   SocketEvent,
   OTTServices,
   OXOptions,
+  LoadingType,
 } from '../utils/constants.js';
 
 /**
@@ -55,6 +57,7 @@ const parseFunctionArgs = (functionArgsRaw) => {
  * @param {string} functionName - 호출할 함수 이름
  * @param {Object} args - 함수 인자
  * @param {Socket} socket - 소켓 객체
+ * @returns {Object} 함수 실행 결과
  */
 export const executeFunctionCall = async (functionName, args, socket) => {
   switch (functionName) {
@@ -64,7 +67,7 @@ export const executeFunctionCall = async (functionName, args, socket) => {
         question: '어떤 OTT 서비스를 함께 사용 중이신가요?',
         options: OTTServices,
       });
-      break;
+      return { success: true, functionName, result: 'OTT 서비스 선택지 제공' };
     }
 
     case 'requestOXCarouselButtons': {
@@ -88,6 +91,60 @@ export const executeFunctionCall = async (functionName, args, socket) => {
       }
       socket.emit(SocketEvent.LOADING_END);
       socket.emit(SocketEvent.CAROUSEL_BUTTONS, items);
+      break;
+    }
+
+    case 'searchPlans': {
+      console.log('🔍 searchPlans 함수 호출됨:', args);
+
+      socket.emit(SocketEvent.LOADING, {
+        type: functionName?.includes('Plan')
+          ? LoadingType.DB_CALLING
+          : LoadingType.SEARCHING,
+        functionName: functionName,
+      });
+      try {
+        // MongoDB에서 조건에 맞는 요금제 검색
+        const result = await searchPlansFromDB(args);
+        const { plans } = result;
+
+        console.log(`📋 검색된 요금제 수: ${plans.length}개`);
+
+        if (plans.length === 0) {
+          console.warn('⚠️ 조건에 맞는 요금제가 없습니다.');
+          // 검색 결과가 없어도 빈 배열을 전송
+          socket.emit(SocketEvent.LOADING_END);
+          socket.emit(SocketEvent.PLAN_LISTS, []);
+          return {
+            success: true,
+            functionName,
+            result: 'empty',
+            plansCount: 0,
+          };
+        } else {
+          // 검색된 요금제를 클라이언트에 전송
+          socket.emit(SocketEvent.LOADING_END);
+          socket.emit(SocketEvent.PLAN_LISTS, plans);
+          return {
+            success: true,
+            functionName,
+            result: 'found',
+            plansCount: plans.length,
+            planNames: plans.map((p) => p.name),
+          };
+        }
+      } catch (dbError) {
+        console.error('❌ DB 조회 실패:', dbError);
+        // 에러 발생 시에도 로딩 종료
+        socket.emit(SocketEvent.LOADING_END);
+        handleFunctionError(
+          ErrorType.FUNCTION_EXECUTION_ERROR,
+          '요금제 검색 중 오류가 발생했습니다.',
+          { functionName, args, error: dbError.message },
+          socket,
+        );
+        return { success: false, functionName, error: dbError.message };
+      }
       break;
     }
 
@@ -120,12 +177,8 @@ export const executeFunctionCall = async (functionName, args, socket) => {
       }
 
       // imageUrl이 없으면 URL에서 메타데이터 추출
-      let finalImageUrl = imageUrl;
-      if (!finalImageUrl) {
-        console.log('🔍 URL에서 메타데이터 추출 중:', url);
-        finalImageUrl = await extractMetadata(url);
-        console.log('📸 추출된 이미지 URL:', finalImageUrl);
-      }
+      let finalImageUrl = await extractMetadata(url);
+      console.log('📸 추출된 이미지 URL:', finalImageUrl);
 
       socket.emit(SocketEvent.LOADING_END);
       socket.emit(SocketEvent.TEXT_CARD, {
@@ -151,6 +204,7 @@ export const executeFunctionCall = async (functionName, args, socket) => {
         { functionName, args },
         socket,
       );
+      return { success: false, functionName, error: 'Unknown function' };
   }
 };
 
@@ -166,11 +220,10 @@ export const handleFunctionCall = async (
   socket,
 ) => {
   try {
-    console.log('🔧 Function called:', functionName);
-
     const args = parseFunctionArgs(functionArgsRaw);
 
-    await executeFunctionCall(functionName, args, socket);
+    const result = await executeFunctionCall(functionName, args, socket);
+    return result;
   } catch (functionError) {
     console.error(`Function call 처리 실패 (${functionName}):`, functionError);
 
@@ -196,6 +249,7 @@ export const handleFunctionCall = async (
         },
         socket,
       );
+      return { success: false, functionName, error: functionError.message };
     }
   }
 };

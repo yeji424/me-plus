@@ -13,7 +13,6 @@ const ChatButton = ({
 }: ChatButtonProps) => {
   const handleClick = () => {
     if (disabled) return;
-    console.log('사용자 메시지:', label);
     if (onClick) onClick();
   };
 

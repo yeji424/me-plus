@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FloatingIcon from '@/components/common/FloadingIcon';
+import FloatingIcon from '@/components/common/FloatingIcon';
 import moonerImage from '../assets/image/mooner_main.png';
 
 const TestFirstPage: React.FC = () => {

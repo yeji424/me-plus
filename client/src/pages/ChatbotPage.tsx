@@ -116,16 +116,11 @@ const ChatbotPage = () => {
     if (urlUserProfile && !hasInitializedForUrlParams.current) {
       hasInitializedForUrlParams.current = true;
       setUserProfile(urlUserProfile); // 사용자 프로필 저장
-      console.log(
-        '💾 URL 파라미터 사용자 프로필 저장:',
-        urlUserProfile.plan.name,
-      );
     }
   }, [urlUserProfile, setUserProfile]);
 
   // 초기 메시지 설정 (사용자 정보에 따라 다르게)
   useEffect(() => {
-    console.log('🔍 초기 메시지 설정 실행', userProfile);
     // 로딩이 완료되고, 아직 초기화되지 않았고, 기존 메시지가 없을 때만 실행
     if (!isInitialLoading && !isInitialized) {
       if (userProfile) {
@@ -210,17 +205,7 @@ const ChatbotPage = () => {
 
   // 새로 추가: 캐러셀 선택 처리 (업데이트 방식)
   const handleCarouselSelect = useCallback(
-    (
-      carouselData: CarouselItem[],
-      selectedItem: CarouselItem,
-      displayIndex?: number, // 화면에 표시된 인덱스
-    ) => {
-      console.log('🎯 캐러셀 선택:', {
-        carouselData,
-        selectedItem,
-        displayIndex,
-      });
-
+    (carouselData: CarouselItem[], selectedItem: CarouselItem) => {
       // 실제 function_call 메시지의 인덱스를 찾기 (messages 배열에서만)
       const actualIndex = messages.findIndex((msg) => {
         return (
@@ -231,10 +216,6 @@ const ChatbotPage = () => {
         );
       });
 
-      console.log(
-        '🔍 실제 function_call 메시지 인덱스 (messages 배열):',
-        actualIndex,
-      );
       console.log('🔍 전체 messages 배열 길이:', messages.length);
       console.log('🔍 전체 allMessages 배열 길이:', allMessages.length);
 
@@ -262,8 +243,6 @@ const ChatbotPage = () => {
         );
       });
 
-      console.log('🔍 실제 OTT function_call 메시지 인덱스:', actualIndex);
-
       if (actualIndex !== -1) {
         updateOttSelection(actualIndex, selectedServices);
       } else {
@@ -285,8 +264,6 @@ const ChatbotPage = () => {
           msg.functionCall?.name === 'requestOXCarouselButtons'
         );
       });
-
-      console.log('🔍 실제 OX function_call 메시지 인덱스:', actualIndex);
 
       if (actualIndex !== -1) {
         updateOxSelection(actualIndex, selectedOption);
