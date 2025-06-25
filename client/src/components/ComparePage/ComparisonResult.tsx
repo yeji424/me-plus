@@ -76,7 +76,6 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
             leftLabel={leftDataLabel}
             rightLabel={rightDataLabel}
             title="데이터"
-            // showComparison={hasBothPlans}
           />
           <DataComparisonBar
             leftValue={leftSharedDataValue}
@@ -84,7 +83,6 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
             leftLabel={leftSharedDataLabel}
             rightLabel={rightSharedDataLabel}
             title="공유 데이터"
-            // showComparison={hasBothPlans}
           />
         </div>
 

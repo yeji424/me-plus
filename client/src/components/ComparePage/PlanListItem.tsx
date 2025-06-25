@@ -27,7 +27,7 @@ const PlanListItem: React.FC<PlanListItemProps> = ({
                 scale: 1.01,
                 boxShadow: '0px 1px 4px rgba(0, 0, 0, 0.08)',
               }
-            : undefined // 열린 상태면 hover 효과 없음
+            : undefined
         }
         whileTap={{
           scale: 0.99,
