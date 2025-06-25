@@ -40,7 +40,7 @@ export const streamChat = async (
       stream: true,
       tool_choice: 'auto',
       tools: GPT_TOOLS,
-      parallel_tool_calls: true,
+      parallel_tool_calls: false,
     });
 
     // 함수 호출 정보 누적용
@@ -142,7 +142,7 @@ export const streamChatWithFollowUp = async (messages, socket, onDelta) => {
     // 2단계: 특정 함수 호출 시에만 역질문 생성
     if (hasFunctionCalls) {
       // 역질문 대상 함수들
-      const followUpTargetFunctions = ['requestTextCard', 'showPlanLists'];
+      const followUpTargetFunctions = ['requestTextCard', 'searchPlans'];
       console.log(functionResults);
       // 실행된 함수들 중 역질문 대상이 있는지 확인
       const executedFunctionNames = functionResults
@@ -169,6 +169,8 @@ export const streamChatWithFollowUp = async (messages, socket, onDelta) => {
         console.log('📝 Executed functions:', executedFunctionNames);
       }
     }
+
+    console.log('🔄 Used total tokens:', usedTotalTokens);
   } catch (error) {
     handleGPTError(error, socket);
   }
@@ -183,7 +185,7 @@ const generateFollowUpQuestion = async (
   socket,
 ) => {
   // 역질문 전용 메시지 구성 (기존 시스템 프롬프트 제외)
-  const userMessages = originalMessages.filter((msg) => msg.role === 'user');
+  const userMessages = originalMessages.filter((msg) => msg.role !== 'system');
 
   // 실행된 함수들 정보 추출
   const executedFunctions = functionResults
@@ -198,26 +200,26 @@ const generateFollowUpQuestion = async (
 
 이미 요금제를 보여줬으니, 요금제 설명은 다시 하지 말고 추가 혜택 질문만 해줘:
 
-**중요: 간결한 질문 후 바로 함수 호출**
+**중요: 질문 텍스트를 먼저 출력하고 그 다음에 함수 호출**
 
 **질문 예시들:**
 1. "혹시 가족 구성원 중 만 18세 이하의 청소년 자녀가 있으신가요? 있으시다면 추가 결합 혜택도 안내드릴게요!" 
-   → 이 질문 후 바로 requestOXCarouselButtons 호출
+   → 이 질문 텍스트를 먼저 출력한 후 requestOXCarouselButtons 호출
    
 2. "혹시 사용 중인 인터넷이 있으신가요? LG U+에서 500Mbps 이상 인터넷을 사용 중이시면 추가 할인을 받을 수 있어요!" 
-   → 이 질문 후 바로 requestOXCarouselButtons 호출
+   → 이 질문 텍스트를 먼저 출력한 후 requestOXCarouselButtons 호출
    
 3. "평소 한 달에 데이터를 얼마나 사용하시나요? 더 정확한 요금제를 추천드릴게요!" 
-   → 이 질문 후 바로 requestCarouselButtons 호출
+   → 이 질문 텍스트를 먼저 출력한 후 requestCarouselButtons 호출
    
 4. "평소 자주 시청하시는 OTT 서비스가 있으신가요? 요금제와 함께 이용하시면 더 저렴해질 수 있어요!" 
-   → 이 질문 후 바로 requestOTTServiceList 호출
+   → 이 질문 텍스트를 먼저 출력한 후 requestOTTServiceList 호출
 
 **절대 규칙:**
 - 요금제 정보는 절대 다시 설명하지 마
-- 간결한 질문만 하고 바로 함수 호출
+- 반드시 질문 텍스트를 먼저 출력하고 그 다음에 함수 호출
 - "답변해주세요", "알려주세요" 같은 추가 멘트 금지
-- 질문 끝에 감탄표(!) 후 바로 함수 호출
+- 텍스트 없이 바로 함수만 호출하는 것은 금지
 - 질문이 필요없다면 빈 응답`,
     },
     ...userMessages,
@@ -230,15 +232,12 @@ const generateFollowUpQuestion = async (
       content: `방금 실행된 함수들:
 ${executedFunctions}
 
-간결한 질문 하나만 하고 바로 함수를 호출해줘. 추가 멘트는 하지 마.`,
+질문 텍스트를 먼저 출력하고 그 다음에 함수를 호출해줘. 텍스트 없이 바로 함수만 호출하지 마.`,
     },
   ];
 
-  console.log('🔄 Generating follow-up question with mini model');
-
   // 역질문 전용 streamChat 호출 (FOLLOWUP_TOOLS 사용)
   await streamChatForFollowUp(followUpMessages, socket, GPTConfig.MODEL_MINI);
-  console.log('🔄 Used total tokens:', usedTotalTokens);
 };
 
 /**
@@ -258,7 +257,7 @@ const streamChatForFollowUp = async (messages, socket, model) => {
     const functionCallMap = {}; // { [item_id]: { ... } }
     const functionCalls = []; // 최종 실행용 배열
     let hasTextContent = false; // 텍스트 응답이 있는지 확인
-
+    usedTotalTokens = 0;
     for await (const event of stream) {
       // 1. 함수 호출 item 추가
       if (
@@ -275,7 +274,6 @@ const streamChatForFollowUp = async (messages, socket, model) => {
           type: LoadingType.SEARCHING,
           functionName: functionName,
         });
-        console.log('🔄 Follow-up 로딩 시작:', functionName);
       }
 
       // 2. arguments 조각 누적
@@ -308,7 +306,6 @@ const streamChatForFollowUp = async (messages, socket, model) => {
     }
 
     // 역질문 함수 호출 실행
-    console.log('Follow-up function calls:', functionCalls);
     console.log('Has text content:', hasTextContent);
 
     for (const { functionName, functionArgsRaw } of functionCalls) {

@@ -51,6 +51,46 @@ export const GPT_TOOLS = [
   },
   {
     type: 'function',
+    name: 'searchPlans',
+    description:
+      'MongoDB에서 조건에 맞는 요금제를 조회하여 최대 3개까지 추천합니다. 사용자 요구사항에 맞는 요금제를 동적으로 검색할 때 사용합니다.',
+    parameters: {
+      type: 'object',
+      properties: {
+        category: {
+          type: 'string',
+          description: '요금제 카테고리 (5G, LTE)',
+          enum: ['5G', 'LTE'],
+        },
+        maxMonthlyFee: {
+          type: 'number',
+          description: '최대 월 요금 (원)',
+        },
+        minDataGb: {
+          type: 'number',
+          description: '최소 데이터량 (GB, -1은 무제한)',
+        },
+        ageGroup: {
+          type: 'string',
+          description: '대상 연령대',
+          enum: ['ALL', 'YOUTH', 'SENIOR', 'STUDENT', 'SOLDIER'],
+        },
+        isPopular: {
+          type: 'boolean',
+          description: '인기 요금제만 조회할지 여부',
+        },
+        limit: {
+          type: 'number',
+          description: '조회할 최대 개수 (기본값: 3)',
+          default: 3,
+        },
+      },
+      required: [],
+      additionalProperties: false,
+    },
+  },
+  {
+    type: 'function',
     name: 'showPlanLists',
     description:
       '유저에게 여러 요금제 상세 정보를 카드 형식으로 제공합니다. 보통 3개 이상의 요금제를 추천할 때 사용합니다.',

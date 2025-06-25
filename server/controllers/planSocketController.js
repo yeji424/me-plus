@@ -77,7 +77,10 @@ export const handleCarouselSelection = async (
   }
 };
 
-export const handlePlanRecommend = async (socket, { sessionId, message }) => {
+export const handlePlanRecommend = async (
+  socket,
+  { sessionId, message, history },
+) => {
   try {
     // 입력 검증
     if (!sessionId || !message) {
@@ -88,12 +91,16 @@ export const handlePlanRecommend = async (socket, { sessionId, message }) => {
       });
       return;
     }
+    console.log('수신메세지', message);
+    console.log('대화히스토리', history?.length || 0, '개');
 
-    // MongoDB 세션 관리 제거 - 로컬스토리지에서 관리
-    // 기본 메시지 형태로 프롬프트 생성 (히스토리 없이)
+    // 🔧 히스토리가 있으면 사용, 없으면 기본 메시지만 사용
     const plans = '';
-    const basicMessages = [{ role: 'user', content: message }];
-
+    const basicMessages =
+      history && history.length > 0
+        ? history
+        : [{ role: 'user', content: message }];
+    console.log('프롬프트메세지', basicMessages.length, '개');
     let messages;
     try {
       messages = buildPromptMessages(plans, basicMessages);
