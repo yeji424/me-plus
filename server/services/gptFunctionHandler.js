@@ -177,12 +177,8 @@ export const executeFunctionCall = async (functionName, args, socket) => {
       }
 
       // imageUrl이 없으면 URL에서 메타데이터 추출
-      let finalImageUrl = imageUrl;
-      if (!finalImageUrl) {
-        console.log('🔍 URL에서 메타데이터 추출 중:', url);
-        finalImageUrl = await extractMetadata(url);
-        console.log('📸 추출된 이미지 URL:', finalImageUrl);
-      }
+      let finalImageUrl = await extractMetadata(url);
+      console.log('📸 추출된 이미지 URL:', finalImageUrl);
 
       socket.emit(SocketEvent.LOADING_END);
       socket.emit(SocketEvent.TEXT_CARD, {

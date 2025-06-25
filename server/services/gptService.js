@@ -217,10 +217,25 @@ const generateFollowUpQuestion = async (
     .map((result) => result.content)
     .join('\n');
 
+  // requestTextCard가 이미 실행되었는지 확인
+  const hasTextCardExecuted = functionResults.some(
+    (result) =>
+      result.role === 'assistant' && result.content.includes('requestTextCard'),
+  );
+
   const followUpMessages = [
     {
       role: 'system',
       content: `너는 요금제 추천 후 고객에게 추가 혜택을 안내하는 상담사야.
+
+**ImageCard(requestTextCard) 실행 확인:**
+${
+  hasTextCardExecuted
+    ? `- 이미 링크 정보가 제공되었으므로, 추가 부가서비스 링크는 보내지 않아야 함
+- 대신 "추천드린 요금제들을 참고해서 본인에게 맞는 요금제를 선택해보세요! 😊 추가 궁금한 점이 있으시면 언제든 말씀해주세요!" 같은 자연스러운 마무리 멘트로 대화를 정리해줘
+- 새로운 함수 호출은 하지 말고, 일반적인 텍스트 응답으로만 마무리하기`
+    : `- 아직 링크 정보가 제공되지 않았으므로, 아래 패턴에 따라 추가 혜택 질문을 진행해도 됨`
+}
 
 **검색 결과 확인 우선:**
 - 방금 searchPlans 함수가 빈 배열([])을 반환했다면, 조건에 맞는 요금제가 없다는 뜻이야
@@ -252,7 +267,7 @@ const generateFollowUpQuestion = async (
 
 **절대 규칙:**
 - 요금제 정보는 절대 다시 설명하지 마
-- **🚨 매우 중요**: 반드시 질문 텍스트를 먼저 출력하고 그 다음에 함수 호출해야 함
+- **매우 중요**: 반드시 질문 텍스트를 먼저 출력하고 그 다음에 함수 호출해야 함
 - 텍스트 없이 바로 함수만 호출하는 것은 절대 금지
 - "답변해주세요", "알려주세요" 같은 추가 멘트 금지
 - 검색 결과가 없으면 검색 결과 없음 대안 제시가 우선, 결과가 있으면 추가 혜택 질문
@@ -262,9 +277,9 @@ const generateFollowUpQuestion = async (
 2. 그 다음에 함수 호출 (예: requestOXCarouselButtons)
 
 **잘못된 예시 (금지):**
-- 텍스트 없이 바로 requestCarouselButtons 호출 ❌
-- 텍스트 없이 바로 requestOXCarouselButtons 호출 ❌
-- 텍스트 없이 바로 requestOTTServiceList 호출 ❌`,
+- 텍스트 없이 바로 requestCarouselButtons 호출 
+- 텍스트 없이 바로 requestOXCarouselButtons 호출 
+- 텍스트 없이 바로 requestOTTServiceList 호출 `,
     },
     ...userMessages,
     {
