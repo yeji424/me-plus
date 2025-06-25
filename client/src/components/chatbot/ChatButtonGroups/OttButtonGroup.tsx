@@ -31,14 +31,10 @@ const OttButtonGroup = ({
   selectedData,
 }: OttButtonGroupProps) => {
   // 디버깅 로그 추가
-  console.log('🎬 OttButtonGroup rendered with selectedData:', selectedData);
 
   const [selectedServices, setSelectedServices] = useState<string[]>(
     selectedData?.isSelected ? selectedData.selectedServices : [],
   );
-
-  // 디버깅 로그 추가
-  console.log('🎬 OttButtonGroup selectedServices state:', selectedServices);
 
   // selectedData가 변경될 때마다 state 업데이트
   useEffect(() => {
@@ -49,7 +45,6 @@ const OttButtonGroup = ({
       );
       setSelectedServices(selectedData.selectedServices);
     } else {
-      console.log('🔄 Resetting selectedServices (no selection data)');
       setSelectedServices([]);
     }
   }, [selectedData]);

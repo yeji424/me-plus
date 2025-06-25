@@ -107,8 +107,6 @@ export const useChatSocket = () => {
           (msg) => convertFromStoredMessage(msg) as Message,
         );
 
-        console.log('📂 Messages loaded from localStorage:', messages.length);
-        console.log('👤 로컬스토리지 userProfile 원본:', session.userProfile);
         return {
           messages,
           userProfile: session.userProfile,
@@ -148,7 +146,6 @@ export const useChatSocket = () => {
 
   const handleSessionId = useCallback(
     (id: string) => {
-      console.log('🆔 handleSessionId 호출됨:', id);
       setSessionId(id);
       localStorage.setItem('sessionId', id);
 
@@ -156,9 +153,6 @@ export const useChatSocket = () => {
       if (useLocalStorage) {
         const { messages: localMessages, userProfile } =
           loadMessagesFromLocal(id);
-        console.log('📂 로컬스토리지 조회 결과:');
-        console.log('  - 메시지 개수:', localMessages.length);
-        console.log('  - userProfile:', userProfile);
 
         if (localMessages.length > 0) {
           setMessages(localMessages);
@@ -454,7 +448,6 @@ export const useChatSocket = () => {
     // 역질문 전용 스트림 핸들러
     const handleFollowUpStream = (chunk: string) => {
       followUpResponseRef.current += chunk;
-      console.log('📥 Follow-up stream chunk:', chunk);
 
       setMessages((prev) => {
         // 첫 번째 청크인 경우 새 메시지 추가, 그 외는 마지막 메시지 업데이트
@@ -538,18 +531,35 @@ export const useChatSocket = () => {
     (text: string) => {
       if (!text.trim() || !sessionId) return;
 
+      // 🔧 현재 메시지를 추가한 전체 대화 히스토리 생성
+      const newUserMessage: Message = { type: 'user', text: text.trim() };
+      const allMessages = [...messages, newUserMessage];
+
+      // 🔧 GPT 형식으로 변환 (user/assistant 역할)
+      const chatHistory = allMessages
+        .map((msg) => {
+          if (msg.type === 'user') {
+            return { role: 'user', content: msg.text };
+          } else if (msg.type === 'bot' && 'messageChunks' in msg) {
+            return { role: 'assistant', content: msg.messageChunks.join('') };
+          }
+          return null;
+        })
+        .filter(Boolean);
+
       const payload = {
         sessionId,
         message: text.trim(),
+        history: chatHistory, // 🔧 전체 대화 히스토리 추가
       };
-
-      setMessages((prev) => [...prev, { type: 'user', text }]);
+      console.log(payload);
+      setMessages((prev) => [...prev, newUserMessage] as Message[]);
       setIsStreaming(true);
       responseRef.current = '';
 
       socket.emit('chat', payload);
     },
-    [sessionId],
+    [sessionId, messages], // 🔧 messages 의존성 추가
   );
 
   // 제거: 서버에 더 이상 선택 상태를 보내지 않음 (로컬스토리지 사용)

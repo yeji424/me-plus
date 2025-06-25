@@ -139,10 +139,6 @@ const BotBubbleFrame = ({
         ) : null;
       case 'requestOTTServiceList':
         // 디버깅 로그 추가
-        console.log(
-          '🎬 BotBubbleFrame rendering OTT with selectedData:',
-          selectedData,
-        );
 
         return (
           <OttButtonGroup

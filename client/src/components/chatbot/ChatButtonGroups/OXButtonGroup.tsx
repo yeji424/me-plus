@@ -32,7 +32,6 @@ const OXButtonGroup = ({
     if (selectedData?.isSelected && selectedData.selectedOption) {
       setClickedButton(selectedData.selectedOption);
     } else {
-      console.log('🔄 OX 버튼 선택 상태 초기화');
       setClickedButton(null);
     }
   }, [selectedData]);

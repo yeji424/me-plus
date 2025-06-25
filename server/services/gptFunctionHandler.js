@@ -116,7 +116,6 @@ export const executeFunctionCall = async (functionName, args, socket) => {
           socket.emit(SocketEvent.PLAN_LISTS, []);
         } else {
           // 검색된 요금제를 클라이언트에 전송
-          console.log('🔍 검색된 요금제:', plans);
           socket.emit(SocketEvent.LOADING_END);
           socket.emit(SocketEvent.PLAN_LISTS, plans);
         }
