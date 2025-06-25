@@ -57,19 +57,23 @@ const DraggableScroll = ({ children, className = '' }: Props) => {
   return (
     <div
       ref={containerRef}
-      className={`${className.includes('overflow-') ? '' : 'overflow-hidden'} ${className}`}
+      className={`overflow-hidden max-w-full -ml-1`}
+      style={{ maxWidth: 'calc(min(100vw, 600px) - 74px)' }}
     >
-      <motion.div
-        ref={innerRef}
-        className={`flex ${className}`}
-        drag="x"
-        dragConstraints={constraints}
-        dragElastic={0.1}
-        whileTap={{ cursor: 'grabbing' }}
-        style={{ cursor: 'grab' }}
-      >
-        {children}
-      </motion.div>
+      <div className="overflow-hidden">
+        <motion.div
+          ref={innerRef}
+          className={`flex pl-1 py-[10px] ${className}`}
+          style={{ maxWidth: 'calc(min(100vw, 600px) - 90px)', cursor: 'grab' }}
+          drag="x"
+          dragConstraints={constraints}
+          dragElastic={0.1}
+          whileTap={{ cursor: 'grabbing' }}
+        >
+          {children}
+          <div className="w-[1px] shrink-0" />
+        </motion.div>
+      </div>
     </div>
   );
 };

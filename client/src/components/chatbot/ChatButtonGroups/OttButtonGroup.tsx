@@ -65,8 +65,9 @@ const OttButtonGroup = ({
   };
 
   return (
-    <div className="px-1 -mx-1">
-      <DraggableScroll className="flex overflow-visible flex-nowrap gap-1  mx-1.5">
+    <>
+      <DraggableScroll className="flex flex-nowrap gap-2">
+
         {OTT_SERVICES.map((service) => (
           <ChatButton
             key={service.id}
@@ -80,7 +81,7 @@ const OttButtonGroup = ({
           />
         ))}
       </DraggableScroll>
-    </div>
+    </>
   );
 };
 
