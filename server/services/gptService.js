@@ -177,7 +177,7 @@ export const streamChatWithFollowUp = async (messages, socket, onDelta) => {
     // 2단계: 특정 함수 호출 시에만 역질문 생성
     if (hasFunctionCalls) {
       // 역질문 대상 함수들
-      const followUpTargetFunctions = ['requestTextCard', 'searchPlans'];
+      const followUpTargetFunctions = ['requestTextCard', 'showPlanLists'];
       console.log('1:', functionResults);
       // 실행된 함수들 중 역질문 대상이 있는지 확인
       const executedFunctionNames = functionResults

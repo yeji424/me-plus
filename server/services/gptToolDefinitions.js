@@ -49,81 +49,81 @@ export const GPT_TOOLS = [
       additionalProperties: false,
     },
   },
-  {
-    type: 'function',
-    name: 'searchPlans',
-    description:
-      'MongoDB에서 조건에 맞는 요금제를 조회하여 최대 3개까지 추천합니다. 사용자 요구사항에 맞는 요금제를 동적으로 검색할 때 사용합니다.',
-    parameters: {
-      type: 'object',
-      properties: {
-        category: {
-          type: 'string',
-          description: '요금제 카테고리 (5G, LTE)',
-          enum: ['5G', 'LTE'],
-        },
-        maxMonthlyFee: {
-          type: 'number',
-          description: '최대 월 요금 (원)',
-        },
-        minMonthlyFee: {
-          type: 'number',
-          description: '최소 월 요금 (원)',
-        },
-        minDataGb: {
-          type: 'number',
-          description: '최소 데이터량 (GB, -1은 무제한)',
-        },
-        ageGroup: {
-          type: 'string',
-          description: '대상 연령대',
-          enum: ['ALL', 'YOUTH', 'SENIOR', 'STUDENT', 'SOLDIER'],
-        },
-        isPopular: {
-          type: 'boolean',
-          description: '인기 요금제만 조회할지 여부',
-        },
-        preferredAddons: {
-          type: 'array',
-          description:
-            '선호하는 부가서비스 키워드 (예: ["NETFLIX", "DISNEY", "TVING", "MUSIC", "YOUTUBE", "BOOK", "KIDS", "UPLAY"])',
-          items: {
-            type: 'string',
-            enum: [
-              'NETFLIX',
-              'DISNEY',
-              'DISNEY+',
-              'TVING',
-              '티빙',
-              'MUSIC',
-              '음악',
-              'YOUTUBE',
-              '유튜브',
-              'BOOK',
-              '책',
-              '독서',
-              'KIDS',
-              '아이',
-              '어린이',
-              'UPLAY',
-              '유플레이',
-              'MEDIA',
-              '미디어',
-              'PREMIUM',
-              '프리미엄',
-            ],
-          },
-        },
-        limit: {
-          type: 'number',
-          description: '조회할 최대 개수 (기본값: 3)',
-          default: 3,
-        },
-      },
-      required: [],
-      additionalProperties: false,
-    },
-  },
+  // {
+  //   type: 'function',
+  //   name: 'searchPlans',
+  //   description:
+  //     'MongoDB에서 조건에 맞는 요금제를 조회하여 최대 3개까지 추천합니다. 사용자 요구사항에 맞는 요금제를 동적으로 검색할 때 사용합니다.',
+  //   parameters: {
+  //     type: 'object',
+  //     properties: {
+  //       category: {
+  //         type: 'string',
+  //         description: '요금제 카테고리 (5G, LTE)',
+  //         enum: ['5G', 'LTE'],
+  //       },
+  //       maxMonthlyFee: {
+  //         type: 'number',
+  //         description: '최대 월 요금 (원)',
+  //       },
+  //       minMonthlyFee: {
+  //         type: 'number',
+  //         description: '최소 월 요금 (원)',
+  //       },
+  //       minDataGb: {
+  //         type: 'number',
+  //         description: '최소 데이터량 (GB, -1은 무제한)',
+  //       },
+  //       ageGroup: {
+  //         type: 'string',
+  //         description: '대상 연령대',
+  //         enum: ['ALL', 'YOUTH', 'SENIOR', 'STUDENT', 'SOLDIER'],
+  //       },
+  //       isPopular: {
+  //         type: 'boolean',
+  //         description: '인기 요금제만 조회할지 여부',
+  //       },
+  //       preferredAddons: {
+  //         type: 'array',
+  //         description:
+  //           '선호하는 부가서비스 키워드 (예: ["NETFLIX", "DISNEY", "TVING", "MUSIC", "YOUTUBE", "BOOK", "KIDS", "UPLAY"])',
+  //         items: {
+  //           type: 'string',
+  //           enum: [
+  //             'NETFLIX',
+  //             'DISNEY',
+  //             'DISNEY+',
+  //             'TVING',
+  //             '티빙',
+  //             'MUSIC',
+  //             '음악',
+  //             'YOUTUBE',
+  //             '유튜브',
+  //             'BOOK',
+  //             '책',
+  //             '독서',
+  //             'KIDS',
+  //             '아이',
+  //             '어린이',
+  //             'UPLAY',
+  //             '유플레이',
+  //             'MEDIA',
+  //             '미디어',
+  //             'PREMIUM',
+  //             '프리미엄',
+  //           ],
+  //         },
+  //       },
+  //       limit: {
+  //         type: 'number',
+  //         description: '조회할 최대 개수 (기본값: 3)',
+  //         default: 3,
+  //       },
+  //     },
+  //     required: [],
+  //     additionalProperties: false,
+  //   },
+  // },
   {
     type: 'function',
     name: 'showPlanLists',
