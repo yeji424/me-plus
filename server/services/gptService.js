@@ -115,8 +115,6 @@ export const streamChat = async (
         content: `${functionName} 함수를 호출했습니다. 인자: ${functionArgsRaw}`,
       });
 
-      // searchPlans 함수의 경우 검색 결과 상세 정보 추가
-      console.log('여기야', functionName, result);
       if (functionName === 'searchPlans' && result) {
         if (result.result === 'empty') {
           functionResults.push({
