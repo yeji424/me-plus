@@ -23,7 +23,7 @@ const ServiceGuidePage: React.FC = () => {
   };
 
   return (
-    <div className="absolute inset-0 bg-background-40 flex flex-col items-center z-100 overflow-hidden h-[100dvh] w-[100vw] max-w-[600px] pt-5">
+    <div className="absolute inset-0 bg-background flex flex-col items-center z-100 overflow-hidden h-[100dvh] w-[100vw] max-w-[600px] pt-5">
       <div className="w-full h-full select-none">
         <Swiper
           pagination={pagination}
