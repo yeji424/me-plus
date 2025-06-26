@@ -31,21 +31,23 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
     }
   };
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const fullHeight = document.body.scrollHeight;
+    const scrollContainer = document.querySelector('.scroll-target');
+    if (!scrollContainer) return;
 
-      // 바닥에 거의 닿았는지 확인 (예: 100px 이내)
-      if (scrollTop + windowHeight >= fullHeight - 100) {
+    const handleScroll = () => {
+      const scrollTop = scrollContainer.scrollTop;
+      const containerHeight = scrollContainer.clientHeight;
+      const scrollHeight = scrollContainer.scrollHeight;
+
+      if (scrollTop + containerHeight >= scrollHeight - 100) {
         setShowButtons(true);
       } else {
         setShowButtons(false);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    scrollContainer.addEventListener('scroll', handleScroll);
+    return () => scrollContainer.removeEventListener('scroll', handleScroll);
   }, []);
 
   // 데이터 값 계산
@@ -177,15 +179,14 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
           />
         </div>
       </div>
-
       <ComparisonActionButtons
         leftButtonText={selectedLeft ? '자세히 보기' : ''}
         rightButtonText={selectedRight ? '자세히 보기' : ''}
         onLeftClick={() => handleDetailClick(selectedLeft?.detailUrl)}
         onRightClick={() => handleDetailClick(selectedRight?.detailUrl)}
-        className={`fixed bottom-[50px] max-w-[560px] transition-all duration-500 ${
-          showButtons ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
-        }`}
+        className={`fixed bottom-[50px] max-w-[560px] transition-all duration-500
+    ${showButtons ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-5 pointer-events-none'}
+  `}
       />
 
       <Modal

@@ -146,7 +146,7 @@ const ComparePage: React.FC = () => {
     <div className="h-[100dvh] flex flex-col scroll-auto">
       <Header title="요금제 비교하기" onBackClick={() => openModal()} />
 
-      <div className="flex-1 overflow-y-auto px-5 hide-scrollbar">
+      <div className="flex-1 overflow-y-auto px-5 hide-scrollbar scroll-target">
         <ComparePageTitle>
           비교하고 싶은
           <br />
