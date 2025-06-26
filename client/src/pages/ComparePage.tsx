@@ -143,34 +143,36 @@ const ComparePage: React.FC = () => {
   }, []);
 
   return (
-    <div className="px-5">
+    <div className="h-[100dvh] flex flex-col scroll-auto">
       <Header title="요금제 비교하기" onBackClick={() => openModal()} />
 
-      <ComparePageTitle>
-        비교하고 싶은
-        <br />
-        요금제를 선택해 주세요
-      </ComparePageTitle>
+      <div className="flex-1 overflow-y-auto px-5 hide-scrollbar">
+        <ComparePageTitle>
+          비교하고 싶은
+          <br />
+          요금제를 선택해 주세요
+        </ComparePageTitle>
 
-      <FadeInUpDiv custom={1}>
-        <PlanSelectionCardArea
-          selectedLeft={selectedLeft}
-          selectedRight={selectedRight}
-          onSelectSlot={openSheetForSlot}
-          onClearSlot={handleClearSlot}
-        />
-      </FadeInUpDiv>
-
-      <FadeInUpDiv custom={2}>
-        {selectedLeft || selectedRight ? (
-          <ComparisonResult
+        <FadeInUpDiv custom={1}>
+          <PlanSelectionCardArea
             selectedLeft={selectedLeft}
             selectedRight={selectedRight}
+            onSelectSlot={openSheetForSlot}
+            onClearSlot={handleClearSlot}
           />
-        ) : (
-          <EmptyState />
-        )}
-      </FadeInUpDiv>
+        </FadeInUpDiv>
+
+        <FadeInUpDiv custom={2}>
+          {selectedLeft || selectedRight ? (
+            <ComparisonResult
+              selectedLeft={selectedLeft}
+              selectedRight={selectedRight}
+            />
+          ) : (
+            <EmptyState />
+          )}
+        </FadeInUpDiv>
+      </div>
 
       <BottomSheet
         className="fixed left-1/2 top-0 bottom-0 -translate-x-1/2 w-full max-w-[600px] flex justify-center items-center z-50"
