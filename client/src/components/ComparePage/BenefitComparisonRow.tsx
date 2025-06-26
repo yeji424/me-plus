@@ -68,7 +68,9 @@ const BenefitComparisonRow: React.FC<BenefitComparisonRowProps> = ({
           </TextWrapper>
         )}
       </div>
-      <div className="pt-[13%] w-25 text-sm flex justify-center">{title}</div>
+      <div className="flex-[1] pt-[13%] w-25 text-sm flex justify-center">
+        {title}
+      </div>
       <div className="flex-[2] relative flex flex-col items-center gap-1 justify-center">
         {rightIcon && rightContent && (
           <ImageWrapper>

@@ -17,8 +17,7 @@ const ComparisonActionButtons: React.FC<ComparisonActionButtonsProps> = ({
 }) => {
   return (
     <div
-      className={`flex flex-col justify-center items-center text-center gap-6 ${className}`}
-      style={{ width: 'calc(100% - 40px)' }}
+      className={`my-3 flex flex-col justify-center items-center text-center gap-6 ${className}`}
     >
       <div className="flex w-full">
         <div className="flex-[2] relative flex flex-col items-center justify-center rounded-[10px]">
