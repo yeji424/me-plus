@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import togetherIcon from '@/assets/image/card_family.png';
 import premiumAddonsIcon from '@/assets/icon/special.png';
 import mediaAddonsIcon from '@/assets/icon/media.png';
