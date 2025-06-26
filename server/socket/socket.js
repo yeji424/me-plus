@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { handlePlanRecommend } from '../controllers/planSocketController.js';
 import { ChatSession } from '../models/ChatSession.js';
 import { conditionByPlanGuide, InputRoleEnum } from '../utils/constants.js';
+import { resetTokenCount } from '../services/gptService.js';
 
 export const setupSocket = (server) => {
   const io = new Server(server, {
@@ -34,6 +35,10 @@ export const setupSocket = (server) => {
     socket.on('reset-session', async ({ sessionId }) => {
       // MongoDB 작업 제거 - 로컬스토리지에서 관리
       const newId = uuidv4();
+
+      // 토큰 카운트 초기화
+      resetTokenCount();
+
       socket.emit('session-id', newId);
       socket.emit('session-history', []);
     });
