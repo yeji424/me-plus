@@ -5,6 +5,7 @@ interface ComparisonActionButtonsProps {
   rightButtonText?: string;
   onLeftClick: () => void;
   onRightClick: () => void;
+  className?: string;
 }
 
 const ComparisonActionButtons: React.FC<ComparisonActionButtonsProps> = ({
@@ -12,10 +13,11 @@ const ComparisonActionButtons: React.FC<ComparisonActionButtonsProps> = ({
   rightButtonText,
   onLeftClick,
   onRightClick,
+  className = '',
 }) => {
   return (
     <div
-      className="flex flex-col justify-center items-center text-center gap-6 fixed bottom-[50px] max-w-[560px]"
+      className={`flex flex-col justify-center items-center text-center gap-6 ${className}`}
       style={{ width: 'calc(100% - 40px)' }}
     >
       <div className="flex w-full">
