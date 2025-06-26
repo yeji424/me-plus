@@ -322,8 +322,6 @@ export const searchPlansFromDB = async (searchConditions) => {
       }
     }
 
-    console.log('📋 생성된 MongoDB 쿼리:', JSON.stringify(query, null, 2));
-
     // 쿼리 실행
     const plans = await Plan.find(query)
       .select(EXCLUDED_FIELDS)
