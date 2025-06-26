@@ -31,11 +31,6 @@ const parseFunctionArgs = (functionArgsRaw) => {
       .replace(/\s+/g, ' ')
       .trim();
 
-    console.log(
-      '🔄 변환 시도 (처음 200자):',
-      fixedJson.substring(0, 200) + '...',
-    );
-
     return JSON.parse(fixedJson);
   } catch (secondParseError) {
     // eval 방식으로 재시도
@@ -46,7 +41,6 @@ const parseFunctionArgs = (functionArgsRaw) => {
       console.error('❌ 최종 JSON 파싱 실패:', secondParseError);
       console.error('❌ eval 방식도 실패:', evalError);
       console.log('🔍 원본:', functionArgsRaw);
-      console.log('🔍 변환 시도:', fixedJson);
       throw new Error('Function arguments 파싱에 실패했습니다.');
     }
   }

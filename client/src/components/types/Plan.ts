@@ -4,7 +4,7 @@ export interface Plan {
   name: string;
   description?: string;
   isPopular: boolean;
-  dataGb?: number;
+  dataGb: number;
   sharedDataGb?: number;
   voiceMinutes?: number;
   addonVoiceMinutes?: number;

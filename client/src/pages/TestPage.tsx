@@ -257,172 +257,178 @@ const TestPage = () => {
   );
 
   return (
-    <div className="px-5 flex flex-col">
-      <Header
-        title="나에게 잘 어울리는 요금제는?"
-        onBackClick={handleBackClick}
-      />
+    <div className="h-[100dvh] flex flex-col items-center overflow-hidden">
+      <div className="w-full max-w-[600px] flex-1 overflow-y-auto mt-[35px] px-5 hide-scrollbar">
+        <Header
+          title="나에게 잘 어울리는 요금제는?"
+          onBackClick={handleBackClick}
+        />
 
-      <ProgressBar
-        currentStep={currentIndex + 1}
-        totalSteps={questions.length}
-      />
+        <ProgressBar
+          currentStep={currentIndex + 1}
+          totalSteps={questions.length}
+        />
 
-      <div className="flex flex-col items-center justify-between flex-1 py-6">
-        <div className="flex flex-col items-center gap-4 w-full">
-          <IconSwitcher
-            isAnswered={isAnswered}
-            shouldBounce={shouldBounce}
-            srcAnswered={moonerAhaImage}
-            srcIdle={moonerImage}
-            alt={isAnswered ? '무너 (답변 완료)' : '무너 (대기 중)'}
-            className="w-[140px]"
-          />
+        <div className="flex flex-col items-center justify-between flex-1 py-6">
+          <div className="flex flex-col items-center gap-4 w-full">
+            <IconSwitcher
+              isAnswered={isAnswered}
+              shouldBounce={shouldBounce}
+              srcAnswered={moonerAhaImage}
+              srcIdle={moonerImage}
+              alt={isAnswered ? '무너 (답변 완료)' : '무너 (대기 중)'}
+              className="w-[140px]"
+            />
 
-          <div className="relative w-full flex justify-center">
-            <p className="text-center text-gray800 text-[20px] font-semibold w-[calc(100%-64px)]">
-              {currentQuestion.text}
-            </p>
+            <div className="relative w-full flex justify-center">
+              <p className="text-center text-gray800 text-[20px] font-semibold w-[calc(100%-64px)]">
+                {currentQuestion.text}
+              </p>
 
-            <button
-              onClick={handleBack}
-              disabled={currentIndex === 0 || isTransitioning}
-              className="absolute left-0 top-1/2 -translate-y-1/2 p-3 cursor-pointer
+              <button
+                onClick={handleBack}
+                disabled={currentIndex === 0 || isTransitioning}
+                className="absolute left-0 top-1/2 -translate-y-1/2 p-3 cursor-pointer
              transition-transform duration-200 ease-in-out
              hover:scale-130 disabled:cursor-not-allowed disabled:opacity-50"
-              style={{ willChange: 'transform' }}
-            >
-              <img src={back} alt="이전질문" className="w-[8px] h-[16px]" />
-            </button>
+                style={{ willChange: 'transform' }}
+              >
+                <img src={back} alt="이전질문" className="w-[8px] h-[16px]" />
+              </button>
 
-            <button
-              onClick={handleNext}
-              disabled={
-                currentIndex === questions.length - 1 || isTransitioning
-              }
-              className="absolute right-0 top-1/2 -translate-y-1/2 p-3 cursor-pointer             transition-transform duration-200 ease-in-out
+              <button
+                onClick={handleNext}
+                disabled={
+                  currentIndex === questions.length - 1 || isTransitioning
+                }
+                className="absolute right-0 top-1/2 -translate-y-1/2 p-3 cursor-pointer             transition-transform duration-200 ease-in-out
              hover:scale-130 disabled:cursor-not-allowed disabled:opacity-50"
-              style={{ willChange: 'transform' }}
-            >
-              <img src={next} alt="다음질문" className="w-[8px] h-[16px]" />
-            </button>
-          </div>
-
-          {currentQuestion.type === 'binary' ? (
-            <div className="flex gap-4 mt-3">
-              <SelectButton
-                label="그렇다"
-                selected={selected === 'yes'}
-                onClick={() => handleSelect('yes')}
-                type="yes"
-                disabled={isTransitioning}
-                animationDisabled={animationDisabled}
-              />
-              <SelectButton
-                label="아니다"
-                selected={selected === 'no'}
-                onClick={() => handleSelect('no')}
-                type="no"
-                disabled={isTransitioning}
-                animationDisabled={animationDisabled}
-              />
+                style={{ willChange: 'transform' }}
+              >
+                <img src={next} alt="다음질문" className="w-[8px] h-[16px]" />
+              </button>
             </div>
-          ) : (
-            <div className="flex flex-col gap-3 w-full mt-4">
-              {currentQuestion.options?.map((opt) => (
-                <SelectButton3
-                  key={opt}
-                  label={opt}
-                  selected={selected === opt}
-                  onClick={() => handleSelect(opt)}
+
+            {currentQuestion.type === 'binary' ? (
+              <div className="flex gap-4 mt-3">
+                <SelectButton
+                  label="그렇다"
+                  selected={selected === 'yes'}
+                  onClick={() => handleSelect('yes')}
+                  type="yes"
                   disabled={isTransitioning}
                   animationDisabled={animationDisabled}
                 />
-              ))}
-            </div>
-          )}
-
-          <div className="flex flex-col items-start mt-6 w-full px-4">
-            <div className="flex items-center justify-center gap-1 text-primary-pink shimmer-text">
-              <img src={tips} alt="꿀팁" className="w-[17px]" />
-              <p className="text-primary text-[12px] leading-none align-middle">
-                꿀팁
-              </p>
-            </div>
-            <p className="text-gray500 text-[11px] font-medium leading-snug mt-2">
-              <span className="text-secondary-purple-80">
-                “{currentQuestion.tip.highlight}”
-              </span>
-              {currentQuestion.tip.rest}
-            </p>{' '}
-            {allAnswered && (
-              <div className="fade-in-up fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[560px] px-4 pb-6 z-50">
-                <Button
-                  onClick={() => {
-                    const matchedRules = rules.filter((rule) =>
-                      rule.condition(selectedOptions),
-                    );
-
-                    const matchedPlans = matchedRules
-                      .map((rule) => {
-                        if (!rule?.resultId) return undefined;
-                        return fetchedPlans.find((p) => p.id === rule.resultId);
-                      })
-                      .filter((p): p is PlanResult => !!p); // null/undefined 제거
-
-                    const sortedPlans = matchedPlans.sort(
-                      (a, b) => a.priority - b.priority,
-                    );
-
-                    const bestPlan = sortedPlans[0];
-
-                    if (bestPlan) {
-                      navigate('/test-wait', {
-                        state: { planId: bestPlan.id },
-                      });
-                    } else {
-                      alert('조건에 맞는 요금제를 찾을 수 없어요.');
-                    }
-                  }}
-                  fullWidth
-                  size="large"
-                  variant="custom"
-                  className="bg-secondary-purple-60 text-white text-[14px] px-4 py-[10px] rounded-[10px] font-medium w-full"
-                >
-                  Me플러스 맞춤 추천 받기
-                </Button>
+                <SelectButton
+                  label="아니다"
+                  selected={selected === 'no'}
+                  onClick={() => handleSelect('no')}
+                  type="no"
+                  disabled={isTransitioning}
+                  animationDisabled={animationDisabled}
+                />
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3 w-full mt-4">
+                {currentQuestion.options?.map((opt) => (
+                  <SelectButton3
+                    key={opt}
+                    label={opt}
+                    selected={selected === opt}
+                    onClick={() => handleSelect(opt)}
+                    disabled={isTransitioning}
+                    animationDisabled={animationDisabled}
+                  />
+                ))}
               </div>
             )}
+
+            <div className="flex flex-col items-start mt-6 w-full px-4">
+              <div className="flex items-center justify-center gap-1 text-primary-pink shimmer-text">
+                <img src={tips} alt="꿀팁" className="w-[17px]" />
+                <p className="text-primary text-[12px] leading-none align-middle">
+                  꿀팁
+                </p>
+              </div>
+              <p className="text-gray500 text-[11px] font-medium leading-snug mt-2">
+                <span className="text-secondary-purple-80">
+                  “{currentQuestion.tip.highlight}”
+                </span>
+                {currentQuestion.tip.rest}
+              </p>{' '}
+              {allAnswered && (
+                <div className="fade-in-up fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[560px] px-4 pb-6 z-50">
+                  <Button
+                    onClick={() => {
+                      const matchedRules = rules.filter((rule) =>
+                        rule.condition(selectedOptions),
+                      );
+
+                      const matchedPlans = matchedRules
+                        .map((rule) => {
+                          if (!rule?.resultId) return undefined;
+                          return fetchedPlans.find(
+                            (p) => p.id === rule.resultId,
+                          );
+                        })
+                        .filter((p): p is PlanResult => !!p); // null/undefined 제거
+
+                      const sortedPlans = matchedPlans.sort(
+                        (a, b) => a.priority - b.priority,
+                      );
+
+                      const bestPlan = sortedPlans[0];
+
+                      if (bestPlan) {
+                        navigate('/test-wait', {
+                          state: { planId: bestPlan.id },
+                        });
+                      } else {
+                        alert('조건에 맞는 요금제를 찾을 수 없어요.');
+                      }
+                    }}
+                    fullWidth
+                    size="large"
+                    variant="custom"
+                    className="bg-secondary-purple-60 text-white text-[14px] px-4 py-[10px] rounded-[10px] font-medium w-full"
+                  >
+                    Me플러스 맞춤 추천 받기
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-      <Modal
-        isOpen={showBackModal}
-        onClose={() => setShowBackModal(false)}
-        modalTitle="맞춤형 요금제 찾기를 그만두시겠어요?"
-        modalDesc="홈으로 이동하면 현재 진행 중인 테스트는 초기화됩니다."
-      >
-        <Button
-          variant="secondary"
-          size="medium"
-          fullWidth
-          onClick={() => setShowBackModal(false)}
+        <Modal
+          isOpen={showBackModal}
+          onClose={() => setShowBackModal(false)}
+          modalTitle="맞춤형 요금제 찾기를 그만두시겠어요?"
+          modalDesc="홈으로 이동하면 현재 진행 중인 테스트는 초기화됩니다."
         >
-          계속할래요
-        </Button>
+          <Button
+            variant="secondary"
+            size="medium"
+            fullWidth
+            onClick={() => setShowBackModal(false)}
+          >
+            계속할래요
+          </Button>
 
-        <Button
-          variant="primary"
-          size="medium"
-          fullWidth
-          onClick={() => {
-            navigate('/');
-            setShowBackModal(false);
-          }}
-        >
-          그만둘래요
-        </Button>
-      </Modal>
+          <Button
+            variant="primary"
+            size="medium"
+            fullWidth
+            onClick={() => {
+              setShowBackModal(false);
+              setTimeout(() => {
+                navigate('/');
+              }, 300);
+            }}
+          >
+            그만둘래요
+          </Button>
+        </Modal>
+      </div>
     </div>
   );
 };

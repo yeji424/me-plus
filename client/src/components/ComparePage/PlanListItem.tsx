@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import dropdownIcon from '@/assets/icon/dropdown_icon.svg';
 import PlanDetailInfo from '@/components/ComparePage/PlanDetailInfo';
 import type { Plan } from '@/components/types/Plan';
+import { useEffect, useRef, useState } from 'react';
 
 interface PlanListItemProps {
   plan: Plan;
@@ -18,8 +19,22 @@ const PlanListItem: React.FC<PlanListItemProps> = ({
   onToggle,
   onSelect,
 }) => {
+  const itemRef = useRef<HTMLDivElement>(null);
+  const [wasOpen, setWasOpen] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && !wasOpen && itemRef.current) {
+      setTimeout(() => {
+        itemRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 0);
+    }
+    setWasOpen(isOpen);
+  }, [isOpen]);
   return (
-    <div>
+    <div ref={itemRef}>
       <motion.div
         whileHover={
           !isOpen

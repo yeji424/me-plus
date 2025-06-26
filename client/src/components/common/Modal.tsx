@@ -5,7 +5,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   modalTitle: string;
-  modalDesc?: string;
+  modalDesc?: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -17,11 +17,11 @@ const Modal: React.FC<ModalProps> = ({
   children,
 }) => {
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'hidden';
-    }
+    // if (isOpen) {
+    //   document.body.style.overflow = 'hidden';
+    // } else {
+    //   document.body.style.overflow = 'hidden';
+    // }
 
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -32,7 +32,7 @@ const Modal: React.FC<ModalProps> = ({
     window.addEventListener('keydown', handleEsc);
     return () => {
       window.removeEventListener('keydown', handleEsc);
-      document.body.style.overflow = 'hidden';
+      // document.body.style.overflow = 'hidden';
     };
   }, [isOpen, onClose]);
 
@@ -41,7 +41,7 @@ const Modal: React.FC<ModalProps> = ({
       {isOpen && (
         <motion.div
           key="backdrop"
-          className="fixed left-1/2 top-0 bottom-0 -translate-x-1/2 w-full max-w-[600px] bg-black/50 flex justify-center items-center z-50"
+          className="fixed left-1/2 top-0 bottom-0 -translate-x-1/2 w-full max-w-[600px] bg-black/50 flex justify-center items-center z-100"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

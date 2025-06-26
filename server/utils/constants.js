@@ -63,8 +63,10 @@ export const conditionByPlanGuide = {
 
 export const InputRoleEnum = {
   USER: 'user',
-  SYSTEM: 'system',
+  DEVELOPER: 'developer',
   ASSISTANT: 'assistant',
+  PLATFORM: 'platform',
+  SYSTEM: 'system',
 };
 
 export const GPTConfig = {

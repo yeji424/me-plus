@@ -25,6 +25,7 @@ const ComparePage: React.FC = () => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [activeDataIndex, setActiveDataIndex] = useState(0);
   const [activePriceIndex, setActivePriceIndex] = useState(0);
+  const [activeDataAmountIndex, setActiveDataAmountIndex] = useState(0);
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>(
     {},
   );
@@ -46,13 +47,23 @@ const ComparePage: React.FC = () => {
     '5만원 이상 10만원 미만',
     '10만원 이상',
   ];
+  const dataAmountList = [
+    '전체',
+    '5GB 미만',
+    '5GB ~ 20GB',
+    '20GB ~ 50GB',
+    '50GB ~ 100GB',
+    '무제한',
+  ];
 
   const filteredPlans = usePlanFilter(
     plans,
     dataList,
     priceList,
+    dataAmountList,
     activeDataIndex,
     activePriceIndex,
+    activeDataAmountIndex,
   );
 
   const resetDropdowns = () => setOpenDropdowns({});
@@ -64,6 +75,11 @@ const ComparePage: React.FC = () => {
 
   const handleSetActivePriceIndex = (index: number) => {
     setActivePriceIndex(index);
+    resetDropdowns();
+  };
+
+  const handleSetActiveDataAmountIndex = (index: number) => {
+    setActiveDataAmountIndex(index);
     resetDropdowns();
   };
 
@@ -127,34 +143,36 @@ const ComparePage: React.FC = () => {
   }, []);
 
   return (
-    <div className="px-5">
+    <div className="h-[100dvh] flex flex-col scroll-auto">
       <Header title="요금제 비교하기" onBackClick={() => openModal()} />
 
-      <ComparePageTitle>
-        비교하고 싶은
-        <br />
-        요금제를 선택해 주세요
-      </ComparePageTitle>
+      <div className="flex-1 overflow-y-auto px-5 hide-scrollbar scroll-target">
+        <ComparePageTitle>
+          비교하고 싶은
+          <br />
+          요금제를 선택해 주세요
+        </ComparePageTitle>
 
-      <FadeInUpDiv custom={1}>
-        <PlanSelectionCardArea
-          selectedLeft={selectedLeft}
-          selectedRight={selectedRight}
-          onSelectSlot={openSheetForSlot}
-          onClearSlot={handleClearSlot}
-        />
-      </FadeInUpDiv>
-
-      <FadeInUpDiv custom={2}>
-        {selectedLeft || selectedRight ? (
-          <ComparisonResult
+        <FadeInUpDiv custom={1}>
+          <PlanSelectionCardArea
             selectedLeft={selectedLeft}
             selectedRight={selectedRight}
+            onSelectSlot={openSheetForSlot}
+            onClearSlot={handleClearSlot}
           />
-        ) : (
-          <EmptyState />
-        )}
-      </FadeInUpDiv>
+        </FadeInUpDiv>
+
+        <FadeInUpDiv custom={2}>
+          {selectedLeft || selectedRight ? (
+            <ComparisonResult
+              selectedLeft={selectedLeft}
+              selectedRight={selectedRight}
+            />
+          ) : (
+            <EmptyState />
+          )}
+        </FadeInUpDiv>
+      </div>
 
       <BottomSheet
         className="fixed left-1/2 top-0 bottom-0 -translate-x-1/2 w-full max-w-[600px] flex justify-center items-center z-50"
@@ -166,10 +184,13 @@ const ComparePage: React.FC = () => {
           <FilterSection
             dataList={dataList}
             priceList={priceList}
+            dataAmountList={dataAmountList}
             activeDataIndex={activeDataIndex}
             activePriceIndex={activePriceIndex}
+            activeDataAmountIndex={activeDataAmountIndex}
             onDataIndexChange={handleSetActiveDataIndex}
             onPriceIndexChange={handleSetActivePriceIndex}
+            onDataAmountIndexChange={handleSetActiveDataAmountIndex}
           />
 
           {isLoading && <LoadingSpinner />}

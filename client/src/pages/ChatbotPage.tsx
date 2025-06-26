@@ -18,6 +18,7 @@ import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import type { UserProfile } from '@/utils/chatStorage';
+import ToastAlert from '@/components/common/ToastAlert';
 
 // 사용자 정보 타입 제거 (chatStorage에서 import)
 
@@ -81,8 +82,11 @@ const MemoizedInputBox = React.memo(InputBox);
 const MemoizedUserBubble = React.memo(UserBubble);
 const MemoizedBotBubbleFrame = React.memo(BotBubbleFrame);
 const MemoizedLoadingBubble = React.memo(LoadingBubble);
-
+const isMobile =
+  /iPhone|iPad|iPod|Android/.test(navigator.userAgent) &&
+  !/Macintosh|Windows/.test(navigator.userAgent);
 const ChatbotPage = () => {
+  const MAX_INPUT_LENGTH = 100; // 글자수 제한 설정
   const [input, setInput] = useState('');
   const {
     messages,
@@ -102,7 +106,7 @@ const ChatbotPage = () => {
   const [showBackModal, setShowBackModal] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
   const hasInitializedForUrlParams = useRef(false); // URL 파라미터 초기화 여부 추적
-
+  const [toastMessage, setToastMessage] = useState('');
   // 사용자 정보 확인: URL 파라미터에서만 읽음 - 메모이제이션으로 최적화
   const urlUserProfile = useMemo(
     () => parseUserProfileFromURL(searchParams),
@@ -169,9 +173,17 @@ const ChatbotPage = () => {
     setShowCallModal(false);
   };
   // 인라인 함수들을 useCallback으로 최적화
-  const handleInputChange = useCallback((value: string) => {
-    setInput(value);
-  }, []);
+  const handleInputChange = useCallback(
+    (value: string) => {
+      // 글자수 제한 체크
+      if (value.length > MAX_INPUT_LENGTH) {
+        setToastMessage(`메시지는 ${MAX_INPUT_LENGTH}자 이하로 작성해주세요.`);
+        return;
+      }
+      setInput(value);
+    },
+    [MAX_INPUT_LENGTH],
+  );
 
   const handleNewChat = useCallback(() => {
     startNewChat();
@@ -182,10 +194,15 @@ const ChatbotPage = () => {
 
   const handleSendMessage = useCallback(
     (text: string) => {
+      // 전송 시에도 글자수 체크
+      if (text.length > MAX_INPUT_LENGTH) {
+        setToastMessage(`메시지는 ${MAX_INPUT_LENGTH}자 이하로 작성해주세요.`);
+        return;
+      }
       sendMessage(text);
       setInput('');
     },
-    [sendMessage],
+    [sendMessage, MAX_INPUT_LENGTH],
   );
 
   const handleButtonClick = useCallback(
@@ -374,7 +391,7 @@ const ChatbotPage = () => {
       {/* 원래 삭제해도 되는데 같이 넣으니까 더 자연스러워서 넣음 */}
       {/* <div className="pointer-events-none fixed top-13 left-1/2 -translate-x-1/2 w-full max-w-[600px] h-[40px] z-30 bg-gradient-to-b from-[#ffffff] to-transparent" /> */}
       {/* 2. ChatArea - Flex */}
-      <div className="px-5 pt-[70px] pb-[70px] gradient-scroll-container flex flex-col h-[100vh] overflow-x-visible">
+      <div className="px-5 pt-[70px] pb-[70px] gradient-scroll-container flex flex-col h-[100dvh] overflow-x-visible">
         {/* 패딩으로 보이는 영역 조절 (= 스크롤 가능 영역) */}
         {/* 마진으로 안하고 패딩으로 한 이유 : 마진으로 하면 그라데이션 넣은 이유 사라짐 */}
         <div
@@ -456,7 +473,7 @@ const ChatbotPage = () => {
           fullWidth
           onClick={handleClose}
         >
-          돌아가기
+          닫기
         </Button>
 
         <Button
@@ -471,12 +488,22 @@ const ChatbotPage = () => {
           새로 시작하기
         </Button>
       </Modal>
-
+      {toastMessage && (
+        <ToastAlert
+          message={toastMessage}
+          onClose={() => setToastMessage('')}
+        />
+      )}
       <Modal
         isOpen={showCallModal}
         onClose={() => setShowCallModal(false)}
-        modalTitle="고객센터 080-019-7000"
-        modalDesc="상담원 연결을 시작할 경우, 이전에 진행한 상담은 모두 초기화됩니다."
+        modalTitle="고객센터 연결 | 080-019-7000"
+        modalDesc={
+          <>
+            상담원 연결을 진행할 경우, 이전에 진행한 상담은 모두 초기화됩니다.
+            <br />※ 전화 연결은 모바일 환경에서만 가능합니다.
+          </>
+        }
       >
         <Button
           variant="secondary"
@@ -484,20 +511,41 @@ const ChatbotPage = () => {
           fullWidth
           onClick={handleClose}
         >
-          돌아가기
+          닫기
         </Button>
-
-        <Button
-          variant="primary"
-          size="medium"
-          fullWidth
-          onClick={() => {
-            handleNewChat();
-            handleClose();
-          }}
-        >
-          전화하기
-        </Button>
+        {isMobile ? (
+          <a
+            href="tel:0800197000"
+            onClick={async (e) => {
+              e.stopPropagation();
+              await navigator.clipboard.writeText('0800197000');
+            }}
+            className="w-full"
+          >
+            <Button variant="primary" size="medium" fullWidth>
+              전화하기
+            </Button>
+          </a>
+        ) : (
+          <Button
+            variant="primary"
+            size="medium"
+            fullWidth
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText('080-019-7000');
+                setToastMessage(
+                  '전화 연결 기능은 모바일에서만 지원됩니다. 고객센터 번호가 복사되었습니다.',
+                );
+              } catch {
+                setToastMessage('전화 연결 기능은 모바일에서만 지원됩니다.');
+              }
+              handleClose();
+            }}
+          >
+            전화하기
+          </Button>
+        )}
       </Modal>
     </>
   );
