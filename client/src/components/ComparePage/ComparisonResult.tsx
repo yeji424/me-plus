@@ -22,7 +22,6 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingLink, setPendingLink] = useState<string | null>(null);
-  const [showButtons, setShowButtons] = useState(false);
 
   const handleDetailClick = (detailUrl?: string) => {
     if (detailUrl) {
@@ -30,25 +29,6 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
       setIsModalOpen(true); // 모달 먼저 띄우기
     }
   };
-  useEffect(() => {
-    const scrollContainer = document.querySelector('.scroll-target');
-    if (!scrollContainer) return;
-
-    const handleScroll = () => {
-      const scrollTop = scrollContainer.scrollTop;
-      const containerHeight = scrollContainer.clientHeight;
-      const scrollHeight = scrollContainer.scrollHeight;
-
-      if (scrollTop + containerHeight >= scrollHeight - 100) {
-        setShowButtons(true);
-      } else {
-        setShowButtons(false);
-      }
-    };
-
-    scrollContainer.addEventListener('scroll', handleScroll);
-    return () => scrollContainer.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // 데이터 값 계산
   const leftDataValue = selectedLeft
