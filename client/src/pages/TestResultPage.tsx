@@ -10,6 +10,7 @@ import Header from '@/components/common/Header';
 import confetti from '../assets/image/confetti.png';
 import plus from '@/assets/icon/plus.png';
 import TestWaitingPage from './TestWaitingPage';
+import Modal from '@/components/common/Modal';
 
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
@@ -56,6 +57,7 @@ const TestResultPage = () => {
   const [plan, setPlan] = useState<PlanResult | null>(null);
   const { width, height } = useWindowSize();
   const [showConfetti, setShowConfetti] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchPlan = async () => {
@@ -141,6 +143,36 @@ const TestResultPage = () => {
 
   return (
     <>
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          modalTitle="외부 링크로 이동"
+          modalDesc="요금제 상세 페이지는 LG U+외부 사이트로 연결됩니다. 계속 진행하시겠습니까?"
+        >
+          <Button
+            variant="secondary"
+            size="medium"
+            fullWidth
+            onClick={() => setIsModalOpen(false)}
+          >
+            취소
+          </Button>
+
+          <Button
+            variant="primary"
+            size="medium"
+            fullWidth
+            onClick={() => {
+              if (plan?.link) window.open(plan.link, '_blank');
+              setIsModalOpen(false);
+            }}
+          >
+            이동하기
+          </Button>
+        </Modal>
+      )}
+
       <div className="absolute inset-0 bg-gradient-to-b from-[#dfe4fd] to-white z-0" />
       <Header
         title="나에게 잘 어울리는 요금제는?"
@@ -168,6 +200,7 @@ const TestResultPage = () => {
             )}
           </div>
         </motion.div>
+
         {/* <div className="relative w-full flex justify-center items-center mt-6">
         <img
           src={confetti}
@@ -267,12 +300,8 @@ const TestResultPage = () => {
         >
           챗봇 상담하기
         </Button>
-        <Button
-          fullWidth
-          size="large"
-          onClick={() => window.open(plan.link, '_blank')}
-        >
-          요금제 바꾸러가기
+        <Button fullWidth size="large" onClick={() => setIsModalOpen(true)}>
+          요금제 자세히보기
         </Button>
       </div>
     </>
