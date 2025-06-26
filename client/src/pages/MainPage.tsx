@@ -9,7 +9,7 @@ import testIcon from '@/assets/icon/test_icon.png';
 
 const MainPage: React.FC = () => {
   return (
-    <div className="h-[100vh] flex flex-col justify-center ">
+    <div className="h-[100dvh] flex flex-col justify-center ">
       <div className="px-5" style={{ top: '25px' }}>
         {/* 제목 */}
         <FadeInUpDiv custom={0} className="mb-[37px]">
