@@ -192,7 +192,13 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         modalTitle="외부 링크로 이동"
-        modalDesc="요금제 상세 페이지는 외부 사이트로 연결됩니다. 계속 진행하시겠습니까?"
+        modalDesc={
+          <>
+            요금제 상세 페이지는 외부 사이트로 연결됩니다.
+            <br />
+            계속 진행하시겠습니까?
+          </>
+        }
       >
         <Button
           fullWidth
@@ -200,7 +206,7 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
           size="medium"
           onClick={() => setIsModalOpen(false)}
         >
-          취소
+          닫기
         </Button>
         <Button
           fullWidth

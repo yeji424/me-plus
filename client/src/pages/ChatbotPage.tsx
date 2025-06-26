@@ -18,6 +18,7 @@ import Modal from '@/components/common/Modal';
 import Button from '@/components/common/Button';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import type { UserProfile } from '@/utils/chatStorage';
+import ToastAlert from '@/components/common/ToastAlert';
 
 // 사용자 정보 타입 제거 (chatStorage에서 import)
 
@@ -104,7 +105,7 @@ const ChatbotPage = () => {
   const [showBackModal, setShowBackModal] = useState(false);
   const [showCallModal, setShowCallModal] = useState(false);
   const hasInitializedForUrlParams = useRef(false); // URL 파라미터 초기화 여부 추적
-
+  const [toastMessage, setToastMessage] = useState('');
   // 사용자 정보 확인: URL 파라미터에서만 읽음 - 메모이제이션으로 최적화
   const urlUserProfile = useMemo(
     () => parseUserProfileFromURL(searchParams),
@@ -458,7 +459,7 @@ const ChatbotPage = () => {
           fullWidth
           onClick={handleClose}
         >
-          돌아가기
+          닫기
         </Button>
 
         <Button
@@ -473,12 +474,22 @@ const ChatbotPage = () => {
           새로 시작하기
         </Button>
       </Modal>
-
+      {toastMessage && (
+        <ToastAlert
+          message={toastMessage}
+          onClose={() => setToastMessage('')}
+        />
+      )}
       <Modal
         isOpen={showCallModal}
         onClose={() => setShowCallModal(false)}
-        modalTitle="고객센터 | 080-019-7000"
-        modalDesc="상담원 연결을 시작할 경우, 이전에 진행한 상담은 모두 초기화됩니다."
+        modalTitle="고객센터 연결 | 080-019-7000"
+        modalDesc={
+          <>
+            상담원 연결을 진행할 경우, 이전에 진행한 상담은 모두 초기화됩니다.
+            <br />※ 전화 연결은 모바일 환경에서만 가능합니다.
+          </>
+        }
       >
         <Button
           variant="secondary"
@@ -486,7 +497,7 @@ const ChatbotPage = () => {
           fullWidth
           onClick={handleClose}
         >
-          돌아가기
+          닫기
         </Button>
         {isMobile ? (
           <a
@@ -506,8 +517,15 @@ const ChatbotPage = () => {
             variant="primary"
             size="medium"
             fullWidth
-            onClick={() => {
-              alert('전화 기능은 모바일에서만 사용 가능합니다.');
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText('080-019-7000');
+                setToastMessage(
+                  '전화 연결 기능은 모바일에서만 지원됩니다. 고객센터 번호가 복사되었습니다.',
+                );
+              } catch {
+                setToastMessage('전화 연결 기능은 모바일에서만 지원됩니다.');
+              }
               handleClose();
             }}
           >
