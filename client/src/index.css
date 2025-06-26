@@ -280,7 +280,7 @@
 /* 서비스 가이드 스와이퍼 */
 .swiper-pagination {
   z-index: -1;
-  top: 185px !important;
+  top: 260px !important;
   display: flex;
   justify-content: center;
   align-items: end;
@@ -289,8 +289,8 @@
   aspect-ratio: 1 / 2;
   bottom: auto !important;
   max-height: 500px;
-  height: 55%;
-  width: 35% !important;
+  height: 49%;
+  width: 40% !important;
 }
 .swiper-pagination-bullet {
   border-radius: 100px;
