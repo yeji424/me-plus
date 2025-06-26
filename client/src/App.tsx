@@ -12,7 +12,6 @@ import TestPage from './pages/TestPage';
 import ComparePage from './pages/ComparePage';
 import TestResultPage from './pages/TestResultPage';
 import MainPage from './pages/MainPage';
-import Footer from './components/common/Footer';
 import ServiceGuidePage from './pages/ServiceGuidePage';
 
 const MainLayout = () => {
@@ -21,7 +20,6 @@ const MainLayout = () => {
       <div className=" min-h-screen flex flex-col">
         <main style={{ minHeight: 'calc(100vh - 50px - 80px)' }}>
           <Outlet />
-          <Footer />
         </main>
       </div>
     </>

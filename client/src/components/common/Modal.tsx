@@ -41,7 +41,7 @@ const Modal: React.FC<ModalProps> = ({
       {isOpen && (
         <motion.div
           key="backdrop"
-          className="fixed left-1/2 top-0 bottom-0 -translate-x-1/2 w-full max-w-[600px] bg-black/50 flex justify-center items-center z-50"
+          className="fixed left-1/2 top-0 bottom-0 -translate-x-1/2 w-full max-w-[600px] bg-black/50 flex justify-center items-center z-100"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
