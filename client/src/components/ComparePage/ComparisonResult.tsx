@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import togetherIcon from '@/assets/image/card_family.png';
 import premiumAddonsIcon from '@/assets/icon/special.png';
 import mediaAddonsIcon from '@/assets/icon/media.png';
@@ -5,6 +6,9 @@ import BenefitText from '@/components/common/BenefitText';
 import DataComparisonBar from '@/components/ComparePage/DataComparisonBar';
 import BenefitComparisonRow from '@/components/ComparePage/BenefitComparisonRow';
 import ComparisonActionButtons from '@/components/ComparePage/ComparisonActionButtons';
+import Modal from '../common/Modal';
+import Button from '../common/Button';
+
 import type { Plan } from '@/components/types/Plan';
 
 interface ComparisonResultProps {
@@ -16,9 +20,13 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
   selectedLeft,
   selectedRight,
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendingLink, setPendingLink] = useState<string | null>(null);
+
   const handleDetailClick = (detailUrl?: string) => {
     if (detailUrl) {
-      window.open(detailUrl, '_blank');
+      setPendingLink(detailUrl); // 링크만 저장
+      setIsModalOpen(true); // 모달 먼저 띄우기
     }
   };
 
@@ -158,6 +166,32 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
         onLeftClick={() => handleDetailClick(selectedLeft?.detailUrl)}
         onRightClick={() => handleDetailClick(selectedRight?.detailUrl)}
       />
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        modalTitle="외부 링크로 이동"
+        modalDesc="요금제 상세 페이지는 외부 사이트로 연결됩니다. 계속 진행하시겠습니까?"
+      >
+        <Button
+          fullWidth
+          variant="secondary"
+          size="medium"
+          onClick={() => setIsModalOpen(false)}
+        >
+          취소
+        </Button>
+        <Button
+          fullWidth
+          size="medium"
+          onClick={() => {
+            if (pendingLink) window.open(pendingLink, '_blank');
+            setIsModalOpen(false);
+          }}
+        >
+          이동하기
+        </Button>
+      </Modal>
     </>
   );
 };
