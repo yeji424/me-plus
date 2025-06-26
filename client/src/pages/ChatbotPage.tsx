@@ -81,7 +81,9 @@ const MemoizedInputBox = React.memo(InputBox);
 const MemoizedUserBubble = React.memo(UserBubble);
 const MemoizedBotBubbleFrame = React.memo(BotBubbleFrame);
 const MemoizedLoadingBubble = React.memo(LoadingBubble);
-
+const isMobile =
+  /iPhone|iPad|iPod|Android/.test(navigator.userAgent) &&
+  !/Macintosh|Windows/.test(navigator.userAgent);
 const ChatbotPage = () => {
   const [input, setInput] = useState('');
   const {
@@ -475,7 +477,7 @@ const ChatbotPage = () => {
       <Modal
         isOpen={showCallModal}
         onClose={() => setShowCallModal(false)}
-        modalTitle="고객센터 080-019-7000"
+        modalTitle="고객센터 | 080-019-7000"
         modalDesc="상담원 연결을 시작할 경우, 이전에 진행한 상담은 모두 초기화됩니다."
       >
         <Button
@@ -486,18 +488,32 @@ const ChatbotPage = () => {
         >
           돌아가기
         </Button>
-
-        <Button
-          variant="primary"
-          size="medium"
-          fullWidth
-          onClick={() => {
-            handleNewChat();
-            handleClose();
-          }}
-        >
-          전화하기
-        </Button>
+        {isMobile ? (
+          <a
+            href="tel:0800197000"
+            onClick={async (e) => {
+              e.stopPropagation();
+              await navigator.clipboard.writeText('0800197000');
+            }}
+            className="w-full"
+          >
+            <Button variant="primary" size="medium" fullWidth>
+              전화하기
+            </Button>
+          </a>
+        ) : (
+          <Button
+            variant="primary"
+            size="medium"
+            fullWidth
+            onClick={() => {
+              alert('전화 기능은 모바일에서만 사용 가능합니다.');
+              handleClose();
+            }}
+          >
+            전화하기
+          </Button>
+        )}
       </Modal>
     </>
   );
