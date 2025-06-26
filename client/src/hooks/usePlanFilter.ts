@@ -5,8 +5,10 @@ export const usePlanFilter = (
   plans: Plan[],
   dataList: string[],
   priceList: string[],
+  dataAmountList: string[],
   activeDataIndex: number,
   activePriceIndex: number,
+  activeDataAmountIndex: number,
 ) => {
   return useMemo(() => {
     if (!plans) return [];
@@ -30,7 +32,32 @@ export const usePlanFilter = (
         }
       };
 
-      return matchNetwork && matchPrice();
+      const matchDataAmount = () => {
+        const amount = plan.dataGb;
+        switch (dataAmountList[activeDataAmountIndex]) {
+          case '5GB 미만':
+            return amount >= 0 && amount < 5;
+          case '5GB ~ 20GB':
+            return amount >= 5 && amount <= 20;
+          case '20GB ~ 50GB':
+            return amount > 20 && amount <= 50;
+          case '50GB ~ 100GB':
+            return amount > 50 && amount <= 100;
+          case '무제한':
+            return (amount === -1) === true;
+          default:
+            return true;
+        }
+      };
+
+      return matchNetwork && matchPrice() && matchDataAmount();
     });
-  }, [plans, dataList, priceList, activeDataIndex, activePriceIndex]);
+  }, [
+    plans,
+    dataList,
+    priceList,
+    activeDataIndex,
+    activePriceIndex,
+    dataAmountList,
+  ]);
 };

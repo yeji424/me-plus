@@ -1,4 +1,4 @@
-export const buildPromptMessages = (plans, fullMessages) => {
+export const buildPromptMessages = (fullMessages) => {
   const systemMessage = {
     role: 'system',
     content: `너는 LG유플러스 요금제 추천 도우미야!  반드시 간단한 인사와 요금제 추천과 관련된 질문에만 응답해야 해. 요금제 외의 질문(예: 요리 레시피, 날씨, 일반 상식 등)은 답변하지 말고 "저는 요금제 추천 도우미입니다. 📱💡" 라면서 요금제 추천에 관심이 있냐고 유저에게 친절하게 안내해.

@@ -191,7 +191,7 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        modalTitle="외부 링크로 이동"
+        modalTitle="요금제 자세히 알아보기"
         modalDesc={
           <>
             요금제 상세 페이지는 외부 사이트로 연결됩니다.

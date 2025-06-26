@@ -3,19 +3,25 @@ import Carousel from '@/components/ComparePage/Carousel';
 interface FilterSectionProps {
   dataList: string[];
   priceList: string[];
+  dataAmountList: string[];
   activeDataIndex: number;
   activePriceIndex: number;
+  activeDataAmountIndex: number;
   onDataIndexChange: (index: number) => void;
   onPriceIndexChange: (index: number) => void;
+  onDataAmountIndexChange: (index: number) => void;
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({
   dataList,
   priceList,
+  dataAmountList,
   activeDataIndex,
   activePriceIndex,
+  activeDataAmountIndex,
   onDataIndexChange,
   onPriceIndexChange,
+  onDataAmountIndexChange,
 }) => {
   return (
     <div className="fixed top-[45px] w-full pt-2 bg-background-40 z-5">
@@ -35,6 +41,11 @@ const FilterSection: React.FC<FilterSectionProps> = ({
           categoryList={priceList}
           activeIndex={activePriceIndex}
           setActiveIndex={onPriceIndexChange}
+        />
+        <Carousel
+          categoryList={dataAmountList}
+          activeIndex={activeDataAmountIndex}
+          setActiveIndex={onDataAmountIndexChange}
         />
       </div>
     </div>
