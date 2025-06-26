@@ -20,6 +20,19 @@ const FOLLOWUP_TOOLS = GPT_TOOLS.filter((tool) =>
 let usedTotalTokens = 0;
 
 /**
+ * 토큰 카운트를 초기화합니다. (새 채팅 시작 시 호출)
+ */
+export const resetTokenCount = () => {
+  usedTotalTokens = 0;
+  console.log('🔄 Token count reset to 0');
+};
+
+/**
+ * 현재 사용된 총 토큰 수를 반환합니다.
+ */
+export const getTotalTokens = () => usedTotalTokens;
+
+/**
  * GPT 스트림 채팅을 처리합니다.
  * @param {Array} messages - 채팅 메시지 배열
  * @param {Socket} socket - 소켓 객체
@@ -131,7 +144,7 @@ export const streamChat = async (
         }
       } else {
         functionResults.push({
-          role: 'user',
+          role: 'developer',
           content: `${functionName} 함수가 성공적으로 실행되었습니다.`,
         });
       }
@@ -326,7 +339,7 @@ const streamChatForFollowUp = async (messages, socket, model) => {
     const functionCallMap = {}; // { [item_id]: { ... } }
     const functionCalls = []; // 최종 실행용 배열
     let hasTextContent = false; // 텍스트 응답이 있는지 확인
-    usedTotalTokens = 0;
+
     for await (const event of stream) {
       // 1. 함수 호출 item 추가
       if (
