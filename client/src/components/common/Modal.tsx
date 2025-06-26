@@ -17,11 +17,11 @@ const Modal: React.FC<ModalProps> = ({
   children,
 }) => {
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
+    // if (isOpen) {
+    //   document.body.style.overflow = 'hidden';
+    // } else {
+    //   document.body.style.overflow = 'hidden';
+    // }
 
     const handleEsc = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -32,7 +32,7 @@ const Modal: React.FC<ModalProps> = ({
     window.addEventListener('keydown', handleEsc);
     return () => {
       window.removeEventListener('keydown', handleEsc);
-      document.body.style.overflow = 'hidden';
+      // document.body.style.overflow = 'hidden';
     };
   }, [isOpen, onClose]);
 

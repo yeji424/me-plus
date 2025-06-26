@@ -78,6 +78,7 @@
   }
   html,
   body {
+    /* overflow: hidden; */
     background-color: var(--color-gray300); /* 필요 없으면 제거 가능 */
     background-image: url('/background.png'); /* 이미지 경로 정확히 */
     background-repeat: no-repeat;

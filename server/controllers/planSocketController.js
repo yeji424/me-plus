@@ -92,10 +92,7 @@ export const handlePlanRecommend = async (
       return;
     }
     console.log('수신메세지', message);
-    console.log('대화히스토리', history?.length || 0, '개');
-
-    // 🔧 히스토리가 있으면 사용, 없으면 기본 메시지만 사용
-    const plans = '';
+    console.log('히스토리:', history);
     const basicMessages =
       history && history.length > 0
         ? history
@@ -103,7 +100,7 @@ export const handlePlanRecommend = async (
     console.log('프롬프트메세지', basicMessages.length, '개');
     let messages;
     try {
-      messages = buildPromptMessages(plans, basicMessages);
+      messages = buildPromptMessages(basicMessages);
     } catch (promptError) {
       console.error('❌ Prompt building error:', promptError);
       socket.emit('error', {
