@@ -86,6 +86,7 @@ const isMobile =
   /iPhone|iPad|iPod|Android/.test(navigator.userAgent) &&
   !/Macintosh|Windows/.test(navigator.userAgent);
 const ChatbotPage = () => {
+  const MAX_INPUT_LENGTH = 100; // 글자수 제한 설정
   const [input, setInput] = useState('');
   const {
     messages,
@@ -172,9 +173,17 @@ const ChatbotPage = () => {
     setShowCallModal(false);
   };
   // 인라인 함수들을 useCallback으로 최적화
-  const handleInputChange = useCallback((value: string) => {
-    setInput(value);
-  }, []);
+  const handleInputChange = useCallback(
+    (value: string) => {
+      // 글자수 제한 체크
+      if (value.length > MAX_INPUT_LENGTH) {
+        setToastMessage(`메시지는 ${MAX_INPUT_LENGTH}자 이하로 작성해주세요.`);
+        return;
+      }
+      setInput(value);
+    },
+    [MAX_INPUT_LENGTH],
+  );
 
   const handleNewChat = useCallback(() => {
     startNewChat();
@@ -185,10 +194,15 @@ const ChatbotPage = () => {
 
   const handleSendMessage = useCallback(
     (text: string) => {
+      // 전송 시에도 글자수 체크
+      if (text.length > MAX_INPUT_LENGTH) {
+        setToastMessage(`메시지는 ${MAX_INPUT_LENGTH}자 이하로 작성해주세요.`);
+        return;
+      }
       sendMessage(text);
       setInput('');
     },
-    [sendMessage],
+    [sendMessage, MAX_INPUT_LENGTH],
   );
 
   const handleButtonClick = useCallback(
