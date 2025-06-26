@@ -544,49 +544,13 @@ export const useChatSocket = () => {
             const content = msg.messageChunks.join('');
             // 빈 문자열인 메시지는 제외 (function call만 있는 메시지들)
             if (content.trim() === '') {
-              const functionName = msg.functionCall?.name;
-              if (
-                functionName === 'showPlanLists' &&
-                msg.functionCall?.args?.plans
-              ) {
-                const planNames = msg.functionCall.args.plans
-                  .map((plan: { name: string }) => plan.name)
-                  .join(', ');
-                return {
-                  role: 'assistant',
-                  content: `${planNames}를 추천받았다`,
-                };
-              }
-              if (
-                functionName === 'requestCarouselButtons' &&
-                msg.functionCall?.args?.items
-              ) {
-                const itemLabels = msg.functionCall.args.items
-                  .map((item: { label: string }) => item.label)
-                  .join(', ');
-                return {
-                  role: 'assistant',
-                  content: `${itemLabels} 선택지를 제공했다`,
-                };
-              }
-              if (functionName === 'requestOXCarouselButtons') {
-                return {
-                  role: 'assistant',
-                  content: '예/아니오 선택지를 제공했다',
-                };
-              }
-              if (functionName === 'requestOTTServiceList') {
-                return {
-                  role: 'assistant',
-                  content: 'OTT 서비스 선택지를 제공했다',
-                };
-              }
+              // function call 정보를 간단히 포함 (환각 방지용 중립적 표현)
               return {
-                role: 'assistant',
-                content: `${functionName}을 수행하였음`,
+                role: 'developer',
+                content: `사용자 ${msg.functionCall?.name} 기능을 실행했습니다.`,
               };
             }
-            return { role: 'assistant', content };
+            return { role: 'developer', content };
           }
           return null;
         })
@@ -606,14 +570,6 @@ export const useChatSocket = () => {
     },
     [sessionId, messages], // 🔧 messages 의존성 추가
   );
-
-  // 제거: 서버에 더 이상 선택 상태를 보내지 않음 (로컬스토리지 사용)
-  // const sendCarouselSelection = useCallback((carouselData, selectedItem, isSelected) => {
-  //   if (!sessionId) return;
-  //   const payload = { sessionId, carouselData, selectedItem, isSelected };
-  //   console.log('📤 Sending carousel selection:', payload);
-  //   socket.emit('carousel-selection', payload);
-  // }, [sessionId]);
 
   // 로컬 상태에서만 선택 상태 업데이트 (서버에 보내지 않음)
   const updateCarouselSelection = useCallback(

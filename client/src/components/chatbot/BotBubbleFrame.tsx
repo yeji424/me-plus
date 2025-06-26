@@ -169,7 +169,7 @@ const BotBubbleFrame = ({
           />
         ) : null;
       case 'showPlanLists':
-        return args?.plans ? (
+        return args?.plans && args.plans.length > 0 ? (
           <div className="space-y-3">
             {args.plans.map((plan, index) => (
               <ToggleCard
@@ -179,7 +179,11 @@ const BotBubbleFrame = ({
               />
             ))}
           </div>
-        ) : null;
+        ) : (
+          <>
+            <BotBubble messageChunks={['해당하는 요금제가 없습니다.']} />
+          </>
+        );
       case 'showFirstCardList':
         return <FirstCardList onButtonClick={onButtonClick} />;
       default:
