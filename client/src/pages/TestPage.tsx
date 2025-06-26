@@ -257,7 +257,7 @@ const TestPage = () => {
   );
 
   return (
-    <div className="h-[100dvh] flex flex-col items-center overflow-hidden">
+    <div className="flex flex-col items-center overflow-hidden">
       <div className="w-full max-w-[600px] flex-1 overflow-y-auto mt-[35px] px-5 hide-scrollbar">
         <Header
           title="나에게 잘 어울리는 요금제는?"

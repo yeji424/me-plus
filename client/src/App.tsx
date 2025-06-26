@@ -18,11 +18,11 @@ import ServiceGuidePage from './pages/ServiceGuidePage';
 const MainLayout = () => {
   return (
     <>
-      <div className=" min-h-screen flex flex-col">
-        <main style={{ minHeight: 'calc(100vh - 50px - 80px)' }}>
+      <div className="h-[100dvh] flex flex-col ">
+        <main className="h-auto  scroll-target">
           <Outlet />
-          <Footer />
         </main>
+        <Footer />
       </div>
     </>
   );

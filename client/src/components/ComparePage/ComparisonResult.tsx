@@ -116,7 +116,7 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
 
         <div className="w-full bg-gray200 h-[1px] my-5" />
 
-        <div className="flex flex-col justify-center items-center text-center w-full gap-6 mb-[106px]">
+        <div className="flex flex-col justify-center items-center text-center w-full gap-6">
           <BenefitComparisonRow
             leftContent={
               selectedLeft?.bundleBenefit ? (
@@ -184,9 +184,6 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
         rightButtonText={selectedRight ? '자세히 보기' : ''}
         onLeftClick={() => handleDetailClick(selectedLeft?.detailUrl)}
         onRightClick={() => handleDetailClick(selectedRight?.detailUrl)}
-        className={`fixed bottom-[50px] max-w-[560px] transition-all duration-500
-    ${showButtons ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-5 pointer-events-none'}
-  `}
       />
 
       <Modal

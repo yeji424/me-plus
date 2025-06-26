@@ -24,7 +24,7 @@ const MainPage: React.FC = () => {
   const shouldCenter = windowHeight >= 790;
 
   return (
-    <div className="w-full h-[100dvh] flex justify-center items-stretch overflow-hidden">
+    <div className="w-full flex justify-center items-stretch overflow-hidden">
       <div className="w-full max-w-[600px] flex flex-col overflow-hidden">
         <div
           className={`flex-1 overflow-y-auto px-5 pt-8 pb-8 hide-scrollbar ${

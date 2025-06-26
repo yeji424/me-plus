@@ -142,7 +142,7 @@ const TestResultPage = () => {
   }
 
   return (
-    <div className="h-[100dvh] flex flex-col items-center overflow-hidden relative bg-gradient-to-b from-[#dfe4fd] to-white">
+    <div className="h-full flex flex-col items-center overflow-hidden relative bg-gradient-to-b from-[#dfe4fd] to-white">
       <div className="w-full max-w-[600px] flex-1 overflow-y-auto px-5 z-10 text-center hide-scrollbar">
         {isModalOpen && (
           <Modal
