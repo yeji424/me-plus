@@ -5,7 +5,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   modalTitle: string;
-  modalDesc?: string;
+  modalDesc?: React.ReactNode;
   children: React.ReactNode;
 }
 

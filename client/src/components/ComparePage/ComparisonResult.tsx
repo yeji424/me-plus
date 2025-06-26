@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import togetherIcon from '@/assets/image/card_family.png';
 import premiumAddonsIcon from '@/assets/icon/special.png';
 import mediaAddonsIcon from '@/assets/icon/media.png';
@@ -22,6 +22,7 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [pendingLink, setPendingLink] = useState<string | null>(null);
+  const [showButtons, setShowButtons] = useState(false);
 
   const handleDetailClick = (detailUrl?: string) => {
     if (detailUrl) {
@@ -29,6 +30,25 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
       setIsModalOpen(true); // 모달 먼저 띄우기
     }
   };
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.scroll-target');
+    if (!scrollContainer) return;
+
+    const handleScroll = () => {
+      const scrollTop = scrollContainer.scrollTop;
+      const containerHeight = scrollContainer.clientHeight;
+      const scrollHeight = scrollContainer.scrollHeight;
+
+      if (scrollTop + containerHeight >= scrollHeight - 100) {
+        setShowButtons(true);
+      } else {
+        setShowButtons(false);
+      }
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll);
+    return () => scrollContainer.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // 데이터 값 계산
   const leftDataValue = selectedLeft
@@ -159,19 +179,27 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
           />
         </div>
       </div>
-
       <ComparisonActionButtons
         leftButtonText={selectedLeft ? '자세히 보기' : ''}
         rightButtonText={selectedRight ? '자세히 보기' : ''}
         onLeftClick={() => handleDetailClick(selectedLeft?.detailUrl)}
         onRightClick={() => handleDetailClick(selectedRight?.detailUrl)}
+        className={`fixed bottom-[50px] max-w-[560px] transition-all duration-500
+    ${showButtons ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-5 pointer-events-none'}
+  `}
       />
 
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         modalTitle="요금제 자세히 알아보기"
-        modalDesc="요금제 상세 페이지는 외부 사이트로 연결됩니다. 계속 진행하시겠습니까?"
+        modalDesc={
+          <>
+            요금제 상세 페이지는 외부 사이트로 연결됩니다.
+            <br />
+            계속 진행하시겠습니까?
+          </>
+        }
       >
         <Button
           fullWidth
@@ -179,7 +207,7 @@ const ComparisonResult: React.FC<ComparisonResultProps> = ({
           size="medium"
           onClick={() => setIsModalOpen(false)}
         >
-          취소
+          닫기
         </Button>
         <Button
           fullWidth
