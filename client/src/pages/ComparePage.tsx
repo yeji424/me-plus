@@ -25,6 +25,7 @@ const ComparePage: React.FC = () => {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [activeDataIndex, setActiveDataIndex] = useState(0);
   const [activePriceIndex, setActivePriceIndex] = useState(0);
+  const [activeDataAmountIndex, setActiveDataAmountIndex] = useState(0);
   const [openDropdowns, setOpenDropdowns] = useState<Record<string, boolean>>(
     {},
   );
@@ -46,13 +47,23 @@ const ComparePage: React.FC = () => {
     '5만원 이상 10만원 미만',
     '10만원 이상',
   ];
+  const dataAmountList = [
+    '전체',
+    '5GB 미만',
+    '5GB ~ 20GB',
+    '20GB ~ 50GB',
+    '50GB ~ 100GB',
+    '무제한',
+  ];
 
   const filteredPlans = usePlanFilter(
     plans,
     dataList,
     priceList,
+    dataAmountList,
     activeDataIndex,
     activePriceIndex,
+    activeDataAmountIndex,
   );
 
   const resetDropdowns = () => setOpenDropdowns({});
@@ -64,6 +75,11 @@ const ComparePage: React.FC = () => {
 
   const handleSetActivePriceIndex = (index: number) => {
     setActivePriceIndex(index);
+    resetDropdowns();
+  };
+
+  const handleSetActiveDataAmountIndex = (index: number) => {
+    setActiveDataAmountIndex(index);
     resetDropdowns();
   };
 
@@ -166,10 +182,13 @@ const ComparePage: React.FC = () => {
           <FilterSection
             dataList={dataList}
             priceList={priceList}
+            dataAmountList={dataAmountList}
             activeDataIndex={activeDataIndex}
             activePriceIndex={activePriceIndex}
+            activeDataAmountIndex={activeDataAmountIndex}
             onDataIndexChange={handleSetActiveDataIndex}
             onPriceIndexChange={handleSetActivePriceIndex}
+            onDataAmountIndexChange={handleSetActiveDataAmountIndex}
           />
 
           {isLoading && <LoadingSpinner />}
