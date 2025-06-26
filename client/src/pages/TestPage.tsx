@@ -416,8 +416,10 @@ const TestPage = () => {
           size="medium"
           fullWidth
           onClick={() => {
-            navigate('/');
             setShowBackModal(false);
+            setTimeout(() => {
+              navigate('/');
+            }, 300);
           }}
         >
           그만둘래요
