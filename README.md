@@ -9,8 +9,6 @@
 [🌐배포사이트](https://me-plus-client.vercel.app/)
 [👨‍🏫시연영상](https://youtu.be/04NNuDxZ5X0)
 
-![image](https://github.com/user-attachments/assets/7b4ec8a6-ad6d-420a-821f-de84351edfcc)
-
 ### ✅ 프로젝트 목적
 
 - 즉각적인 요금제 추천 : 사용자의 요금제 탐색 시간 및 이탈률을 줄이고, 직관적인 UI 제공
@@ -23,6 +21,8 @@
 - 복잡하고 다양한 통신사 요금제 중 사용자의 성향과 패턴에 맞는 최적 요금제를 빠르게 추천
 - AI 챗봇 기반 UX를 활용해 사용자 친화적인 상담 경험 제공
 - 가족 결합, 부가서비스 등의 다양한 조건도 반영하여 실질적인 할인 혜택 안내
+
+![image](https://github.com/user-attachments/assets/7b4ec8a6-ad6d-420a-821f-de84351edfcc)
 
 ## 🏃‍♂️ 주요기능
 
