@@ -246,7 +246,7 @@ const ChatbotPage = () => {
 
   // 새로 추가: OTT 선택 처리
   const handleOttSelect = useCallback(
-    (selectedServices: string[], displayIndex?: number) => {
+    (selectedServices: string[]) => {
       // 실제 function_call 메시지의 인덱스를 찾기 (messages 배열에서만)
       const actualIndex = messages.findIndex((msg) => {
         return (
@@ -266,7 +266,7 @@ const ChatbotPage = () => {
 
   // 새로 추가: OX 선택 처리
   const handleOxSelect = useCallback(
-    (selectedOption: string, displayIndex?: number) => {
+    (selectedOption: string) => {
       // 실제 function_call 메시지의 인덱스를 찾기 (messages 배열에서만)
       const actualIndex = messages.findIndex((msg) => {
         return (
