@@ -98,7 +98,6 @@ export const deleteSession = (sessionId: string): void => {
     const sessions = getAllSessions();
     const filtered = sessions.filter((s) => s.sessionId !== sessionId);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
-    console.log('✅ 세션 삭제 완료:', sessionId);
   } catch (error) {
     console.error('❌ 세션 삭제 실패:', error);
   }
@@ -108,7 +107,6 @@ export const deleteSession = (sessionId: string): void => {
 export const clearAllSessions = (): void => {
   try {
     localStorage.removeItem(STORAGE_KEY);
-    console.log('✅ 모든 세션 삭제 완료');
   } catch (error) {
     console.error('❌ 세션 삭제 실패:', error);
   }
