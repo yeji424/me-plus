@@ -9,6 +9,8 @@
 [🌐배포사이트](https://me-plus-client.vercel.app/)
 [👨‍🏫시연영상](https://youtu.be/04NNuDxZ5X0)
 
+![image](https://github.com/user-attachments/assets/7b4ec8a6-ad6d-420a-821f-de84351edfcc)
+
 ### ✅ 프로젝트 목적
 
 - 즉각적인 요금제 추천 : 사용자의 요금제 탐색 시간 및 이탈률을 줄이고, 직관적인 UI 제공
