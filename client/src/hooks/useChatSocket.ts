@@ -100,7 +100,6 @@ export const useChatSocket = () => {
 
       try {
         const session = getSession(sessionIdToLoad);
-        console.log('🔍 실제 로컬스토리지 세션 데이터:', session);
         if (!session) return { messages: [] };
 
         const messages: Message[] = session.messages.map(
@@ -161,17 +160,6 @@ export const useChatSocket = () => {
             setStoredUserProfile(userProfile);
           }
           if (!hasLoggedSession.current) {
-            console.log(
-              '📂 로컬스토리지에서 기존 채팅 히스토리를 불러왔습니다:',
-              localMessages.length,
-              '개',
-            );
-            if (userProfile) {
-              console.log(
-                '👤 사용자 프로필도 복원되었습니다:',
-                userProfile.plan.name,
-              );
-            }
             hasLoggedSession.current = true;
           }
         } else {
@@ -180,7 +168,6 @@ export const useChatSocket = () => {
             setStoredUserProfile(userProfile);
           }
           if (!hasLoggedSession.current) {
-            console.log('📭 새로운 세션을 시작합니다');
             hasLoggedSession.current = true;
           }
         }
@@ -207,11 +194,6 @@ export const useChatSocket = () => {
       }
 
       const converted: Message[] = logs.map((msg) => {
-        // 로그 추가 (각 메시지별로)
-        if (msg.type) {
-          console.log('🔍 Processing message with type:', msg.type, msg.data);
-        }
-
         // 캐러셀 선택 등 특별한 타입 처리
         if (
           msg.type === 'carousel_select' ||
@@ -561,7 +543,6 @@ export const useChatSocket = () => {
         message: text.trim(),
         history: chatHistory, // 🔧 전체 대화 히스토리 추가
       };
-      console.log(payload);
       setMessages((prev) => [...prev, newUserMessage] as Message[]);
       setIsStreaming(true);
       responseRef.current = '';
@@ -574,11 +555,6 @@ export const useChatSocket = () => {
   // 로컬 상태에서만 선택 상태 업데이트 (서버에 보내지 않음)
   const updateCarouselSelection = useCallback(
     (messageIndex: number, selectedItem: CarouselItem) => {
-      console.log('🔄 로컬에서 캐러셀 선택 상태 업데이트:', {
-        messageIndex,
-        selectedItem,
-      });
-
       // 로컬 상태만 업데이트
       setMessages((prev) =>
         prev.map((msg, idx) => {
@@ -598,11 +574,6 @@ export const useChatSocket = () => {
   // 로컬 상태에서만 OTT 선택 상태 업데이트 (서버에 보내지 않음)
   const updateOttSelection = useCallback(
     (messageIndex: number, selectedServices: string[]) => {
-      console.log('🎬 로컬에서 OTT 선택 상태 업데이트:', {
-        messageIndex,
-        selectedServices,
-      });
-
       // 로컬 상태만 업데이트
       setMessages((prev) =>
         prev.map((msg, idx) => {
@@ -625,11 +596,6 @@ export const useChatSocket = () => {
   // 로컬 상태에서만 OX 선택 상태 업데이트 (서버에 보내지 않음)
   const updateOxSelection = useCallback(
     (messageIndex: number, selectedOption: string) => {
-      console.log('🔘 로컬에서 OX 선택 상태 업데이트:', {
-        messageIndex,
-        selectedOption,
-      });
-
       // 로컬 상태만 업데이트
       setMessages((prev) =>
         prev.map((msg, idx) => {
@@ -645,14 +611,6 @@ export const useChatSocket = () => {
     },
     [],
   );
-
-  // storedUserProfile 상태 변화 디버깅
-  useEffect(() => {
-    console.log(
-      '📊 storedUserProfile 상태 변화:',
-      storedUserProfile?.plan?.name || 'null',
-    );
-  }, [storedUserProfile]);
 
   // 메시지가 변경될 때마다 로컬스토리지에 저장
   useEffect(() => {
@@ -675,7 +633,6 @@ export const useChatSocket = () => {
 
   // userProfile 설정 함수 (ChatbotPage에서 사용)
   const setUserProfile = useCallback((userProfile: UserProfile | null) => {
-    console.log('💾 setUserProfile 호출됨:', userProfile?.plan?.name || 'null');
     setStoredUserProfile(userProfile);
   }, []);
 

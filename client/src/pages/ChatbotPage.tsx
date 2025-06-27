@@ -233,9 +233,6 @@ const ChatbotPage = () => {
         );
       });
 
-      console.log('🔍 전체 messages 배열 길이:', messages.length);
-      console.log('🔍 전체 allMessages 배열 길이:', allMessages.length);
-
       if (actualIndex !== -1) {
         updateCarouselSelection(actualIndex, selectedItem);
       } else {
@@ -250,8 +247,6 @@ const ChatbotPage = () => {
   // 새로 추가: OTT 선택 처리
   const handleOttSelect = useCallback(
     (selectedServices: string[], displayIndex?: number) => {
-      console.log('🎬 OTT 선택:', { selectedServices, displayIndex });
-
       // 실제 function_call 메시지의 인덱스를 찾기 (messages 배열에서만)
       const actualIndex = messages.findIndex((msg) => {
         return (
@@ -272,8 +267,6 @@ const ChatbotPage = () => {
   // 새로 추가: OX 선택 처리
   const handleOxSelect = useCallback(
     (selectedOption: string, displayIndex?: number) => {
-      console.log('🔘 OX 선택:', { selectedOption, displayIndex });
-
       // 실제 function_call 메시지의 인덱스를 찾기 (messages 배열에서만)
       const actualIndex = messages.findIndex((msg) => {
         return (
@@ -352,7 +345,6 @@ const ChatbotPage = () => {
 
     // 컨테이너의 첫 번째 자식 (실제 메시지들이 들어있는 div) 관찰
     const messageContainer = container.querySelector('div');
-    console.log(messageContainer);
     if (messageContainer) {
       observer.observe(messageContainer);
     }
