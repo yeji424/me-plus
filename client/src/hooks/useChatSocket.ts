@@ -450,7 +450,6 @@ export const useChatSocket = () => {
     };
 
     const handleDone = () => {
-      console.log('✅ Stream completed');
       setIsStreaming(false);
       followUpResponseRef.current = ''; // 역질문 완료 시 리셋
     };
