@@ -39,10 +39,6 @@ const OttButtonGroup = ({
   // selectedData가 변경될 때마다 state 업데이트
   useEffect(() => {
     if (selectedData?.isSelected && selectedData.selectedServices) {
-      console.log(
-        '🔄 Updating selectedServices from props:',
-        selectedData.selectedServices,
-      );
       setSelectedServices(selectedData.selectedServices);
     } else {
       setSelectedServices([]);
@@ -62,7 +58,6 @@ const OttButtonGroup = ({
   return (
     <>
       <DraggableScroll className="flex flex-nowrap gap-2">
-
         {OTT_SERVICES.map((service) => (
           <ChatButton
             key={service.id}
