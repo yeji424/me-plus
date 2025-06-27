@@ -6,7 +6,7 @@
 
 [🔗팀노션](https://chip-yumberry-7c7.notion.site/02-Me-20294459a69c8052b3f0cf717ac47af0?source=copy_link)
 [🎨피그마](https://www.figma.com/design/BYe3HZoyP4ZyrDg27bUOHg/2%EC%A1%B0_%EB%94%94%EC%9E%90%EC%9D%B8?node-id=0-1&t=kj4A9Yv5fHoMdDRJ-1)
-[🌐배포사이트]()
+[🌐배포사이트](https://youtu.be/04NNuDxZ5X0)
 [👨‍🏫발표자료]()
 
 ### ✅ 프로젝트 목적
