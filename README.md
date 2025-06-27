@@ -78,8 +78,7 @@
 - 사용자가 모든 질문에 답하면 사용자 입력에 따라 하나의 추천 요금제에 결합혜택를 함께 제공한다.
 - 요금제에는 이름, 월정액, 설명, 기본 혜택, 특별 혜택(있는 경우에만) 내용이 표시된다.
 - 요금제 정보와 함께 요금제 상세페이지로 넘어갈 수 있는 버튼을 제공한다.
-![Animation](https://github.com/user-attachments/assets/c5cfe7d0-d41d-4c96-846b-13832e6efc9e)
-
+![image](https://github.com/user-attachments/assets/ce656805-7da9-45c5-ab52-427d813e8db6)
 
 ### 6. 요금제 비교
 
@@ -90,7 +89,6 @@
 - 두 요금제의 비교 수치에 따라 막대그래프는 유동적으로 나타나며 시각적으로 인지할 수 있도록 한다.
 - 요금제 리스트에서는 필터링을 제공하여 사용자의 선택을 돕는다.
 - 해당 요금제 하단에 상세 페이지로 연결되는 버튼을 제공한다.
-  
 ![image](https://github.com/user-attachments/assets/111a226b-65b6-45fe-963d-5d6068fceeeb)
 
 # 🗂️ 디렉토리 구조
